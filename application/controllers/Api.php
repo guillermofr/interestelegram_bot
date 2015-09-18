@@ -95,47 +95,45 @@ class Api extends CI_Controller {
 
 			//lista de comandos disponibles
 			$commands = array(
-					'crearpartida' => '/(\/crearpartida)$/',
-					'cancelarpartida' => '/(\/cancelarpartida)$/',
-					'infopartida' => '/(\/infopartida)$/',
-				);
+				'crearpartida' => '/(\/crearpartida)$/',
+				'cancelarpartida' => '/(\/cancelarpartida)$/',
+				'infopartida' => '/(\/infopartida)$/',
+			);
 
-				$matches = null;
-				foreach ($commands as $commandkey => $commandexp){
+			$matches = null;
+			foreach ($commands as $commandkey => $commandexp){
 
-					$returnValue = preg_match($commandexp, $text, $matches);
+				$returnValue = preg_match($commandexp, $text, $matches);
 
-					//print_r($matches);
+				//print_r($matches);
 
-					if (!empty($matches)) {
+				if (!empty($matches)) {
 
-						switch($commandkey){
-	
-							case "crearpartida":
-								echo "comando $commandkey<br>";
-								file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando crearpartida leído");
-							break;
+					switch($commandkey){
 
-							case "cancelarpartida":
-								echo "comando $commandkey<br>";
-								file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando cerrarpartida leído.");
-							break;
+						case "crearpartida":
+							echo "comando $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando crearpartida leído");
+						break;
 
-							case "infopartida":
-								echo "comando $commandkey<br>";
-								file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando infopartida leído.");
-							break;
+						case "cancelarpartida":
+							echo "comando $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando cerrarpartida leído.");
+						break;
 
-
-						}
+						case "infopartida":
+							echo "comando $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando infopartida leído.");
+						break;
 
 					}
 
-					$matches = null;
-					//$last_id = file_put_contents('./lastid.txt',$last_update_id);
-
 				}
 
+				$matches = null;
+				//$last_id = file_put_contents('./lastid.txt',$last_update_id);
+
+			}
 
 		}
 
