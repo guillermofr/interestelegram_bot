@@ -30,6 +30,11 @@ class Api extends CI_Controller {
 		$last_id = 1;
 
 		$update = file_get_contents($website."/getupdates?offset=$last_id");
+
+		//cuando se cambie a servidor SSL hay que poner esto
+		//$update = file_get_contents("php://input");
+		//y no hace falta recorrer los mensajes porque te mandan un post por mensaje
+
 		echo "<pre>";
 		print_r(json_decode($update));
 		$data  = json_decode($update);
@@ -79,8 +84,8 @@ class Api extends CI_Controller {
 			$last_update_id = $msg->update_id;
 
 			//solo permitimos hablar en grupo		
-			if (!$in_group) continue;
-			echo "mensaje a grupo :". intval($in_group) ."<br>";
+			//if (!$in_group) continue;
+			//echo "mensaje a grupo :". intval($in_group) ."<br>";
 
 			//datos mensaje
 			$group_id 	= $msg->message->chat->id;
