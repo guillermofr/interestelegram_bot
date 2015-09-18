@@ -139,4 +139,63 @@ class Api extends CI_Controller {
 
 
 	}
+
+	public function customKeyboard()
+	{
+		$this->config->load('bot');
+		$params = array(
+				$this->config->item('botToken')
+			);
+
+		$this->load->library('Telegram', $params);
+
+		$option = array( array("CANCELAR"), array("SI", "NO") );
+		$chat_id = "13051004";
+		$chat_id = "8908013"; // killer
+		$text = "@killer415 estás seguro de la nueva API?";
+
+		// Create custom keyboard
+		$keyboard = $this->telegram->buildKeyBoard($option, $onetime=TRUE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->telegram->sendMessage($content);
+
+		echo '<pre>'.print_r($output, TRUE);
+	}
+
+	public function getUpdates()
+	{
+		$this->config->load('bot');
+		$params = array(
+				$this->config->item('botToken')
+			);
+
+		$this->load->library('Telegram', $params);
+
+		$output = $this->telegram->getUpdates();
+
+		$output = array_pop($output['result']); // solo el ultimo
+
+		echo '<pre>'.print_r($output, TRUE);
+	}
+
+	public function sendPhoto()
+	{
+		$this->config->load('bot');
+		$params = array(
+				$this->config->item('botToken')
+			);
+
+		$this->load->library('Telegram', $params);
+
+		$chat_id = "13051004";
+		$chat_id = "8908013"; // killer
+		$img = '@'.realpath(APPPATH.'../imgs/'.'space-ship.jpg');
+		// $img = 'AgADBAADqacxG3864gf8EKgg3EpKRVXNijAABMy2MMSlqhpUJGAAAgI'; // file_id
+		$caption = 'Bienvenido a la Milano, comandante killer415. Un crucero ligero de clase Firefly. Tripulación actual: 1.';
+		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
+
+		$output = $this->telegram->sendPhoto($content);
+
+		echo '<pre>'.print_r($output, TRUE);
+	}
 }
