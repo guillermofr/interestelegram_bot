@@ -149,13 +149,14 @@ class Api extends CI_Controller {
 
 		$this->load->library('Telegram', $params);
 
-		$option = array( array("CANCELAR"), array("SI", "NO") );
+		$option = array( array("UNO"), array("DOS"), array("TRES"), array("CUATRO"), array("CINCO"), array("SEIS"), array("SIETE") );
 		$chat_id = "13051004";
-		$chat_id = "8908013"; // killer
-		$text = "@killer415 estás seguro de la nueva API?";
+		$chat_id = "-24787695";
+		//$chat_id = "8908013"; // killer
+		$text = "@NdeNahun cuantos testículos tienes?";
 
 		// Create custom keyboard
-		$keyboard = $this->telegram->buildKeyBoard($option, $onetime=TRUE);
+		$keyboard = $this->telegram->buildKeyBoard($option, $onetime=TRUE, $selective=TRUE);
 		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
 		$output = $this->telegram->sendMessage($content);
 
@@ -164,6 +165,8 @@ class Api extends CI_Controller {
 
 	public function getUpdates()
 	{
+		$this->load->library('migration');
+
 		$this->config->load('bot');
 		$params = array(
 				$this->config->item('botToken')
@@ -173,9 +176,10 @@ class Api extends CI_Controller {
 
 		$output = $this->telegram->getUpdates();
 
-		$output = array_pop($output['result']); // solo el ultimo
-
-		echo '<pre>'.print_r($output, TRUE);
+		echo '<pre>';
+		foreach ($output['result'] as $key => $value) {
+			echo print_r($value, TRUE);
+		}
 	}
 
 	public function sendPhoto()
@@ -197,5 +201,31 @@ class Api extends CI_Controller {
 		$output = $this->telegram->sendPhoto($content);
 
 		echo '<pre>'.print_r($output, TRUE);
+	}
+
+	public function debug()
+	{
+		$this->config->load('bot');
+		$params = array(
+				$this->config->item('botToken')
+			);
+
+		$this->load->library('Telegram', $params);
+
+		$output = $this->telegram->getUpdates();
+
+		echo '<pre>';
+		foreach ($output['result'] as $key => $value) {
+			echo print_r($value, TRUE);
+		}
+
+		echo '<script>setTimeout(function(){ window.location = window.location; }, 3000);</script>';
+	}
+
+	public function test()
+	{
+		$this->load->model('Ships');
+
+		var_dump( $this->Ships->create_ship(array('captain' => 123, 'chat_id' => 321)) );
 	}
 }
