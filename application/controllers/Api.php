@@ -150,9 +150,10 @@ class Api extends CI_Controller {
 		$this->load->library('Telegram', $params);
 
 		$option = array( array("UNO"), array("DOS"), array("TRES"), array("CUATRO"), array("CINCO"), array("SEIS"), array("SIETE") );
-		$chat_id = "13051004";
-		$chat_id = "-24787695";
+		$chat_id = "-24787695";	// Nagigu
+		//$chat_id = "13051004"; // nahún
 		//$chat_id = "8908013"; // killer
+		//$chat_id = "42802034"; // tavo
 		$text = "@NdeNahun cuantos testículos tienes?";
 
 		// Create custom keyboard

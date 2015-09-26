@@ -18,6 +18,8 @@ class Webhook extends CI_Controller
 
 			$output = $this->telegram->getUpdates($this->lastUpdate);
 
+			log_message('error', print_r($output, TRUE) );
+
 			$this->load->library('Processor');
 
 			echo '<pre>';
