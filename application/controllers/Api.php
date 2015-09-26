@@ -150,10 +150,7 @@ class Api extends CI_Controller {
 		$this->load->library('Telegram', $params);
 
 		$option = array( array("UNO"), array("DOS"), array("TRES"), array("CUATRO"), array("CINCO"), array("SEIS"), array("SIETE") );
-		$chat_id = "-24787695";	// Nagigu
-		//$chat_id = "13051004"; // nahún
-		//$chat_id = "8908013"; // killer
-		//$chat_id = "42802034"; // tavo
+		$chat_id = "-24787695";
 		$text = "@NdeNahun cuantos testículos tienes?";
 
 		// Create custom keyboard
@@ -192,7 +189,6 @@ class Api extends CI_Controller {
 
 		$this->load->library('Telegram', $params);
 
-		$chat_id = "13051004";
 		$chat_id = "8908013"; // killer
 		$img = '@'.realpath(APPPATH.'../imgs/'.'space-ship.jpg');
 		// $img = 'AgADBAADqacxG3864gf8EKgg3EpKRVXNijAABMy2MMSlqhpUJGAAAgI'; // file_id
