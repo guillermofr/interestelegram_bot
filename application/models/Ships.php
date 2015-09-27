@@ -46,7 +46,7 @@ class Ships extends MY_Model
             return false;
         }
 
-        return $this->insert($values);
+        return ( $this->insert($values) ? $this->get_ship($this->db->insert_id()) : false );
     }
 
     /**
@@ -91,4 +91,9 @@ class Ships extends MY_Model
         // TODO: Caché
         return $this->where('captain', $captain)->get();
     }
+
+
+    // get crew
+    // get crew but captain
+
 }
