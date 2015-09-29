@@ -7,7 +7,7 @@ class Crew extends MY_Model
     //https://github.com/avenirer/CodeIgniter-MY_Model
 
     public $table = 'crew'; // you MUST mention the table name
-    public $primary_key = array('ship_id', 'user_id'); // you MUST mention the primary key
+    public $primary_key = 'id'; // you MUST mention the primary key
     public $fillable = array(); // If you want, you can set an array with the fields that can be filled by insert/update
     public $protected = array(); // ...Or you can set an array with the fields that cannot be filled by insert/update
 

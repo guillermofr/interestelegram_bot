@@ -76,14 +76,25 @@ class Processor {
 	 */
 	private function _ayuda(& $msg, $already_ship=false) {
 		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
 
 		if ($already_ship) {
-			$content = array(
-				'chat_id' => $chat_id, 
-				'text' => "Capitán, no hay mucho más que hacer por ahora. ".
-						"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
-						"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
-			);
+
+			if ( $user_id != $ship->captain ) {
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
+				);
+			}
+			else {			
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
+							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
+							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
+				);
+			}
+
 		} else {
 			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
 		}
@@ -119,18 +130,19 @@ class Processor {
 				$output = $this->CI->telegram->sendMessage($content);
 			}
 		} else {
-			$captain = $this->CI->Users->get_user($ship->captain);
+			
+			$captain = ( is_null($ship->captain) || $ship->captain == 0 ) ? null : $this->CI->Users->get_user($ship->captain);
 
 			if ($user_id != $ship->captain) {
 
 				if (empty($captain)) {
-					$this->CI->Ships->update_ship(array('ship_id' => $ship->id, 'captain' => $user_id));
+					$this->CI->Ships->update_ship(array('captain' => $user_id), $ship->id);
 
 					$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
 					$output = $this->CI->telegram->sendMessage($content);
 				}
 				else {
-					$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ya tiene piloto, el capitán '.$captain->username);						
+					$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ya tiene piloto, el capitán '.( isset($captain->username) ? $captain->username : 'no-hay-capitan' ));						
 					$output = $this->CI->telegram->sendMessage($content);	
 				}
 			} else {
@@ -192,7 +204,14 @@ class Processor {
 		$captain = $this->CI->Users->get_user($ship->captain);
 
 		if (empty($this->CI->Crew->get_crew_member($ship->id, $joiner->id)) )
-			$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joiner->id));
+			if (!$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joiner->id))){
+				$output = array(
+					'chat_id' => $chat_id,
+					'text' => "El usuario @".$joiner->username." no ha sido añadido a la tripulación. ".
+							"Es necesario que vuelvas a introducirle en el grupo para que cuente como tripulante."
+				);
+				return $this->CI->telegram->sendMessage($output);
+			};
 
 		$crew_count = $ship->total_crew + 1;
 		$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
@@ -200,14 +219,14 @@ class Processor {
 		$outputGroup = array(
 			'chat_id' => $chat_id,
 			'text' => "¡Ey Capitan! @".$joiner->username." ahora es un nuevo miembro de la '".$ship->name."'.\n\n".
-					  "Capitan @".$captain->username.", su nave ahora tiene ".$crew_count." miembros!"
+					  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
 		);
 		$this->CI->telegram->sendMessage($outputGroup);
 		$outputMention = array(
 			'chat_id' => $joiner->id,
 			'text' => "@".$joiner->username."! Ahora eres miembro de una nave, la '".$ship->name."'.\n".
 					  "Permíteme presentarme, soy el ordenador de abordo\n.".
-					  "Durante tu periplo por el espacio junto al capitan @".$captain->username." podrás vivir aventuras trepidantes!".
+					  "Durante tu periplo por el espacio junto al capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." podrás vivir aventuras trepidantes!".
 					  "Recuerda estar atento a las órdenes de tu capitan, te necesita para cumplir sus objetivos.".
 					  "Aunque siempre puedes fastidiarle el paseo y echarlo de su propia nave!! encuentra el cómo..."
 		);
@@ -241,7 +260,7 @@ class Processor {
 
 			$output = array(
 				'chat_id' => $captain->id,
-				'text' => "@".$captain->username." has eliminado el ordenador de abordo de tu nave '".$ship->name."'.\n".
+				'text' => "@".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." has eliminado el ordenador de abordo de tu nave '".$ship->name."'.\n".
 						"Esto tendrá implicaciones, tu nave desaparecerá y quedará a la deriva.\n".
 						"Sin contar con que tu y toda tu tripulación habéis muerto... so sad...\n".
 						"Ehm, bueno... ".$ship->total_crew." bajas tampoco son tantas, el espacio es muy basto.\n".
@@ -259,7 +278,14 @@ class Processor {
 		}
 
 		if ($this->CI->Crew->get_crew_member(array('ship_id' => $ship->id, 'user_id' => $leaver->id)))
-			$this->CI->Crew->delete_crew(array('ship_id' => $ship->id, 'user_id' => $leaver->id));
+			if (!$this->CI->Crew->delete_crew(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
+				$output = array(
+					'chat_id' => $chat_id,
+					'text' => "El usuario @".$joiner->username." no ha sido elimnado de la tripulación. ".
+							"Si fue añadido al grupo antes que yo es normal. Si no, para que deje de contar deberás volver a añadirle y volver a expulsarle."
+				);
+				return $this->CI->telegram->sendMessage($output);
+			};
 
 		$crew_count = $ship->total_crew - 1;
 		$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
@@ -279,7 +305,7 @@ class Processor {
 			$outputGroup = array(
 				'chat_id' => $chat_id,
 				'text' => "¡Ey Capitan! @".$leaver->username." abandonó su name.\n\n".
-						  "Capitan @".$captain->username.", su nave ahora tiene ".$crew_count." miembros!"
+						  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
 			);
 			$this->CI->telegram->sendMessage($outputGroup);
 			$outputMention = array(

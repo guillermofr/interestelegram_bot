@@ -11,8 +11,20 @@ class Migrate extends CI_Controller
                 {
                     show_error($this->migration->error_string());
                 } else {
-					echo "Migraciones realizadas.";
-				}
+                    echo "Migraciones realizadas.";
+                }
+        }
+
+        public function version($version)
+        {
+            $this->load->library('migration');
+            
+            if ($this->migration->version($version))
+            {
+                echo "Migraciones realizadas: Version ".$version;
+            } else {
+                show_error($this->migration->error_string());
+            }
         }
 
 }
