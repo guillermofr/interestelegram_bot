@@ -12,6 +12,8 @@ class Processor {
 		$this->CI->load->model('Ships');
 		$this->CI->load->model('Users');
 		$this->CI->load->model('Crew');
+		$this->CI->load->model('Actions');
+		$this->CI->load->model('Votes');
 
 		$this->CI->config->load('bot');
 		$this->botToken = $this->CI->config->item('botToken');
@@ -37,6 +39,7 @@ class Processor {
 		if ($msg->isCommand()) $this->_processAction( $ship, $msg );
 		elseif ($msg->isJoin()) $this->_joinShip( $ship, $msg );
 		elseif ($msg->isLeave()) $this->_leaveShip( $ship, $msg );
+		elseif ($msg->isReply()) $this->_processReply( $ship, $msg );
 		else {
 
 		}
@@ -63,6 +66,9 @@ class Processor {
 			if ( $command == 'ayuda') $this->_ayuda($msg, $ship);
 			elseif ( $command == 'pilotar' ) {
 				$this->_pilotar($msg, $ship);
+			}
+			elseif ( $command == 'test' && $ship->captain == $fromId ) {
+				$this->_test($msg, $ship);
 			}
 			else {
 				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado.'));
@@ -281,7 +287,7 @@ class Processor {
 			if (!$this->CI->Crew->delete_crew(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
 				$output = array(
 					'chat_id' => $chat_id,
-					'text' => "El usuario @".$joiner->username." no ha sido elimnado de la tripulación. ".
+					'text' => "El usuario @".$joiner->username." no ha sido eliminado de la tripulación. ".
 							"Si fue añadido al grupo antes que yo es normal. Si no, para que deje de contar deberás volver a añadirle y volver a expulsarle."
 				);
 				return $this->CI->telegram->sendMessage($output);
@@ -315,6 +321,103 @@ class Processor {
 						  "No olvides tu toalla. Adios y gracias por el pescado."
 			);
 			$this->CI->telegram->sendMessage($outputMention);
+		}
+
+	}
+
+
+	private function _processReply(& $ship, & $msg){
+
+		$chatId = $msg->chatId();
+		$user_id = $msg->fromId();
+		$username = $msg->fromUsername();
+		$response = $msg->text();
+		$messageId = $msg->messageId();
+		$replyMessageId = $msg->replyId();
+		$apply_action = false;
+
+		$response_value = ( $response == 'SI' ? 1 : 0 );
+
+		$last_action = $this->CI->Actions->get_last_action($ship->id);
+		if ($last_action->message_id != $replyMessageId) {
+
+			// hide keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+			$content = array(
+				'chat_id' => $chatId, 
+				'reply_markup' => $keyboard, 
+				'reply_to_message_id' => $messageId, 
+				'text' => '@'.$username.' el mensaje al que respondes ha caducado'
+			);
+			return $this->CI->telegram->sendMessage($content);
+
+		}
+
+		if ( ! $this->CI->Votes->create_vote( array('action_id' => $last_action->id, 'user_id' => $user_id, 'vote' => $response_value) ) ) {
+
+			// hide keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+			$content = array(
+				'chat_id' => $chatId, 
+				'reply_markup' => $keyboard, 
+				'reply_to_message_id' => $messageId, 
+				'text' => '@'.$username.' tu voto no se ha tenido en cuenta. Ya has votado o ha fallado.'
+			);
+			return $this->CI->telegram->sendMessage($content);
+
+		}
+
+		$update = array();
+		if ($response_value == 1) $update['positives'] = $last_action->positives + 1;
+		else $update['negatives'] = $last_action->negatives + 1;
+		if ($response_value + $last_action->positives >= $last_action->required ) {
+			$update['fail'] = 0;
+			$update['closedAt'] = Date('Y-m-d H:i:s', time());
+			$apply_action = true;
+		}
+
+		$this->CI->Actions->update_action($update, $last_action->id);
+
+		$output = array(
+			'chat_id' => $chatId,
+			'text' => "Se ha detectado una votación de @{$username} ({$response})"
+		);
+		$o = $this->CI->telegram->sendMessage($output);
+
+		// hide keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+		$content = array('chat_id' => $chatId, 'reply_markup' => $keyboard, 'reply_to_message_id' => $messageId, 'text' => 'tu voto se ha registrado');
+		$o = $this->CI->telegram->sendMessage($content);
+
+		//apply action if success
+		if ($apply_action) {
+			$this->{"_{$last_action->command}"}( $msg, $ship );
+		}
+
+	}
+
+
+	private function _test(& $msg, & $ship){
+
+		$option = array( array("SI", "NO") );
+		$chat_id = $msg->chatId();
+		$text = "¿Nos vamos de paseo?";
+
+		// Create custom keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->CI->telegram->sendMessage($content);
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'ayuda',
+				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
 		}
 
 	}

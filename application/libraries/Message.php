@@ -86,6 +86,7 @@ class Message {
 		$this->_parseJoin($msg['message']);
 		$this->_parseLeave($msg['message']);
 		$this->_parseText($msg['message']);
+		$this->_parseReplyTo($msg['message']);
 
 	}
 
@@ -186,6 +187,15 @@ class Message {
 			}
 		}
 	}
+
+
+	private function _parseReplyTo(& $message) {
+		if (isset($message['reply_to_message']) && !empty($message['reply_to_message'])){
+			$this->replyId = $message['reply_to_message']['message_id'];
+			$this->isReply = true;
+		}
+	}
+
 
 	/* getters */
 
