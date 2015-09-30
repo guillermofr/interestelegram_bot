@@ -86,7 +86,7 @@ class Processor {
 
 		if ($already_ship) {
 
-			if ( $user_id != $ship->captain ) {
+			if ( $user_id != $already_ship->captain ) {
 				$content = array(
 					'chat_id' => $chat_id, 
 					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
