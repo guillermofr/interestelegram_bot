@@ -92,6 +92,9 @@ class Processor {
 			elseif ( $command == 'test' && $ship->captain == $fromId ) {
 				$this->_test($msg, $ship);
 			}
+			elseif ( $command == 'escanear' && $ship->captain == $fromId ) {
+				$this->_set_escanear($msg, $ship);
+			}
 			else {
 				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado.'));
 			}
@@ -99,87 +102,7 @@ class Processor {
 
 	}
 
-	/**
-	 * Acción texto de ayuda. Distingue entre ayuda a canal nuevo y canal que ya es nave.
-	 */
-	private function _ayuda(& $msg, $already_ship=false) {
-		$chat_id = $msg->chatId();
-		$user_id = $msg->fromId();
 
-		if ($already_ship) {
-
-			if ( $user_id != $already_ship->captain ) {
-				$content = array(
-					'chat_id' => $chat_id, 
-					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
-				);
-			}
-			else {			
-				$content = array(
-					'chat_id' => $chat_id, 
-					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
-							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
-							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
-				);
-			}
-
-		} else {
-			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
-		}
-		
-		$output = $this->CI->telegram->sendMessage($content);
-	}
-
-	/**
-	 * Acción pilotar. Crea la nave en base de datos y asigna al capitán. Detecta si el capitán ya se ha fijado.
-	 */
-	private function _pilotar(& $msg, $ship=null) {
-		$chat_id = $msg->chatId();
-		$chat_title = $msg->chatTitle();
-		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
-		$username = $msg->fromUsername();
-		$first_name = $msg->fromFirstName();
-		$user_id = $msg->fromId();
-
-		if (empty($ship)) {
-			if ($username != null) {
-				// create new ship.
-				$ship = $this->CI->Ships->create_ship(array('chat_id' => $chat_id, 'captain' => $user_id, 'name' => $chat_title, 'total_crew' => 1, 'active' => 1));
-				// create user if does not exist
-				$user = $this->CI->Users->get_user($user_id);
-				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
-				$crew = $this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $user->id));
-
-				$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
-				$output = $this->CI->telegram->sendMessage($content);
-				$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
-				$output = $this->CI->telegram->sendMessage($content);
-			} else {
-				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un username en Ajustes');						
-				$output = $this->CI->telegram->sendMessage($content);
-			}
-		} else {
-			
-			$captain = ( is_null($ship->captain) || $ship->captain == 0 ) ? null : $this->CI->Users->get_user($ship->captain);
-
-			if ($user_id != $ship->captain) {
-
-				if (empty($captain)) {
-					$this->CI->Ships->update_ship(array('captain' => $user_id), $ship->id);
-
-					$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
-					$output = $this->CI->telegram->sendMessage($content);
-				}
-				else {
-					$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ya tiene piloto, el capitán '.( isset($captain->username) ? $captain->username : 'no-hay-capitan' ));						
-					$output = $this->CI->telegram->sendMessage($content);	
-				}
-			} else {
-				$content = array('chat_id' => $chat_id, 'text' => 'Capitán, ya pilotáis la "'.$chat_title.'". Alguna otra orden?');						
-				$output = $this->CI->telegram->sendMessage($content);	
-			}
-		}
-	}
 
 	/**
 	 * _joinShip
@@ -406,7 +329,7 @@ class Processor {
 
 		$output = array(
 			'chat_id' => $chatId,
-			'text' => "Se ha detectado una votación de @{$username} ({$response})"
+			'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
 		);
 		$o = $this->CI->telegram->sendMessage($output);
 
@@ -422,6 +345,149 @@ class Processor {
 
 	}
 
+	/**
+	  Acción texto de ayuda. Distingue entre ayuda a canal nuevo y canal que ya es nave.
+	 */
+	private function _ayuda(& $msg, $already_ship=false) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+
+		if ($already_ship) {
+
+			if ( $user_id != $already_ship->captain ) {
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
+				);
+			}
+			else {			
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
+							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
+							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
+				);
+			}
+
+		} else {
+			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
+		}
+		
+		$output = $this->CI->telegram->sendMessage($content);
+	}
+
+	/**
+	  Acción pilotar. Crea la nave en base de datos y asigna al capitán. Detecta si el capitán ya se ha fijado.
+	 */
+	private function _pilotar(& $msg, $ship=null) {
+		$chat_id = $msg->chatId();
+		$chat_title = $msg->chatTitle();
+		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
+		$username = $msg->fromUsername();
+		$first_name = $msg->fromFirstName();
+		$user_id = $msg->fromId();
+
+		if (empty($ship)) {
+			if ($username != null) {
+				// create new ship.
+				$ship = $this->CI->Ships->create_ship(array('chat_id' => $chat_id, 'captain' => $user_id, 'name' => $chat_title, 'total_crew' => 1, 'active' => 1));
+				// create user if does not exist
+				$user = $this->CI->Users->get_user($user_id);
+				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
+				$crew = $this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $user->id));
+
+				$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
+				$output = $this->CI->telegram->sendMessage($content);
+				$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
+				$output = $this->CI->telegram->sendMessage($content);
+			} else {
+				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un username en Ajustes');						
+				$output = $this->CI->telegram->sendMessage($content);
+			}
+		} else {
+			
+			$captain = ( is_null($ship->captain) || $ship->captain == 0 ) ? null : $this->CI->Users->get_user($ship->captain);
+
+			if ($user_id != $ship->captain) {
+
+				if (empty($captain)) {
+					$this->CI->Ships->update_ship(array('captain' => $user_id), $ship->id);
+
+					$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
+					$output = $this->CI->telegram->sendMessage($content);
+				}
+				else {
+					$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ya tiene piloto, el capitán '.( isset($captain->username) ? $captain->username : 'no-hay-capitan' ));						
+					$output = $this->CI->telegram->sendMessage($content);	
+				}
+			} else {
+				$content = array('chat_id' => $chat_id, 'text' => 'Capitán, ya pilotáis la "'.$chat_title.'". Alguna otra orden?');						
+				$output = $this->CI->telegram->sendMessage($content);	
+			}
+		}
+	}
+
+/**
+	Acción escanear
+*/
+
+	private function _set_escanear(& $msg, & $ship){
+
+		$option = array( array("SI", "NO") );
+		$chat_id = $msg->chatId();
+		$text = "El capitán quiere escanear el sector en busca de objetivos ¿Ayudas a escanear?";
+
+		// Create custom keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->CI->telegram->sendMessage($content);
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'do_escanear',
+				'required' => 1 ));
+		}
+
+	}
+
+	private function _do_escanear(& $msg, $already_ship=false) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+
+		if ($already_ship) {
+
+			if ( $user_id != $already_ship->captain ) {
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
+				);
+			}
+			else {			
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
+							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
+							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
+				);
+			}
+
+		} else {
+			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
+		}
+		
+		$output = $this->CI->telegram->sendMessage($content);
+	}
+
+
+/**
+	Acción test
+*/
 
 	private function _test(& $msg, & $ship){
 
