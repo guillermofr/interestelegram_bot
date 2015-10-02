@@ -18,5 +18,5 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 $config['botToken'] = 'TOKEN ID DADO POR BOTFATHER';
-
+$config['botPath'] = '';  // sample '/interestelegram_bot' if you use /www/interestelegram_bot and no virtualhost
 //ESTE FICHERO SE DEBE LLAMAR bot.php HAY QUE QUITARLE EL EXAMPLE

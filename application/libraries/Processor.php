@@ -113,7 +113,8 @@ class Processor {
 	 */
 	private function _pilotar(& $msg, $ship=null) {
 		$chat_id = $msg->chatId();
-		$chat_title = ( !empty($msg->chatTitle()) ) ? $msg->chatTitle() : ('ship-'.microtime());
+		$chat_title = $msg->chatTitle();
+		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
 		$username = $msg->fromUsername();
 		$first_name = $msg->fromFirstName();
 		$user_id = $msg->fromId();
@@ -167,7 +168,8 @@ class Processor {
 	 */
 	private function _joinShip(& $ship, & $msg) {
 		$chat_id = $msg->chatId();
-		$chat_title = ( !empty($msg->chatTitle()) ) ? $msg->chatTitle() : ('ship-'.microtime());
+		$chat_title = $msg->chatTitle();
+		$chat_title = ( !empty($chat_title) ) ? $msg->chatTitle() : ('ship-'.microtime());
 
 		$new_player = false;
 		$user_id = $msg->fromId();
@@ -209,7 +211,8 @@ class Processor {
 
 		$captain = $this->CI->Users->get_user($ship->captain);
 
-		if (empty($this->CI->Crew->get_crew_member($ship->id, $joiner->id)) )
+		$crew_member = $this->CI->Crew->get_crew_member($ship->id, $joiner->id);
+		if (empty($crew_member) )
 			if (!$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joiner->id))){
 				$output = array(
 					'chat_id' => $chat_id,
@@ -245,7 +248,8 @@ class Processor {
 		if (empty($ship)) return false;
 
 		$chat_id = $msg->chatId();
-		$chat_title = ( !empty($msg->chatTitle()) ) ? $msg->chatTitle() : ('ship-'.microtime());
+		$chat_title = $msg->chatTitle();
+		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
 
 		$new_player = false;
 		$user_id = $msg->fromId();

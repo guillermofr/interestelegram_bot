@@ -28,7 +28,7 @@ class Webhook extends CI_Controller
 
 			$this->processor->process($message);
 
-			echo '<script>setTimeout(function(){ window.location = \'/index.php/webhook/index/'.$this->lastUpdate.'\'; }, '.$this->refreshMillis.');</script>';
+			echo '<script>setTimeout(function(){ window.location = \''.$this->config->item('botPath').'/index.php/webhook/index/'.$this->lastUpdate.'\'; }, '.$this->refreshMillis.');</script>';
         }
 
 }
