@@ -96,7 +96,7 @@ class Processor {
 				$this->_set_escanear($msg, $ship);
 			}
 			else {
-				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado.'));
+				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado o no tienes permisos para usarlo.'));
 			}
 		}
 
@@ -505,12 +505,13 @@ class Processor {
 	}
 
 	private function _seleccionar(& $msg, & $ship) {
+		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 		if ($msg->text() == "NO"){
-			$text = "Cagao! xD";
+			$text = $username ." eres un CACAS! xD";
 		} else {
-			$text = "seleccionando a ".$msg->text();
+			$text = $username ." has seleccionado a ".$msg->text();
 		}
 
 		$content = array(
