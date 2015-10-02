@@ -16,6 +16,7 @@ class Processor {
 		$this->CI->load->model('Votes');
 
 		$this->CI->config->load('bot');
+		$this->CI->config->load('images');
 		$this->botToken = $this->CI->config->item('botToken');
 		$this->botUsername = $this->CI->config->item('botUsername');
 
@@ -47,8 +48,29 @@ class Processor {
 	}
 
 	private function _welcome(& $msg) {
-		$output = array('chat_id' => $msg->chatId(), 'text' => "Bienvenido a Interestelegram @".$msg->fromUsername().", tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando '/pilotar.'' para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
-		return $this->CI->telegram->sendMessage($output);
+
+		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
+			Bienvenido a Interestelegram @".$msg->fromUsername().", tu aventura espacial!\n
+			Para jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Hecho esto estarás preparado para empezar.\n
+			Crea un grupo de telegram con uno o más amigos.\n 
+			"));
+			
+		//foto de invitar amigos
+		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $this->CI->config->item('img_help__crearGrupo')));		
+
+		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
+			Una vez creado, en el perfil del bot encontrarás como añadirlo a tu grupo.\n
+			"));
+		
+		//foto de invitar bot
+		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $this->CI->config->item('img_help__invitarBot')));
+
+		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
+			Él os guiará en vuestro grupo y lo transformará en una nave espacial lista para jugar.\n
+			Ten cuidado con tu tripulación, tus amigos podrán ser la ayuda que necesitas para conquistar la galaxia o la razón de la autodestrucción de la nave.\n
+			Recuerda que necesitas su participación para que tu nave funcione!"));
+
+		return true;
 	}
 
 	/* Only for group chats. */
