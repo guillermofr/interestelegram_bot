@@ -74,6 +74,15 @@ class Users extends MY_Model
         return $this->_get($id);
     }
 
+    /**
+     * Obtiene un capitan en base a su nave
+     */
+    public function get_name_by_id($captain_id=null) {
+        if ($captain_id == null) return null;
+        // TODO: Caché
+        return $this->where('id', $captain_id)->get();
+    }
+
     // get ships
     // get only my ships
 

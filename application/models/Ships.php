@@ -95,12 +95,15 @@ class Ships extends MY_Model
     /**
      * Obtiene una nave en base a su chat_id
      */
-    public function get_ship_by_xy($x=null,$y=null) {
-        if ($x == null) return null;
-        if ($y == null) return null;
+    public function get_ships_by_xy($x=null,$y=null,$chat_id=null) {
+        if ($x === null) return null;
+        if ($y === null) return null;
+        if ($chat_id === null) return null;
         // TODO: Caché
-        return $this->where(array('x'=> $x,'y' => $y))->get();
+        return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id))->get_all();
     }
+
+
 
     // get crew
     // get crew but captain

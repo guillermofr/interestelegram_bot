@@ -288,6 +288,7 @@ class Processor {
 		$response_value = ( $response == 'SI' ? 1 : 0 );
 
 		$last_action = $this->CI->Actions->get_last_action($ship->id);
+
 		if ($last_action->message_id != $replyMessageId) {
 
 			// hide keyboard
@@ -301,6 +302,12 @@ class Processor {
 			return $this->CI->telegram->sendMessage($content);
 
 		}
+
+		// seleccionar un objetivo (votación especial del capitán)
+		if ($last_action->command == 'seleccionar'){
+			return $this->_seleccionar( $msg, $ship );
+		}
+
 
 		if ( ! $this->CI->Votes->create_vote( array('action_id' => $last_action->id, 'user_id' => $user_id, 'vote' => $response_value) ) ) {
 
@@ -428,7 +435,7 @@ class Processor {
 	}
 
 /**
-	Acción escanear
+	Acción escanear/seleccionar
 */
 
 	private function _set_escanear(& $msg, & $ship){
@@ -456,31 +463,62 @@ class Processor {
 
 	}
 
-	private function _do_escanear(& $msg, $already_ship=false) {
+	private function _do_escanear(& $msg, & $ship) {
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
+		$username = $msg->fromUsername();
 
-		if ($already_ship) {
+		$ships = $this->CI->Ships->get_ships_by_xy( 0 , 0 ,$chat_id);
 
-			if ( $user_id != $already_ship->captain ) {
-				$content = array(
-					'chat_id' => $chat_id, 
-					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
-				);
-			}
-			else {			
-				$content = array(
-					'chat_id' => $chat_id, 
-					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
-							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
-							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
-				);
-			}
+		foreach ($ships as $s){
+			$cpt = $this->CI->Users->get_name_by_id($s->captain);
 
-		} else {
-			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
+			$nearShips[] = "@".$cpt->username;
+			//$nearShips[] = "@".$s->captain;
+
 		}
+		$nearShips[] = "NO";
+
+		$option = array($nearShips);
+		$chat_id = $msg->chatId();
+		$text = "Selecciona un abjetivo @".$username.":";
+
+		// Create custom keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->CI->telegram->sendMessage($content);
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'seleccionar',
+				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+		}
+
+
 		
+	}
+
+	private function _seleccionar(& $msg, & $ship) {
+		$chat_id = $msg->chatId();
+		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+		if ($msg->text() == "NO"){
+			$text = "Cagao! xD";
+		} else {
+			$text = "seleccionando a ".$msg->text();
+		}
+
+		$content = array(
+			'reply_markup' => $keyboard, 
+			'chat_id' => $chat_id, 
+			'text' => $text
+		);
+
 		$output = $this->CI->telegram->sendMessage($content);
 	}
 
