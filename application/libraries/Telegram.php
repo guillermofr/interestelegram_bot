@@ -211,6 +211,12 @@ class Telegram {
 		curl_close($ch);
 		return $result;
 	}
+
+	public function prepareImage($path) {
+		require_once(APPPATH.'libraries/CURLFile.php');
+		$filename = realpath($path);
+		return new CURLFile($filename, 'image/png', basename($path));
+	}
 }
 
 ?>

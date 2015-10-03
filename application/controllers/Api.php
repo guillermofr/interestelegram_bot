@@ -190,7 +190,11 @@ class Api extends CI_Controller {
 		$this->load->library('Telegram', $params);
 
 		$chat_id = "8908013"; // killer
-		$img = '@'.realpath(APPPATH.'../imgs/'.'space-ship.jpg');
+		$chat_id = "-28127793";
+		//$filename = realpath(APPPATH.'../imgs/'.'space-ship.jpg');
+		//require_once(APPPATH.'libraries/CURLFile.php');
+		//$img = new CURLFile($filename, 'image/jpg', 'space-ship.jpg');
+		$img = $this->telegram->prepareImage(APPPATH.'../imgs/'.'space-ship.jpg');
 		// $img = 'AgADBAADqacxG3864gf8EKgg3EpKRVXNijAABMy2MMSlqhpUJGAAAgI'; // file_id
 		$caption = 'Bienvenido a la Milano, comandante killer415. Un crucero ligero de clase Firefly. Tripulación actual: 1.';
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
@@ -222,6 +226,7 @@ class Api extends CI_Controller {
 	public function test()
 	{
 		$this->load->library('Mapdrawer');
+		log_message('error', 'TEST');
 		try {
 			//$this->mapdrawer->setAsteroids($asteroids);
 			//$this->mapdrawer->setShips($ships);

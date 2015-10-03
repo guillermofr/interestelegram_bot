@@ -587,18 +587,19 @@ class Processor {
 				$this->CI->mapdrawer->__random();
 				$imagePath = $this->CI->mapdrawer->generateMap();
 
-				$img = '@'.realpath($imagePath);
-				$caption = "Información de la nave:\n
-					
-					Nombre: ".$Ship->name."
-					\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health."
-					\xF0\x9F\x8C\x80:".$Ship->shield."/".$Ship->max_shield."
-					money: ".$Ship->money."
-					minerals: ".$Ship->minerals."
-					".print_r($Ship,true);
+				$img = $this->CI->telegram->prepareImage($imagePath);
+				// http://apps.timwhitlock.info/emoji/tables/unicode
+				$caption = "Información de la nave:".
+							"\n\xF0\x9F\x9A\x80: ".$Ship->name.
+							"\n\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health.
+							"\n\xF0\x9F\x94\xB5: ".$Ship->shield."/".$Ship->max_shield.
+							"\n\xF0\x9F\x92\xB0: ".$Ship->money.
+							"\n\xF0\x9F\x92\x8E: ".$Ship->minerals;
+							//.print_r($Ship,true);
 
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 				$output = $this->CI->telegram->sendPhoto($content);
+				log_message('error', print_r($output, TRUE));
 			}
 			else {			
 				$content = array(
