@@ -100,7 +100,7 @@ class Ships extends MY_Model
         if ($y === null) return null;
         if ($chat_id === null) return null;
         // TODO: Caché
-        return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id))->get_all();
+        return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id, 'active' => 1))->get_all();
     }
 
 

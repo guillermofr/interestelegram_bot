@@ -58,7 +58,7 @@ class Message {
 	private function _clean_msg() {
 		// booleans to false.
 		$this->isJoin = $this->isLeave = $this->isBotJoin = $this->isBotLeave = $this->isReply =
-		$this->isBot = $this->isCommand = $this->isPrivate = $this->isGroup = false;
+		$this->isBot = $this->isCommand = $this->isPrivate = $this->isGroup = $this->isTitleChange = false;
 		// anyting else to null.
 		$this->text = $this->command = $this->params = $this->replyId = $this->updateId = $this->messageId = 
 		$this->fromId = $this->fromUsername = $this->fromFirstName = $this->date = $this->chatId = 
@@ -87,6 +87,7 @@ class Message {
 		$this->_parseLeave($msg['message']);
 		$this->_parseText($msg['message']);
 		$this->_parseReplyTo($msg['message']);
+		$this->_parseTitleChange($msg['message']);
 
 	}
 
@@ -197,6 +198,14 @@ class Message {
 	}
 
 
+	private function _parseTitleChange(& $message) {
+		if (isset($message['new_chat_title']) && !empty($message['new_chat_title'])){
+			$this->isTitleChange = true;
+			$this->chatTitle = $message['new_chat_title'];
+		}
+	}
+
+
 	/* getters */
 
 	public function isJoin() { return $this->isJoin; }
@@ -205,6 +214,7 @@ class Message {
 	public function isBotLeave() { return $this->isBotLeave; }
 	public function joiner() { return $this->joiner; }
 	public function leaver() { return $this->leaver; }
+	public function isTitleChange() { return $this->isTitleChange; }
 
 	public function isReply() { return $this->isReply; }
 	public function replyId() { return $this->replyId; }

@@ -3,7 +3,7 @@
 class Webhook extends CI_Controller
 {
 		public $lastUpdate = 0;
-		public $refreshMillis = 6000;
+		public $refreshMillis = 3000;
 
         public function index($lastUpdate=0)
         {

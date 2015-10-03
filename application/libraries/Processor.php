@@ -41,6 +41,7 @@ class Processor {
 		elseif ($msg->isJoin()) $this->_joinShip( $ship, $msg );
 		elseif ($msg->isLeave()) $this->_leaveShip( $ship, $msg );
 		elseif ($msg->isReply()) $this->_processReply( $ship, $msg );
+		elseif ($msg->isTitleChange()) $this->_processTitleChange( $ship, $msg );
 		else {
 
 		}
@@ -357,6 +358,14 @@ class Processor {
 
 	}
 
+
+	private function _processTitleChange(& $ship, & $msg) {
+
+		$this->CI->Ships->update_ship(array('name' => $msg->chatTitle()), $ship->id);
+
+	}
+
+
 	/**
 	  Acción texto de ayuda. Distingue entre ayuda a canal nuevo y canal que ya es nave.
 	 */
@@ -474,40 +483,31 @@ class Processor {
 		$user_id = $msg->fromId();
 		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
-		//$username = $msg->fromUsername();
+		$sectorShips = $this->CI->Ships->get_ships_by_xy( $ship->x, $ship->y, $ship->chat_id);
 
-		$ships = $this->CI->Ships->get_ships_by_xy( 0 , 0 ,$chat_id);
+		foreach ($sectorShips as $shipIndex => $sectorShip){
 
-		foreach ($ships as $k => $s){
+			$captain = $this->CI->Users->get_name_by_id($sectorShip->captain);
+			$captain_name = ($captain && isset($captain->username) && $captain->username != '') ? $captain->username : $this->botUsername;
 
-			$cpt = $this->CI->Users->get_name_by_id($s->captain);
+			$nearShips[] = $sectorShip->chat_id."@".$captain_name;
 
-			$nearShips[] = $s->chat_id."@".$cpt->username;
-
-			$string = (strlen($s->name) > 20) ? substr($s->name,0,20).'...' : $s->name;
-			$nearShipsDetail[] = ($k+1).") ". $string." (@".$cpt->username.")";
-			//$nearShips[] = "@".$s->captain;
+			$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
+			$nearShipsDetail[] = ($shipIndex+1).") ". $string." (@".$captain_name.")";
 
 		}
 		$nearShips[] = "Ninguno";
 
 		$nearShipsDetailString = "";
-		foreach ($nearShipsDetail as $n){
-			$nearShipsDetailString .= "\n".$n;
-		}
+		foreach ($nearShipsDetail as $n) $nearShipsDetailString .= "\n".$n;
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
-
-
-
 
 		$option = array($nearShips);
 		$chat_id = $msg->chatId();
 		$captain_id = $ship->captain;
 		$user = $this->CI->Users->get_name_by_id($captain_id);
 		$text = "Selecciona un objetivo @". $user->username ." :";
-
-
 
 		// Create custom keyboard
 		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
@@ -525,8 +525,6 @@ class Processor {
 				'command' => 'seleccionar',
 				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
 		}
-
-
 		
 	}
 
@@ -620,14 +618,9 @@ class Processor {
 
 
 
-
-
-
-
-/**
-	Acción test
-*/
-
+	/**
+		Acción test
+	*/
 	private function _test(& $msg, & $ship){
 
 		$option = array( array("SI", "NO") );
