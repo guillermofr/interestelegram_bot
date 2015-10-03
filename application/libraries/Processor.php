@@ -361,20 +361,7 @@ class Processor {
 
 	private function _processTitleChange(& $ship, & $msg) {
 
-		if ( $this->CI->Ships->update_ship(array('name' => $msg->chatTitle()), $ship->id) ) {
-			$output = array(
-				'chat_id' => $msg->chatId(),
-				'text' => 'Capitan, la nave ha cambiado de nombre a "'.$msg->chatTitle().'"'
-			);
-		}
-		else{
-			$output = array(
-				'chat_id' => $msg->chatId(),
-				'text' => 'Capitan, no ha sido posible cambiar el nombre de la nave'
-			);
-		}
-
-		$this->CI->telegram->sendMessage($output);
+		$this->CI->Ships->update_ship(array('name' => $msg->chatTitle()), $ship->id);
 
 	}
 
