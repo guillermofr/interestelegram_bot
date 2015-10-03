@@ -93,7 +93,7 @@ class Processor {
 				$this->_test($msg, $ship);
 			}
 			elseif ( $command == 'escanear' && $ship->captain == $fromId ) {
-				$this->_set_escanear($msg, $ship);
+				$this->_vote_escanear($msg, $ship);
 			}
 			else {
 				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado o no tienes permisos para usarlo.'));
@@ -438,7 +438,7 @@ class Processor {
 	Acción escanear/seleccionar
 */
 
-	private function _set_escanear(& $msg, & $ship){
+	private function _vote_escanear(& $msg, & $ship){
 
 		$option = array( array("SI", "NO") );
 		$chat_id = $msg->chatId();
@@ -457,13 +457,13 @@ class Processor {
 				'ship_id' => $ship->id, 
 				'captain_id' => $ship->captain, 
 				'message_id' => $message_id,
-				'command' => 'do_escanear',
-				'required' => 1 ));
+				'command' => 'escanear',
+				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
 		}
 
 	}
 
-	private function _do_escanear(& $msg, & $ship) {
+	private function _escanear(& $msg, & $ship) {
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
 		$username = $msg->fromUsername();
