@@ -481,7 +481,7 @@ class Processor {
 
 		$option = array($nearShips);
 		$chat_id = $msg->chatId();
-		$text = "Selecciona un abjetivo @".$username.":";
+		$text = "Selecciona un abjetivo @".$username." :";
 
 		// Create custom keyboard
 		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
@@ -505,6 +505,7 @@ class Processor {
 	}
 
 	private function _seleccionar(& $msg, & $ship) {
+		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
@@ -515,6 +516,7 @@ class Processor {
 		}
 
 		$content = array(
+			'reply_to_message_id' => $messageId, 
 			'reply_markup' => $keyboard, 
 			'chat_id' => $chat_id, 
 			'text' => $text
