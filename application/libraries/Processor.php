@@ -474,10 +474,23 @@ class Processor {
 			$cpt = $this->CI->Users->get_name_by_id($s->captain);
 
 			$nearShips[] = "@".$cpt->username;
+
+			$string = (strlen($s->name) > 20) ? substr($s->name,0,20).'...' : $s->name;
+			$nearShipsDetail[] = $string." (@".$cpt->username.")";
 			//$nearShips[] = "@".$s->captain;
 
 		}
-		$nearShips[] = "NO";
+		$nearShips[] = "Ninguno";
+
+		$nearShipsDetailString = "";
+		foreach ($nearShipsDetail as $n){
+			$nearShipsDetailString .= "\n".$n;
+		}
+
+		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
+
+
+
 
 		$option = array($nearShips);
 		$chat_id = $msg->chatId();
@@ -509,10 +522,18 @@ class Processor {
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-		if ($msg->text() == "NO"){
+		if ($msg->text()[0] != "@"){
 			$text = $username ." eres un CACAS! xD";
 		} else {
 			$text = $username ." has seleccionado a ".$msg->text();
+
+			/**
+
+				TODO. METER EN BASE DE DATOS EL TARGET.
+
+			*/
+
+
 		}
 
 		$content = array(
