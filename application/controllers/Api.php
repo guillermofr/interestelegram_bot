@@ -221,8 +221,15 @@ class Api extends CI_Controller {
 
 	public function test()
 	{
-		$this->load->model('Ships');
+		$this->load->library('Mapdrawer');
+		try {
+			//$this->mapdrawer->setAsteroids($asteroids);
+			//$this->mapdrawer->setShips($ships);
+			$this->mapdrawer->__random();
+			$this->mapdrawer->generateMap();
 
-		var_dump( $this->Ships->create_ship(array('captain' => 123, 'chat_id' => 321)) );
+		} catch (Exception $e) {
+			var_dump($e);
+		}
 	}
 }

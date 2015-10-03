@@ -28,3 +28,5 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 
 /application/config/bot.php
 /application/config/database.php
+
+imgs/map/scans/*

@@ -585,27 +585,31 @@ class Processor {
 
 				$Ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
+				$this->CI->load->library('Mapdrawer');
+				$this->CI->mapdrawer->__random();
+				$imagePath = $this->CI->mapdrawer->generateMap();
 
-				$content = array(
-					'chat_id' => $chat_id, 
-					'text' => "Información de la nave:\n
+				$img = '@'.realpath($imagePath);
+				$caption = "Información de la nave:\n
 					
 					Nombre: ".$Ship->name."
-					❤: ".$Ship->health."/".$Ship->max_health."
-					👕: ".$Ship->shield."/".$Ship->max_shield."
+					\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health."
+					\xF0\x9F\x8C\x80:".$Ship->shield."/".$Ship->max_shield."
 					money: ".$Ship->money."
 					minerals: ".$Ship->minerals."
-					".print_r($Ship,true)
-				);
+					".print_r($Ship,true);
+
+				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
+				$output = $this->CI->telegram->sendPhoto($content);
 			}
 			else {			
 				$content = array(
 					'chat_id' => $chat_id, 
 					'text' => "Sólo el capitán puede pedir el informe."
 				);
+				$output = $this->CI->telegram->sendMessage($content);
 			}
 
-			$output = $this->CI->telegram->sendMessage($content);
 		} 
 		
 	}
