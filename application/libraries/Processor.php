@@ -41,6 +41,7 @@ class Processor {
 		elseif ($msg->isJoin()) $this->_joinShip( $ship, $msg );
 		elseif ($msg->isLeave()) $this->_leaveShip( $ship, $msg );
 		elseif ($msg->isReply()) $this->_processReply( $ship, $msg );
+		elseif ($msg->isTitleChange()) $this->_processTitleChange( $ship, $msg );
 		else {
 
 		}
@@ -356,6 +357,27 @@ class Processor {
 		}
 
 	}
+
+
+	private function _processTitleChange(& $ship, & $msg) {
+
+		if ( $this->CI->Ships->update_ship(array('name' => $msg->chatTitle()), $ship->id) ) {
+			$output = array(
+				'chat_id' => $msg->chatId(),
+				'text' => 'Capitan, la nave ha cambiado de nombre a "'.$msg->chatTitle().'"'
+			);
+		}
+		else{
+			$output = array(
+				'chat_id' => $msg->chatId(),
+				'text' => 'Capitan, no ha sido posible cambiar el nombre de la nave'
+			);
+		}
+
+		$this->CI->telegram->sendMessage($output);
+
+	}
+
 
 	/**
 	  Acción texto de ayuda. Distingue entre ayuda a canal nuevo y canal que ya es nave.
