@@ -85,7 +85,9 @@ class Processor {
 			elseif ( $command == 'pilotar' ) $this->_pilotar($msg);
 		}
 		else {
-			if ( $command == 'ayuda') $this->_ayuda($msg, $ship);
+			if ( $command == 'ayuda') {
+				$this->_ayuda($msg, $ship);
+			}
 			elseif ( $command == 'pilotar' ) {
 				$this->_pilotar($msg, $ship);
 			}
@@ -94,6 +96,9 @@ class Processor {
 			}
 			elseif ( $command == 'escanear' && $ship->captain == $fromId ) {
 				$this->_vote_escanear($msg, $ship);
+			}
+			elseif ( $command == 'informe' ) {
+				$this->_informe($msg, $ship);
 			}
 			else {
 				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado o no tienes permisos para usarlo.'));
@@ -383,6 +388,7 @@ class Processor {
 		$output = $this->CI->telegram->sendMessage($content);
 	}
 
+
 	/**
 	  Acción pilotar. Crea la nave en base de datos y asigna al capitán. Detecta si el capitán ya se ha fijado.
 	 */
@@ -466,17 +472,20 @@ class Processor {
 	private function _escanear(& $msg, & $ship) {
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
-		$username = $msg->fromUsername();
+		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
+
+		//$username = $msg->fromUsername();
 
 		$ships = $this->CI->Ships->get_ships_by_xy( 0 , 0 ,$chat_id);
 
-		foreach ($ships as $s){
+		foreach ($ships as $k => $s){
+
 			$cpt = $this->CI->Users->get_name_by_id($s->captain);
 
-			$nearShips[] = "@".$cpt->username;
+			$nearShips[] = $s->chat_id."@".$cpt->username;
 
 			$string = (strlen($s->name) > 20) ? substr($s->name,0,20).'...' : $s->name;
-			$nearShipsDetail[] = $string." (@".$cpt->username.")";
+			$nearShipsDetail[] = ($k+1).") ". $string." (@".$cpt->username.")";
 			//$nearShips[] = "@".$s->captain;
 
 		}
@@ -494,7 +503,11 @@ class Processor {
 
 		$option = array($nearShips);
 		$chat_id = $msg->chatId();
-		$text = "Selecciona un abjetivo @".$username." :";
+		$captain_id = $ship->captain;
+		$user = $this->CI->Users->get_name_by_id($captain_id);
+		$text = "Selecciona un objetivo @". $user->username ." :";
+
+
 
 		// Create custom keyboard
 		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
@@ -522,10 +535,22 @@ class Processor {
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-		if ($msg->text()[0] != "@"){
+		
+		$target = explode("@",$msg->text());
+		print_r($target);
+		if (!isset($target[1])){
 			$text = $username ." eres un CACAS! xD";
 		} else {
-			$text = $username ." has seleccionado a ".$msg->text();
+			$text = $username ." has seleccionado a ".$target[1];
+
+			
+			//avisar al objetivo targeteado
+			//echo "<pre>";
+			//$targetCaptain = $this->CI->Users->get_id_by_name(substr($msg->text(),1));
+			//print_r($targetCaptain);
+			//$targetShip = $this->CI->Ships->get_ship_by_captain($targetCaptain->id);
+			//print_r($targetShip);
+			$this->CI->telegram->sendMessage(array('chat_id' => $target[0], 'text' => "⚠ ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
 
 			/**
 
@@ -545,6 +570,54 @@ class Processor {
 
 		$output = $this->CI->telegram->sendMessage($content);
 	}
+
+
+	/**
+	  Acción informe. Lista la información de la nave actual. 
+	 */
+	private function _informe(& $msg, $already_ship=false) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+
+		if ($already_ship) {
+
+			if ( $user_id == $already_ship->captain ) {
+
+				$Ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
+
+
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Información de la nave:\n
+					
+					Nombre: ".$Ship->name."
+					❤: ".$Ship->health."/".$Ship->max_health."
+					👕: ".$Ship->shield."/".$Ship->max_shield."
+					money: ".$Ship->money."
+					minerals: ".$Ship->minerals."
+					".print_r($Ship,true)
+				);
+			}
+			else {			
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Sólo el capitán puede pedir el informe."
+				);
+			}
+
+			$output = $this->CI->telegram->sendMessage($content);
+		} 
+		
+	}
+
+
+
+
+
+
+
+
+
 
 
 /**
