@@ -309,12 +309,6 @@ class Processor {
 
 		}
 
-		// seleccionar un objetivo (votación especial del capitán)
-		if ($last_action->command == 'seleccionar'){
-			return $this->_seleccionar( $msg, $ship );
-		}
-
-
 		if ( ! $this->CI->Votes->create_vote( array('action_id' => $last_action->id, 'user_id' => $user_id, 'vote' => $response_value) ) ) {
 
 			// hide keyboard
@@ -340,16 +334,19 @@ class Processor {
 
 		$this->CI->Actions->update_action($update, $last_action->id);
 
-		$output = array(
-			'chat_id' => $chatId,
-			'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
-		);
-		$o = $this->CI->telegram->sendMessage($output);
+		//si no hay required no se muestra el conteo de datos
+		if ($last_action->required) {
+			$output = array(
+				'chat_id' => $chatId,
+				'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
+			);
+			$o = $this->CI->telegram->sendMessage($output);
+			// hide keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+			$content = array('chat_id' => $chatId, 'reply_markup' => $keyboard, 'reply_to_message_id' => $messageId, 'text' => 'tu voto se ha registrado');
+			$o = $this->CI->telegram->sendMessage($content);
+		}
 
-		// hide keyboard
-		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-		$content = array('chat_id' => $chatId, 'reply_markup' => $keyboard, 'reply_to_message_id' => $messageId, 'text' => 'tu voto se ha registrado');
-		$o = $this->CI->telegram->sendMessage($content);
 
 		//apply action if success
 		if ($apply_action) {
@@ -488,12 +485,12 @@ class Processor {
 		foreach ($sectorShips as $shipIndex => $sectorShip){
 
 			$captain = $this->CI->Users->get_name_by_id($sectorShip->captain);
-			$captain_name = ($captain && isset($captain->username) && $captain->username != '') ? $captain->username : $this->botUsername;
+			$captain_name = ($captain && isset($captain->username) && $captain->username != '') ? $captain->username : "Sin piloto";
 
-			$nearShips[] = $sectorShip->chat_id."@".$captain_name;
+			$nearShips[] = $sectorShip->id."@".$captain_name;
 
 			$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
-			$nearShipsDetail[] = ($shipIndex+1).") ". $string." (@".$captain_name.")";
+			$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.")";
 
 		}
 		$nearShips[] = "Ninguno";
@@ -523,7 +520,7 @@ class Processor {
 				'captain_id' => $ship->captain, 
 				'message_id' => $message_id,
 				'command' => 'seleccionar',
-				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+				'required' => 0));
 		}
 		
 	}
@@ -546,9 +543,11 @@ class Processor {
 			//echo "<pre>";
 			//$targetCaptain = $this->CI->Users->get_id_by_name(substr($msg->text(),1));
 			//print_r($targetCaptain);
-			//$targetShip = $this->CI->Ships->get_ship_by_captain($targetCaptain->id);
+			$targetShip = $this->CI->Ships->get_ship($target[0]);
 			//print_r($targetShip);
-			$this->CI->telegram->sendMessage(array('chat_id' => $target[0], 'text' => "⚠ ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
+
+
+			$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "⚠ ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
 
 			/**
 
