@@ -84,31 +84,6 @@ class Processor {
 
 		$this->CI->commander->{$command}( $msg, $ship );
 
-		/*if (empty($ship)) {
-			if ( $command == 'ayuda') $this->CI->commander->ayuda($msg);
-			elseif ( $command == 'pilotar' ) $this->CI->commander->pilotar($msg);
-		}
-		else {
-			if ( $command == 'ayuda') {
-				$this->CI->commander->ayuda($msg, $ship);
-			}
-			elseif ( $command == 'pilotar' ) {
-				$this->CI->commander->pilotar($msg, $ship);
-			}
-			elseif ( $command == 'test' && $ship->captain == $fromId ) {
-				$this->CI->commander->test($msg, $ship);
-			}
-			elseif ( $command == 'escanear' && $ship->captain == $fromId ) {
-				$this->CI->commander->vote_escanear($msg, $ship);
-			}
-			elseif ( $command == 'informe' ) {
-				$this->CI->commander->informe($msg, $ship);
-			}
-			else {
-				$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$command.'" no está contemplado o no tienes permisos para usarlo.'));
-			}
-		}*/
-
 	}
 
 
