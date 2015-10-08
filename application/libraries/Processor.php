@@ -82,7 +82,7 @@ class Processor {
 		$command = mb_strtolower($msg->command()); 
 		$params = $msg->params();
 
-		$this->CI->commander->{$command}( $msg, $ship );
+		$this->CI->commander->{$command}( $msg, $ship, $msg->params() );
 
 	}
 
