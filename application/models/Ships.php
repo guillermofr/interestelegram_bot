@@ -103,6 +103,8 @@ class Ships extends MY_Model
         return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id, 'active' => 1))->get_all();
     }
 
+    
+    
 
 
     // get crew

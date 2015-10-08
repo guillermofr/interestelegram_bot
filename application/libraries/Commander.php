@@ -441,18 +441,21 @@ class Commander {
 		if (!isset($target[1])){
 			$text = $username ." eres un CACAS! xD";
 		} else {
-			$text = $username ." has seleccionado a ".$target[1];
-
 			
-			//avisar al objetivo targeteado
-			//echo "<pre>";
-			//$targetCaptain = $this->CI->Users->get_id_by_name(substr($msg->text(),1));
-			//print_r($targetCaptain);
 			$targetShip = $this->CI->Ships->get_ship($target[0]);
-			//print_r($targetShip);
 
+			if ($ship->x == $targetShip->x && $ship->y == $targetShip->y ){
+				//todo, comprobar el rango avanzado
 
-			$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "⚠ ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
+				$this->CI->Ships->_set(array('target'=>$targetShip->id),$ship->id); //¿por que no funciona esto?
+
+				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
+				$text = $username ." has seleccionado a ".$target[1];
+			} else {
+				//avisar al objetivo targeteado
+				$text = $username ." la nave de ".$target[1]. " se está demasiado lejos para seleccionarla.";
+			}
+	
 
 			/**
 
