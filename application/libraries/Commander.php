@@ -557,7 +557,138 @@ class Commander {
 		$output = $this->CI->telegram->sendMessage($content);
 	}
 
+	/**
+		Acción mover
+	*/
+	private function _mover($msg, $ship, $params = FALSE){
 
+		$option = array( array("SI", "NO") );
+		$chat_id = $msg->chatId();
+		$text = "El capitán quiere mover la nave a otro sector \n¿Ayudas con la maniobra?";
+
+		// Create custom keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->CI->telegram->sendMessage($content);
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'do_mover',
+				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+		}
+	}
+
+	private function _do_mover($msg, $ship, $params) {
+		$this->CI->load->library('Movement');
+
+		$messageId = $msg->messageId();
+
+		$captain_id = $ship->captain;
+		$user = $this->CI->Users->get_name_by_id($captain_id);
+
+		$username = "@".$user->username;
+		$chat_id = $msg->chatId();
+		$keyboard = $this->CI->telegram->buildKeyBoard($this->CI->movement->generateKeyboard($ship), $onetime=TRUE, $resize=TRUE, $selective=TRUE);
+
+		$text = $username ." fijad el rumbo!";
+
+		$content = array(
+			'reply_to_message_id' => $messageId, 
+			'reply_markup' => $keyboard, 
+			'chat_id' => $chat_id, 
+			'text' => $text
+		);
+
+		$output = $this->CI->telegram->sendMessage($content);
+
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'perform_mover',
+				'required' => 0
+			));
+		}
+	}
+
+	private function _perform_mover($msg, $ship, $params) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+		$messageId = $msg->messageId();
+
+		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=false);
+
+		if ($ship) {
+			if ($user_id == $ship->captain ) {
+				$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
+
+				$this->CI->load->library('Movement');
+				switch ($this->CI->movement->moveShip($ship, $msg->text())) {
+					case 1: // EXITO
+						$this->CI->Ships->update_ship(array(
+							'x'=>$ship->x,
+							'y'=>$ship->y,
+							'angle'=>$ship->angle
+						),$ship->id); 
+						$content = array(
+							'reply_to_message_id' => $messageId, 
+							'reply_markup' => $keyboard,
+							'chat_id' => $chat_id, 
+							'text' => "Fijando rumbo y coordenadas... generando impulso... \n¡SALTO COMPLETADO!"
+						);
+						$output = $this->CI->telegram->sendMessage($content);
+
+						$this->CI->load->library('Mapdrawer');
+						$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
+						$img = $this->CI->telegram->prepareImage($imagePath);
+						$caption = "Mostrando nueva posición";
+						$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
+						$output = $this->CI->telegram->sendPhoto($content);
+
+						break;
+					
+					case 0:
+						$content = array(
+							'reply_to_message_id' => $messageId, 
+							'reply_markup' => $keyboard,
+							'chat_id' => $chat_id, 
+							'text' => "Cancelando la maniobra! Todos de vuelta a sus puestos!"
+						);
+						$output = $this->CI->telegram->sendMessage($content);
+						break;
+
+					case -1:
+						$content = array(
+							'reply_to_message_id' => $messageId, 
+							'reply_markup' => $keyboard,
+							'chat_id' => $chat_id, 
+							'text' => "Capitán me temo que ese movimiento es totalmente imposible con el equipamiento actual. Conozco un taller en Coruscant que tal vez podría instalarnos unas piezas..."
+						);
+						$output = $this->CI->telegram->sendMessage($content);
+						break;
+				}
+			} else {			
+				$content = array(
+					'reply_to_message_id' => $messageId, 
+					'reply_markup' => $keyboard,
+					'chat_id' => $chat_id, 
+					'text' => "Sólo el capitán puede maniobrar la nave."
+				);
+				$output = $this->CI->telegram->sendMessage($content);
+			}
+		}
+	}
 
 	/**
 		Acción test

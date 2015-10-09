@@ -225,13 +225,16 @@ class Api extends CI_Controller {
 
 	public function test()
 	{
+		$this->load->model('Ships');
+		$ship = $this->Ships->get(1);
+
 		$this->load->library('Mapdrawer');
 		log_message('error', 'TEST');
 		try {
 			//$this->mapdrawer->setAsteroids($asteroids);
 			//$this->mapdrawer->setShips($ships);
-			$this->mapdrawer->__random();
-			$this->mapdrawer->generateMap();
+			//$this->mapdrawer->__random();
+			$this->mapdrawer->generateShipMap($ship);
 
 		} catch (Exception $e) {
 			var_dump($e);
