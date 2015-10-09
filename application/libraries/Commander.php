@@ -337,7 +337,7 @@ class Commander {
 	private function _listar($msg, $ship, $params = FALSE, $last_action = null) {
 
 		/* Code to prevent cheating on command series */
-		if ($last_action->command != 'escanear' && !$last_action->fail) {
+		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "Listar requiere haber hecho 'escanear'.");
 			return $this->CI->telegram->sendMessage($content);
 		}
@@ -395,7 +395,7 @@ class Commander {
 	private function _seleccionar($msg, $ship, $params, $last_action = null) {
 
 		/* Code to prevent cheating on command series */
-		if (!is_null($last_action) && $last_action->command != 'listar' && !$last_action->fail) {
+		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'listar' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "seleccionar requiere haber hecho 'listar'.");
 			return $this->CI->telegram->sendMessage($content);
 		}
@@ -536,8 +536,8 @@ class Commander {
 	private function _do_esquivar($msg, $ship, $params, $last_action = null) {
 
 		/* Code to prevent cheating on command series */
-		if (!is_null($last_action) && $last_action->command != 'esquivar' && !$last_action->fail) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "Listar requiere haber hecho 'do_esquivar'.");
+		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
+			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar esquivar requiere haber hecho 'esquivar'.");
 			return $this->CI->telegram->sendMessage($content);
 		}
 
