@@ -13,6 +13,6 @@ class Migration_Add_target extends CI_Migration {
 
         public function down()
         {
-
+            $this->db->query("ALTER TABLE {$this->_table} DROP COLUMN target");
         }
 }
