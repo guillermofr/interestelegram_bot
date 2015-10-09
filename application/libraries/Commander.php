@@ -400,7 +400,13 @@ class Commander {
 
 /**
 
+
+
+
 	TODO : FALTA PONER QUE ESTÉN EN POSICIONES VÁLIDAS DE ATAQUE, AHORA ESTÁ A LA MISMA CASILLA
+
+
+
 
 */
 
@@ -521,7 +527,13 @@ class Commander {
 		
 /**
 
+
+
+
 	TODO : FALTA EL CALCULO DE ESQUIVA Y LA FUNCIÓN QUE TE QUITA EL TARGET DE TODAS LAS NAVES
+
+
+
 
 */
 
