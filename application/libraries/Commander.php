@@ -309,7 +309,7 @@ class Commander {
 	Acción escanear/seleccionar
 */
 
-	private function _vote_escanear($msg, $ship, $params = FALSE){
+	private function _escanear($msg, $ship, $params = FALSE){
 
 		$option = array( array("SI", "NO") );
 		$chat_id = $msg->chatId();
@@ -328,13 +328,13 @@ class Commander {
 				'ship_id' => $ship->id, 
 				'captain_id' => $ship->captain, 
 				'message_id' => $message_id,
-				'command' => 'escanear',
+				'command' => 'listar',
 				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
 		}
 
 	}
 
-	private function _escanear($msg, $ship, $params = FALSE) {
+	private function _listar($msg, $ship, $params = FALSE) {
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
 		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
@@ -349,7 +349,7 @@ class Commander {
 			$nearShips[] = $sectorShip->id."@".$captain_name;
 
 			$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
-			$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.")";
+			$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") ppl:".$sectorShip->total_crew;
 
 		}
 		$nearShips[] = "Ninguno";
@@ -385,6 +385,51 @@ class Commander {
 	}
 
 
+	private function _seleccionar($msg, $ship, $params) {
+		$messageId = $msg->messageId();
+		$username = "@".$msg->fromUsername();
+		$chat_id = $msg->chatId();
+		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+		
+		$target = explode("@",$msg->text());
+		if (!isset($target[1])){
+			$text = $username ." eres un CACAS! xD";
+		} else {
+			
+			$targetShip = $this->CI->Ships->get_ship($target[0]);
+
+/**
+
+	TODO : FALTA PONER QUE ESTÉN EN POSICIONES VÁLIDAS DE ATAQUE, AHORA ESTÁ A LA MISMA CASILLA
+
+*/
+
+			if ($ship->x == $targetShip->x && $ship->y == $targetShip->y ){
+				//todo, comprobar el rango avanzado
+
+				$this->CI->Ships->update_ship(array('target'=>$targetShip->id),$ship->id); 
+
+				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo! Usa /esquivar para librarte de sus ataques."));
+				$text = $username ." has seleccionado a ".$target[1]. " con éxito";
+			} else {
+				//avisar al objetivo targeteado
+				$text = $username ." la nave de ".$target[1]. " se está demasiado lejos para seleccionarla.";
+			}
+	
+		}
+
+		$content = array(
+			'reply_to_message_id' => $messageId, 
+			'reply_markup' => $keyboard, 
+			'chat_id' => $chat_id, 
+			'text' => $text
+		);
+
+		$output = $this->CI->telegram->sendMessage($content);
+	}
+
+
+
 
 	/**
 	  Acción informe. Lista la información de la nave actual. 
@@ -395,7 +440,7 @@ class Commander {
 
 		if ($already_ship) {
 
-			if ( $user_id == $already_ship->captain ) {
+			if ($user_id == $already_ship->captain ) {
 
 				$Ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
@@ -403,10 +448,18 @@ class Commander {
 				$this->CI->mapdrawer->__random();
 				$imagePath = $this->CI->mapdrawer->generateMap();
 
+
+				$target = false;
+				if (!is_null($Ship->target)){
+					$TargetedShip = $this->CI->Ships->get_ship($Ship->target);
+					$target = "\n\xF0\x9F\x92\xA2: ".$TargetedShip->name;
+				}
+
 				$img = $this->CI->telegram->prepareImage($imagePath);
 				// http://apps.timwhitlock.info/emoji/tables/unicode
 				$caption = "Información de la nave:".
 							"\n\xF0\x9F\x9A\x80: ".$Ship->name.
+							$target.
 							"\n\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health.
 							"\n\xF0\x9F\x94\xB5: ".$Ship->shield."/".$Ship->max_shield.
 							"\n\xF0\x9F\x92\xB0: ".$Ship->money.
@@ -430,39 +483,56 @@ class Commander {
 	}
 
 
-	private function _seleccionar($msg, $ship, $params) {
+
+	/**
+		Acción test
+	*/
+
+	private function _esquivar($msg, $ship, $params = FALSE){
+
+		$option = array( array("SI", "NO") );
+		$chat_id = $msg->chatId();
+		$text = "El capitán quiere hacer maniobra de evasión ¿Ayudas en la maniobra?";
+
+		// Create custom keyboard
+		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+		$output = $this->CI->telegram->sendMessage($content);
+		$response = json_decode($output);
+
+		if ($response->ok){
+			$message_id = $response->result->message_id;
+			$this->CI->Actions->create_action(array( 
+				'chat_id' => $chat_id, 
+				'ship_id' => $ship->id, 
+				'captain_id' => $ship->captain, 
+				'message_id' => $message_id,
+				'command' => 'do_esquivar',
+				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+		}
+
+	}
+
+	private function _do_esquivar($msg, $ship, $params) {
 		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 		
-		$target = explode("@",$msg->text());
-		print_r($target);
-		if (!isset($target[1])){
-			$text = $username ." eres un CACAS! xD";
+/**
+
+	TODO : FALTA EL CALCULO DE ESQUIVA Y LA FUNCIÓN QUE TE QUITA EL TARGET DE TODAS LAS NAVES
+
+*/
+
+		if ( false ){ //cambiar esto por el cálculo de esquive
+			//quitar el id de todos los que le targetean
+			//$this->CI->Ships->untarget_ship($ship->id); 
+			//avisar de exito
+			$text = $username ." has desaparecido del radar de tus enemigos!";
 		} else {
-			
-			$targetShip = $this->CI->Ships->get_ship($target[0]);
-
-			if ($ship->x == $targetShip->x && $ship->y == $targetShip->y ){
-				//todo, comprobar el rango avanzado
-
-				$this->CI->Ships->_set(array('target'=>$targetShip->id),$ship->id); //¿por que no funciona esto?
-
-				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo!"));
-				$text = $username ." has seleccionado a ".$target[1];
-			} else {
-				//avisar al objetivo targeteado
-				$text = $username ." la nave de ".$target[1]. " se está demasiado lejos para seleccionarla.";
-			}
-	
-
-			/**
-
-				TODO. METER EN BASE DE DATOS EL TARGET.
-
-			*/
-
+			//avisar de pifia
+			$text = $username ." la maniobra evasiva ha fallado y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
 		}
 
 		$content = array(
@@ -474,7 +544,6 @@ class Commander {
 
 		$output = $this->CI->telegram->sendMessage($content);
 	}
-
 
 
 
