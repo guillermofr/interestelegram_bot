@@ -155,7 +155,7 @@ class Processor {
 
 		//apply action if success
 		if ($apply_action) {
-			$this->CI->commander->{"{$last_action->command}"}( $msg, $ship, $last_action->params );
+			$this->CI->commander->{"{$last_action->command}"}( $msg, $ship, $last_action->params, $last_action );
 		}
 
 	}
