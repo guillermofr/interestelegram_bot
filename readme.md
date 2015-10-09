@@ -1,11 +1,14 @@
 #Interestelegram
 
-## Qué es?
+## ¿Qué es?
 
 Es un proyecto para crear un juego conversacional a través de web y Telegram. Utiliza la API de bots de Telegram y una web hecha con Code Igniter.
+Toda la documentación se puede encontrar aquí
+https://docs.google.com/document/d/1dfeGdC2gUoB5qJ0LUF58SEu_IwiqckzxTgXPO3yhnBs/edit?usp=sharing
 
 ## Instalación
 
+Renombra `config/bot.example.php` a `config/bot.php`.
 Modifica el fichero `config/bot.php` para indicar el token de tu [bot de Telegram](https://core.telegram.org/bots/api).
 
 Modifica el fichero `config/database.php` para indicar usuario y base de datos disponible para el proyecto.
@@ -20,8 +23,12 @@ Simula el punto en el que se recibirán los POST de Telegram. Abre en el navegad
 
 #### Librería Processor
 
-Se encarga de procesar los mensajes recibidos y reaccionar según corresponda. Ahora mismo interpreta `/ayuda` y `/pilotar`.
+Se encarga de procesar los mensajes recibidos y reaccionar según corresponda. 
 
-#### Modelo Ships
+#### Librería Commander
 
-Se encarga de gestionar las naves en la correspondiente tabla de base de datos. Extiende de [MY_Model](https://github.com/avenirer/CodeIgniter-MY_Model). Falta añadirle soporte para caché.
+Lugar donde se implementan las operaciones.
+
+#### Modelos
+
+Extiende de [MY_Model](https://github.com/avenirer/CodeIgniter-MY_Model). Falta añadirle soporte para caché.
