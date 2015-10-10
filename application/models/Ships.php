@@ -93,7 +93,7 @@ class Ships extends MY_Model
     }
 
     /**
-     * Obtiene una nave en base a su chat_id
+     * Obtiene un listado de naves en una posición, ignorando a la que ha lanzado la petición
      */
     public function get_ships_by_xy($x=null,$y=null,$chat_id=null) {
         if ($x === null) return null;
@@ -103,8 +103,19 @@ class Ships extends MY_Model
         return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id, 'active' => 1))->get_all();
     }
 
-    
-    
+    /**
+     * Obtiene un listado de naves fijadas en el blanco.
+     */
+    public function get_target_lock_candidates($ship=null, $range=1) {
+        if ($ship === null) return array();
+
+        $minX = $ship->x - $range;
+        $maxX = $ship->x + $range;
+        $minY = $ship->y - $range;
+        $maxY = $ship->y + $range;
+
+        return $this->where(array('x >=' => $minX, 'x <=' => $maxX, 'y >=' => $minY, 'y <=' => $maxY, 'chat_id !=' => $ship->chat_id, 'active' => 1))->get_all();
+    }
 
 
     // get crew

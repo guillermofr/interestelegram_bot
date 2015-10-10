@@ -346,7 +346,7 @@ class Commander {
 		$user_id = $msg->fromId();
 		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
-		$sectorShips = $this->CI->Ships->get_ships_by_xy( $ship->x, $ship->y, $ship->chat_id);
+		$sectorShips = $this->CI->Ships->get_target_lock_candidates($ship);
 
 		foreach ($sectorShips as $shipIndex => $sectorShip){
 
@@ -359,34 +359,39 @@ class Commander {
 			$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") ppl:".$sectorShip->total_crew;
 
 		}
-		$nearShips[] = "Ninguno";
 
-		$nearShipsDetailString = "";
-		foreach ($nearShipsDetail as $n) $nearShipsDetailString .= "\n".$n;
+		if (count($nearShips) > 0) {
+			$nearShips[] = "Ninguno";
 
-		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
+			$nearShipsDetailString = "";
+			foreach ($nearShipsDetail as $n) $nearShipsDetailString .= "\n".$n;
 
-		$option = array($nearShips);
-		$chat_id = $msg->chatId();
-		$captain_id = $ship->captain;
-		$user = $this->CI->Users->get_name_by_id($captain_id);
-		$text = "Selecciona un objetivo @". $user->username ." :";
+			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
 
-		// Create custom keyboard
-		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
-		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
-		$output = $this->CI->telegram->sendMessage($content);
-		$response = json_decode($output);
+			$option = array($nearShips);
+			$chat_id = $msg->chatId();
+			$captain_id = $ship->captain;
+			$user = $this->CI->Users->get_name_by_id($captain_id);
+			$text = "Selecciona un objetivo @". $user->username ." :";
 
-		if ($response->ok){
-			$message_id = $response->result->message_id;
-			$this->CI->Actions->create_action(array( 
-				'chat_id' => $chat_id, 
-				'ship_id' => $ship->id, 
-				'captain_id' => $ship->captain, 
-				'message_id' => $message_id,
-				'command' => 'seleccionar',
-				'required' => 0));
+			// Create custom keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
+			$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+			$output = $this->CI->telegram->sendMessage($content);
+			$response = json_decode($output);
+
+			if ($response->ok){
+				$message_id = $response->result->message_id;
+				$this->CI->Actions->create_action(array( 
+					'chat_id' => $chat_id, 
+					'ship_id' => $ship->id, 
+					'captain_id' => $ship->captain, 
+					'message_id' => $message_id,
+					'command' => 'seleccionar',
+					'required' => 0));
+			}
+		} else {
+			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "No hay blancos posibles en rango capitán!"));
 		}
 		
 	}
@@ -407,33 +412,22 @@ class Commander {
 		
 		$target = explode("@",$msg->text());
 		if (!isset($target[1])){
-			$text = $username ." eres un CACAS! xD";
+			$text = $username ." esperemos tener otra oportunidad capitán...";
 		} else {
 			
 			$targetShip = $this->CI->Ships->get_ship($target[0]);
+			$sectorShips = $this->CI->Ships->get_target_lock_candidates($ship);
 
-/**
-
-
-
-
-	TODO : FALTA PONER QUE ESTÉN EN POSICIONES VÁLIDAS DE ATAQUE, AHORA ESTÁ A LA MISMA CASILLA
-
-
-
-
-*/
-
-			if ($ship->x == $targetShip->x && $ship->y == $targetShip->y ){
-				//todo, comprobar el rango avanzado
-
+			if (in_array($targetShip, $sectorShips)){
 				$this->CI->Ships->update_ship(array('target'=>$targetShip->id),$ship->id); 
 
+				// Avisar al objetivo targeteado
 				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo! Usa /esquivar para librarte de sus ataques."));
-				$text = $username ." has seleccionado a ".$target[1]. " con éxito";
+				
+				$text = $username ." hemos fijado en el blanco a ".$target[1]. " con éxito";
 			} else {
-				//avisar al objetivo targeteado
-				$text = $username ." la nave de ".$target[1]. " se está demasiado lejos para seleccionarla.";
+				// La nave no está en rango
+				$text = $username ." la nave de ".$target[1]. " está demasiado lejos para seleccionarla.";
 			}
 	
 		}
