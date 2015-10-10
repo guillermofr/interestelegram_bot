@@ -69,10 +69,10 @@ class Movement {
 			270 => array(
 					array("\xE2\x86\x96","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9"),
 					array("\xE2\xAC\x85","\xF0\x9F\x9A\xAB","\xE2\x86\xAA"),
-					array("\xE2\x86\xAA","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9")
+					array("\xE2\x86\x99","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9")
 				),
 			315 => array(
-					array("\xE2\x86\x96","\xE2\x86\xAA","\xF0\x9F\x94\xB9"),
+					array("\xE2\x86\x96","\xE2\xAC\x86","\xF0\x9F\x94\xB9"),
 					array("\xE2\xAC\x85","\xF0\x9F\x9A\xAB","\xF0\x9F\x94\xB9"),
 					array("\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9","\xE2\x86\xAA")
 				)
@@ -146,7 +146,8 @@ class Movement {
 		
 		// Cancelation icon
 		if ($move === false) return 0;
-		if ($move == 5) {
+		if ($move == 5) { // Turn icon, get turn from dial
+			$move = $this->movementDials[$ship->angle][3];
 			$movement = 3;
 		} else {
 			$movement = array_search($move, $this->movementDials[$ship->angle]);

@@ -146,6 +146,9 @@ class Processor {
 				'chat_id' => $chatId,
 				'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
 			);
+			if (($response_value + $last_action->positives) == $last_action->required) {
+				$output['reply_markup'] = $this->CI->telegram->buildKeyBoardHide($selective=FALSE);
+			}
 			$o = $this->CI->telegram->sendMessage($output);
 			// hide keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);

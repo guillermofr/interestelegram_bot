@@ -465,8 +465,7 @@ class Commander {
 				$Ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
 				$this->CI->load->library('Mapdrawer');
-				$this->CI->mapdrawer->__random();
-				$imagePath = $this->CI->mapdrawer->generateMap();
+				$imagePath = $this->CI->mapdrawer->generateShipMap($Ship);
 
 
 				$target = false;
@@ -662,6 +661,7 @@ class Commander {
 							'y'=>$ship->y,
 							'angle'=>$ship->angle
 						),$ship->id); 
+
 						$content = array(
 							'reply_to_message_id' => $messageId, 
 							'reply_markup' => $keyboard,

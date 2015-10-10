@@ -145,7 +145,6 @@ class Mapdrawer {
 
 	private function translate($base, $value) {
 		$transform = 1 - $base;
-		log_message('error', 'translate base='.$base.', value='.$value.', result='.($value + $transform));
 		return $value + $transform;
 	}
 
