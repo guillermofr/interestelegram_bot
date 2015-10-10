@@ -328,19 +328,19 @@ class Commander {
 				'ship_id' => $ship->id, 
 				'captain_id' => $ship->captain, 
 				'message_id' => $message_id,
-				'command' => 'listar',
+				'command' => 'do_escanear',
 				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
 		}
 
 	}
 
-	private function _listar($msg, $ship, $params = FALSE, $last_action = null) {
+	private function _do_escanear($msg, $ship, $params = FALSE, $last_action = null) {
 
-		/* Code to prevent cheating on command series */
+		/* Code to prevent cheating on command series 
 		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "Listar requiere haber hecho 'escanear'.");
 			return $this->CI->telegram->sendMessage($content);
-		}
+		}*/
 
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
@@ -394,11 +394,11 @@ class Commander {
 
 	private function _seleccionar($msg, $ship, $params, $last_action = null) {
 
-		/* Code to prevent cheating on command series */
+		/* Code to prevent cheating on command series 
 		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'listar' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "seleccionar requiere haber hecho 'listar'.");
 			return $this->CI->telegram->sendMessage($content);
-		}
+		}*/
 
 		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
@@ -534,11 +534,11 @@ class Commander {
 
 	private function _do_esquivar($msg, $ship, $params, $last_action = null) {
 
-		/* Code to prevent cheating on command series */
+		/* Code to prevent cheating on command series 
 		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar esquivar requiere haber hecho 'esquivar'.");
 			return $this->CI->telegram->sendMessage($content);
-		}
+		}*/
 
 		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
