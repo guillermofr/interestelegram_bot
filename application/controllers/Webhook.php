@@ -33,6 +33,7 @@ class Webhook extends CI_Controller
 
         public function hook()
         {
+        	log_message('error', 'got hook');
         	$rawData = file_get_contents("php://input");
         	$message = json_decode($rawData, TRUE);
         	$this->load->library('Processor');
@@ -48,8 +49,9 @@ class Webhook extends CI_Controller
 
 			$this->load->library('Telegram', $params);
 
-			$output = $this->telegram->setWebhook('http://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareCert(APPPATH.'../certs/YOURPUBLIC.pem'));
+			$output = $this->telegram->setWebhook('https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareCert(APPPATH.'../certs/YOURPUBLIC.pem'));
 			log_message('error', print_r($output, true));
+			log_message('error', 'is_file?'.is_file(APPPATH.'../certs/YOURPUBLIC.pem'));
         }
 
 }
