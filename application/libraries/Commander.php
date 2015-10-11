@@ -360,17 +360,20 @@ class Commander {
 		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
 		$sectorShips = $this->CI->Ships->get_target_lock_candidates($ship);
+		$nearShips = array();
 
-		foreach ($sectorShips as $shipIndex => $sectorShip){
+		if (is_array($sectorShips)) {
+			foreach ($sectorShips as $shipIndex => $sectorShip){
 
-			$captain_name = $this->CI->Users->get_name_by_id($sectorShip->captain);
-			if (empty($captain_name)) $captain_name = "Sin piloto";
+				$captain_name = $this->CI->Users->get_name_by_id($sectorShip->captain);
+				if (empty($captain_name)) $captain_name = "Sin piloto";
 
-			$nearShips[] = $sectorShip->id."@".$captain_name;
+				$nearShips[] = $sectorShip->id."@".$captain_name;
 
-			$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
-			$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") ppl:".$sectorShip->total_crew;
+				$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
+				$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") ppl:".$sectorShip->total_crew;
 
+			}
 		}
 
 		if (count($nearShips) > 0) {
