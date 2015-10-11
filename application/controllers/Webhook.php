@@ -31,4 +31,11 @@ class Webhook extends CI_Controller
 			echo '<script>setTimeout(function(){ window.location = \''.$this->config->item('botPath').'/index.php/webhook/index/'.$this->lastUpdate.'\'; }, '.$this->refreshMillis.');</script>';
         }
 
+        public function hook()
+        {
+        	$rawData = file_get_contents("php://input");
+        	$message = json_decode($rawData, TRUE);
+        	$this->processor->process($message);
+        }
+
 }
