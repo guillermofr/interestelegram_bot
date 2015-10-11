@@ -503,7 +503,7 @@ class Commander {
 							'required' => $param));
 					}
 				} else {
-					$text = "Capitán la nave no se encuentra dentro de nuestro arco de fuego!";
+					$text = $ship->target == null ? "Capitán no tenemos objetivo, utilice /seleccionar" : "Capitán la nave no se encuentra dentro de nuestro arco de fuego!";
 					$content = array(
 						'reply_to_message_id' => $messageId, 
 						'chat_id' => $chat_id, 

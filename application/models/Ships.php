@@ -124,6 +124,7 @@ class Ships extends MY_Model
     public function can_i_attack($ship=null) {
         if ($ship === null) return false;
 
+        if ($ship->target == null) return false;
         $target = $this->get($ship->target);
         if (empty($target)) return false;
 
@@ -167,7 +168,7 @@ class Ships extends MY_Model
      */
     public function deal_damage($ship=null, $damage=1) {
         if ($ship == null) return null;
-        
+
         if ($ship->shield > 0) {
             $ship->shield -= $damage;
         } else if ($ship->health > 0) {
