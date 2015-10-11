@@ -35,7 +35,21 @@ class Webhook extends CI_Controller
         {
         	$rawData = file_get_contents("php://input");
         	$message = json_decode($rawData, TRUE);
+        	$this->load->library('Processor');
         	$this->processor->process($message);
+        }
+
+        public function sethook()
+        {
+        	$this->config->load('bot');
+			$params = array(
+				$this->config->item('botToken')
+			);
+
+			$this->load->library('Telegram', $params);
+
+			$output = $this->telegram->setWebhook('http://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareImage(APPPATH.'../certs/YOURPUBLIC.pem'));
+			log_message('error', print_r($output, true));
         }
 
 }
