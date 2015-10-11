@@ -311,25 +311,38 @@ class Commander {
 
 	private function _escanear($msg, $ship, $params = FALSE){
 
-		$option = array( array("SI", "NO") );
 		$chat_id = $msg->chatId();
-		$text = "El capitán quiere escanear el sector en busca de objetivos ¿Ayudas a escanear?";
+		$user_id = $msg->fromId();
+		$messageId = $msg->messageId();
+		
+		if ($user_id == $ship->captain ) {
+			$option = array( array("SI", "NO") );
+			$text = "El capitán quiere escanear el sector en busca de objetivos ¿Ayudas a escanear?";
 
-		// Create custom keyboard
-		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
-		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
-		$output = $this->CI->telegram->sendMessage($content);
-		$response = json_decode($output);
+			// Create custom keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+			$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+			$output = $this->CI->telegram->sendMessage($content);
+			$response = json_decode($output);
 
-		if ($response->ok){
-			$message_id = $response->result->message_id;
-			$this->CI->Actions->create_action(array( 
+			if ($response->ok){
+				$message_id = $response->result->message_id;
+				$this->CI->Actions->create_action(array( 
+					'chat_id' => $chat_id, 
+					'ship_id' => $ship->id, 
+					'captain_id' => $ship->captain, 
+					'message_id' => $message_id,
+					'command' => 'do_escanear',
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+			}
+		} else {
+			$text = "Solo el capitán puede escanear, tripulante.";
+			$content = array(
+				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
-				'ship_id' => $ship->id, 
-				'captain_id' => $ship->captain, 
-				'message_id' => $message_id,
-				'command' => 'do_escanear',
-				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+				'text' => $text
+			);
+			$output = $this->CI->telegram->sendMessage($content);
 		}
 
 	}
@@ -350,8 +363,8 @@ class Commander {
 
 		foreach ($sectorShips as $shipIndex => $sectorShip){
 
-			$captain = $this->CI->Users->get_name_by_id($sectorShip->captain);
-			$captain_name = ($captain && isset($captain->username) && $captain->username != '') ? $captain->username : "Sin piloto";
+			$captain_name = $this->CI->Users->get_name_by_id($sectorShip->captain);
+			if (empty($captain_name)) $captain_name = "Sin piloto";
 
 			$nearShips[] = $sectorShip->id."@".$captain_name;
 
@@ -371,8 +384,8 @@ class Commander {
 			$option = array($nearShips);
 			$chat_id = $msg->chatId();
 			$captain_id = $ship->captain;
-			$user = $this->CI->Users->get_name_by_id($captain_id);
-			$text = "Selecciona un objetivo @". $user->username ." :";
+			$username = $this->CI->Users->get_name_by_id($captain_id);
+			$text = "Selecciona un objetivo @". $username ." :";
 
 			// Create custom keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
@@ -387,7 +400,7 @@ class Commander {
 					'ship_id' => $ship->id, 
 					'captain_id' => $ship->captain, 
 					'message_id' => $message_id,
-					'command' => 'seleccionar',
+					'command' => 'do_seleccionar',
 					'required' => 0));
 			}
 		} else {
@@ -397,7 +410,7 @@ class Commander {
 	}
 
 
-	private function _seleccionar($msg, $ship, $params, $last_action = null) {
+	private function _do_seleccionar($msg, $ship, $params, $last_action = null) {
 
 		/* Code to prevent cheating on command series 
 		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'listar' && !$last_action->fail) ) {
@@ -443,6 +456,102 @@ class Commander {
 	}
 
 
+	private function _atacar($msg, $ship, $params = FALSE){
+		$user_id = $msg->fromId();
+		$chat_id = $msg->chatId();
+		$messageId = $msg->messageId();
+		$param = str_replace('#', '', $params);
+		$param = intval($param);
+
+		if ($user_id == $ship->captain ) {
+
+			if (!is_numeric($param) || $param == 0) {
+				$text = "Capitán debéis indicar la potencia del ataque! (/atacar#2 , /atacar#5 ...)";
+				$content = array(
+					'reply_to_message_id' => $messageId, 
+					'chat_id' => $chat_id, 
+					'text' => $text
+				);
+				$output = $this->CI->telegram->sendMessage($content);
+			} else {
+				if ($this->CI->Ships->can_i_attack($ship)) {
+
+					$option = array( array("SI", "NO") );
+					$text = "El capitán quiere atacar con potencia ".$param." ¿Apoyas el ataque?";
+
+					// Create custom keyboard
+					$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+					$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+					$output = $this->CI->telegram->sendMessage($content);
+					$response = json_decode($output);
+
+					if ($response->ok){
+						$message_id = $response->result->message_id;
+						$this->CI->Actions->create_action(array( 
+							'chat_id' => $chat_id, 
+							'ship_id' => $ship->id, 
+							'captain_id' => $ship->captain, 
+							'message_id' => $message_id,
+							'command' => 'do_atacar',
+							'required' => $param));
+					}
+				} else {
+					$text = "Capitán la nave no se encuentra dentro de nuestro arco de fuego!";
+					$content = array(
+						'reply_to_message_id' => $messageId, 
+						'chat_id' => $chat_id, 
+						'text' => $text
+					);
+					$output = $this->CI->telegram->sendMessage($content);
+				}
+			}
+		} else {
+			$text = "Solo el capitán puede atacar, tripulante.";
+			$content = array(
+				'reply_to_message_id' => $messageId, 
+				'chat_id' => $chat_id, 
+				'text' => $text
+			);
+			$output = $this->CI->telegram->sendMessage($content);
+		}
+	}
+
+	private function _do_atacar($msg, $ship, $params = FALSE){
+		$chat_id = $msg->chatId();
+		$text = "Atacando con torpedos de protones!";
+		$content = array(
+			'chat_id' => $chat_id, 
+			'text' => $text
+		);
+		$output = $this->CI->telegram->sendMessage($content);
+
+		$this->CI->load->library('Calculations');
+		$target_ship = $this->CI->Ships->get($ship->target);
+		if ($this->CI->calculations->attack_success($ship, $target_ship)) {
+			$text = "IMPACTO!!!";
+			$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de alcanzar con su ataque!!';
+
+			/**
+		    TODO: Causar daño a la nave impactada
+		 	*/
+		} else {
+			$text = "El ataque ha fallado!";
+			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
+		}
+
+		$content = array(
+			'chat_id' => $chat_id, 
+			'text' => $text
+		);
+		$output = $this->CI->telegram->sendMessage($content);
+
+		// Avisar del impacto al objetivo
+		$content = array(
+			'chat_id' => $target_ship->chat_id, 
+			'text' => $target_text
+		);
+		$output = $this->CI->telegram->sendMessage($content);
+	}
 
 
 	/**
@@ -503,27 +612,39 @@ class Commander {
 
 	private function _esquivar($msg, $ship, $params = FALSE){
 
-		$option = array( array("SI", "NO") );
 		$chat_id = $msg->chatId();
-		$text = "El capitán quiere hacer maniobra de evasión ¿Ayudas en la maniobra?";
+		$user_id = $msg->fromId();
+		$messageId = $msg->messageId();
+		if ($user_id == $ship->captain ) {
 
-		// Create custom keyboard
-		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
-		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
-		$output = $this->CI->telegram->sendMessage($content);
-		$response = json_decode($output);
+			$option = array( array("SI", "NO") );
+			$text = "El capitán quiere hacer maniobra de evasión ¿Ayudas en la maniobra?";
 
-		if ($response->ok){
-			$message_id = $response->result->message_id;
-			$this->CI->Actions->create_action(array( 
+			// Create custom keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+			$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+			$output = $this->CI->telegram->sendMessage($content);
+			$response = json_decode($output);
+
+			if ($response->ok){
+				$message_id = $response->result->message_id;
+				$this->CI->Actions->create_action(array( 
+					'chat_id' => $chat_id, 
+					'ship_id' => $ship->id, 
+					'captain_id' => $ship->captain, 
+					'message_id' => $message_id,
+					'command' => 'do_esquivar',
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+			}
+		} else {
+			$text = "Solo el capitán puede esquivar, tripulante.";
+			$content = array(
+				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
-				'ship_id' => $ship->id, 
-				'captain_id' => $ship->captain, 
-				'message_id' => $message_id,
-				'command' => 'do_esquivar',
-				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+				'text' => $text
+			);
+			$output = $this->CI->telegram->sendMessage($content);
 		}
-
 	}
 
 	private function _do_esquivar($msg, $ship, $params, $last_action = null) {
@@ -576,25 +697,37 @@ class Commander {
 	*/
 	private function _mover($msg, $ship, $params = FALSE){
 
-		$option = array( array("SI", "NO") );
 		$chat_id = $msg->chatId();
-		$text = "El capitán quiere mover la nave a otro sector \n¿Ayudas con la maniobra?";
+		$user_id = $msg->fromId();
+		$messageId = $msg->messageId();
+		if ($user_id == $ship->captain ) {
+			$option = array( array("SI", "NO") );
+			$text = "El capitán quiere mover la nave a otro sector \n¿Ayudas con la maniobra?";
 
-		// Create custom keyboard
-		$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
-		$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
-		$output = $this->CI->telegram->sendMessage($content);
-		$response = json_decode($output);
+			// Create custom keyboard
+			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
+			$content = array('chat_id' => $chat_id, 'reply_markup' => $keyboard, 'text' => $text);
+			$output = $this->CI->telegram->sendMessage($content);
+			$response = json_decode($output);
 
-		if ($response->ok){
-			$message_id = $response->result->message_id;
-			$this->CI->Actions->create_action(array( 
+			if ($response->ok){
+				$message_id = $response->result->message_id;
+				$this->CI->Actions->create_action(array( 
+					'chat_id' => $chat_id, 
+					'ship_id' => $ship->id, 
+					'captain_id' => $ship->captain, 
+					'message_id' => $message_id,
+					'command' => 'do_mover',
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+			}
+		} else {
+			$text = "Solo el capitán puede mover, tripulante.";
+			$content = array(
+				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
-				'ship_id' => $ship->id, 
-				'captain_id' => $ship->captain, 
-				'message_id' => $message_id,
-				'command' => 'do_mover',
-				'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+				'text' => $text
+			);
+			$output = $this->CI->telegram->sendMessage($content);
 		}
 	}
 
@@ -602,12 +735,18 @@ class Commander {
 		$this->CI->load->library('Movement');
 
 		$messageId = $msg->messageId();
-
-		$captain_id = $ship->captain;
-		$user = $this->CI->Users->get_name_by_id($captain_id);
-
-		$username = "@".$user->username;
 		$chat_id = $msg->chatId();
+		$captain_id = $ship->captain;
+		$username = $this->CI->Users->get_name_by_id($captain_id);
+
+		$this->CI->load->library('Mapdrawer');
+		$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
+		$img = $this->CI->telegram->prepareImage($imagePath);
+		$caption = "Mostrando posición actual";
+		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
+		$output = $this->CI->telegram->sendPhoto($content);
+
+		$username = "@".$username;
 		$keyboard = $this->CI->telegram->buildKeyBoard($this->CI->movement->generateKeyboard($ship), $onetime=TRUE, $resize=TRUE, $selective=TRUE);
 
 		$text = $username ." fijad el rumbo!";

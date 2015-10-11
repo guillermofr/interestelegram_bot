@@ -18,6 +18,23 @@ class Calculations {
 	 * - The ship calculations methods will require the Ship model entitiy and not its id.
 	 */
 
+	private function _chance($chance) {
+		$rand = rand(0, 100);
+		log_message('error', 'chance '.$rand.' <= '.$chance);
+		return ($rand <= $chance);
+	}
+
+	public function attack_success($attackerShip, $defenderShip) {
+		if (empty($attackerShip)) return false;
+		if (empty($defenderShip)) return false;
+		$baseAgility = 45;
+		$multiplier = 5;
+		$diffCrew = $attackerShip->total_crew - $defenderShip->total_crew;
+
+		log_message('error', $attackerShip->total_crew.' vs '.$defenderShip->total_crew.' = '.($baseAgility + ($diffCrew * $multiplier)));
+		return (! $this->_chance($baseAgility + ($diffCrew * $multiplier)));
+	}
+
 	/**
 	 * ship_damage
 	 * - The ship damage

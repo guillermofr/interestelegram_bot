@@ -80,7 +80,8 @@ class Users extends MY_Model
     public function get_name_by_id($captain_id=null) {
         if ($captain_id == null) return null;
         // TODO: Caché
-        return $this->where('id', $captain_id)->get();
+        $user = $this->where('id', $captain_id)->get();
+        return (!empty($user)) ? $user->username : '';
     }
 
     /**

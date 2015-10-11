@@ -104,7 +104,7 @@ class Ships extends MY_Model
     }
 
     /**
-     * Obtiene un listado de naves fijadas en el blanco.
+     * Obtiene un listado de naves fijables en el blanco.
      */
     public function get_target_lock_candidates($ship=null, $range=1) {
         if ($ship === null) return array();
@@ -115,6 +115,50 @@ class Ships extends MY_Model
         $maxY = $ship->y + $range;
 
         return $this->where(array('x >=' => $minX, 'x <=' => $maxX, 'y >=' => $minY, 'y <=' => $maxY, 'chat_id !=' => $ship->chat_id, 'active' => 1))->get_all();
+    }
+
+    /**
+     * Comprueba que una nave puede atacar a su objetivo fijado
+     */
+    public function can_i_attack($ship=null) {
+        if ($ship === null) return false;
+
+        $target = $this->get($ship->target);
+        if (empty($target)) return false;
+
+        if ($ship->x == $target->x && $ship->y == $target->y) return true;
+
+        if ($ship->angle % 90 == 0) {
+            switch ($ship->angle) {
+                case 0:
+                    return ($target->x >= $ship->x-1 && $target->x <= $ship->x+1 && $target->y == $ship->y+1);
+                    break;
+                case 90:
+                    return ($target->y >= $ship->y-1 && $target->y <= $ship->y+1 && $target->x == $ship->x+1);
+                    break;
+                case 180:
+                    return ($target->x >= $ship->x-1 && $target->x <= $ship->x+1 && $target->y == $ship->y-1);
+                    break;
+                case 270:
+                    return ($target->y >= $ship->y-1 && $target->y <= $ship->y+1 && $target->x == $ship->x-1);
+                    break;
+            }
+        } else {
+            switch ($ship->angle) {
+                case 45:
+                    return ($target->x >= $ship->x && $target->x <= $ship->x+1 && $target->y >= $ship->y && $target->y <= $ship->y+1);
+                    break;
+                case 135:
+                    return ($target->x >= $ship->x && $target->x <= $ship->x+1 && $target->y >= $ship->y-1 && $target->y <= $ship->y);
+                    break;
+                case 225:
+                    return ($target->x >= $ship->x-1 && $target->x <= $ship->x && $target->y >= $ship->y-1 && $target->y <= $ship->y);
+                    break;
+                case 315:
+                    return ($target->x >= $ship->x-1 && $target->x <= $ship->x && $target->y >= $ship->y && $target->y <= $ship->y+1);
+                    break;
+            }
+        }
     }
 
 
