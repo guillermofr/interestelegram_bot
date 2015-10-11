@@ -49,9 +49,10 @@ class Webhook extends CI_Controller
 
 			$this->load->library('Telegram', $params);
 
-			$output = $this->telegram->setWebhook('https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareCert(APPPATH.'../certs/YOURPUBLIC.pem'));
+			$output = $this->telegram->setWebhook('https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareCert(APPPATH.'../cert/YOURPUBLIC.pem'));
 			log_message('error', print_r($output, true));
-			log_message('error', 'is_file?'.is_file(APPPATH.'../certs/YOURPUBLIC.pem'));
+			log_message('error', 'is_file?'.is_file(APPPATH.'../cert/YOURPUBLIC.pem'));
+			log_message('error', 'https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook');
         }
 
 }
