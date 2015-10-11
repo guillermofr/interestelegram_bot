@@ -119,6 +119,7 @@ class Ships extends MY_Model
 
     /**
      * Comprueba que una nave puede atacar a su objetivo fijado
+       TODO: Mover a calculations posiblemente
      */
     public function can_i_attack($ship=null) {
         if ($ship === null) return false;
@@ -161,6 +162,25 @@ class Ships extends MY_Model
         }
     }
 
+    /**
+     * Reduce el daño de vida o escudo según corresponda a una nave
+     */
+    public function deal_damage($ship=null, $damage=1) {
+        if ($ship == null) return null;
+        
+        if ($ship->shield > 0) {
+            $ship->shield -= $damage;
+        } else if ($ship->health > 0) {
+            $ship->health -= $damage;
+        }
+
+        $this->update(array(
+                'shield' => $ship->shield,
+                'health' => $ship->health
+            ), $ship->id);
+
+        return $ship;
+    }
 
     // get crew
     // get crew but captain

@@ -456,6 +456,13 @@ class Commander {
 	}
 
 
+	// Atajos para el ataque
+	private function _a1($msg, $ship, $params) { $this->_atacar($msg, $ship, '#1'); }
+	private function _a2($msg, $ship, $params) { $this->_atacar($msg, $ship, '#2'); }
+	private function _a3($msg, $ship, $params) { $this->_atacar($msg, $ship, '#3'); }
+	private function _a4($msg, $ship, $params) { $this->_atacar($msg, $ship, '#4'); }
+	private function _a5($msg, $ship, $params) { $this->_atacar($msg, $ship, '#5'); }
+
 	private function _atacar($msg, $ship, $params = FALSE){
 		$user_id = $msg->fromId();
 		$chat_id = $msg->chatId();
@@ -516,24 +523,37 @@ class Commander {
 		}
 	}
 
-	private function _do_atacar($msg, $ship, $params = FALSE){
+	private function _do_atacar($msg, $ship, $params = FALSE, $last_action = null){
 		$chat_id = $msg->chatId();
-		$text = "Atacando con torpedos de protones!";
-		$content = array(
-			'chat_id' => $chat_id, 
-			'text' => $text
-		);
-		$output = $this->CI->telegram->sendMessage($content);
+
+		$quantity = $last_action->required == 1 ? 'una bolea' : $last_action->required.' boleas';
+		$img = $this->CI->telegram->prepareImage(APPPATH.'../imgs/attack.png');
+		$img = "AgADBAADNKgxG3864gdqo4ey0GF1r7VxcjAABOFBKjmiSAABdrgSAQABAg";
+		$caption = "Atacando con ".$quantity." de torpedos de protones!";
+		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
+		$output = $this->CI->telegram->sendPhoto($content);
 
 		$this->CI->load->library('Calculations');
 		$target_ship = $this->CI->Ships->get($ship->target);
 		if ($this->CI->calculations->attack_success($ship, $target_ship)) {
+			$target_ship = $this->CI->Ships->deal_damage($target_ship, $last_action->required);
+
 			$text = "IMPACTO!!!";
+			$text .= "\nEstado de la nave objetivo:".
+				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
+				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
+			
 			$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de alcanzar con su ataque!!';
+			$target_text .= "\nEstado de la nave:".
+				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
+				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
 
 			/**
-		    TODO: Causar daño a la nave impactada
-		 	*/
+			 TODO: Muerte
+			 */
+			 if ($target_ship->health == 0) {
+
+			 }
 		} else {
 			$text = "El ataque ha fallado!";
 			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
