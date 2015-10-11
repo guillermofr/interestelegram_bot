@@ -76,7 +76,7 @@ class Telegram {
 		if ($certificate == "") {
 			$content = array('url' => $url);
 		} else {
-			$content = array('url' => $url, 'certificate' => $certificate);
+			$content = array('url' => $url, 'certificate' => $certificate, true);
 		}
 		return $this->endpoint("setWebhook", $content);
 	}
@@ -216,6 +216,12 @@ class Telegram {
 		require_once(APPPATH.'libraries/CURLFile.php');
 		$filename = realpath($path);
 		return new CURLFile($filename, 'image/png', basename($path));
+	}
+
+	public function prepareCert($path) {
+		require_once(APPPATH.'libraries/CURLFile.php');
+		$filename = realpath($path);
+		return new CURLFile($filename, 'application/x-pem-file', basename($path));
 	}
 }
 
