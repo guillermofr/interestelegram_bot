@@ -111,7 +111,7 @@ class Mapdrawer {
 		imagedestroy($asteroids);
 
 		$this->CI->load->model('Ships');
-		$ships = $this->CI->Ships->get_all();
+		$ships = $this->CI->Ships->get_all_active();
 		foreach ($ships as $ship) {
 			if ($ship->id != $mainShip->id) $base = $this->addShip($base, $mainShip, $ship);
 		}

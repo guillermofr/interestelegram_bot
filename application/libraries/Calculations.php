@@ -33,6 +33,8 @@ class Calculations {
 		return (! $this->_chance($baseAgility + ($diffCrew * $multiplier)));
 	}
 
+
+
 	/**
 	 * ship_damage
 	 * - The ship damage
@@ -57,7 +59,24 @@ class Calculations {
 	 * @param $ship 			<Ship Model Entity> 	The ship that is doing the damage.
 	 * @param $target_ship 		<Ship Model Entity> 	The ship that will recieve the damage.
 	 */
-	public function ship_dodge( $ship ) {}
+
+	/**
+
+
+
+	//ajustar formula
+
+
+
+
+	*/
+	public function ship_dodge($mainShip) {
+		if (empty($mainShip)) return false;
+
+		$targetedBy = 1;
+
+		return (! $this->_chance(50));
+	}
 
 
 	/**

@@ -99,8 +99,16 @@ class Message {
 	private function _parseFrom(& $message) {
 		if (isset($message['from']) && !empty($message['from']) ){
 			$this->fromId = $message['from']['id'];
-			$this->fromUsername = $message['from']['username'];
-			$this->fromFirstName = $message['from']['first_name'];
+			if (isset($message['from']['username']))
+				$this->fromUsername = $message['from']['username'];
+			else 
+				$this->fromUsername = null;
+
+			if (isset($message['from']['first_name']))
+				$this->fromFirstName = $message['from']['first_name'];
+			else 
+				$this->fromFirstName = null;
+
 			if ($this->fromUsername == $this->botUsername) {
 				$this->isFromBot = true;
 			}

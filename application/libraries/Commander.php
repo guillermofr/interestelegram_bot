@@ -574,9 +574,22 @@ class Commander {
 				$target_text .= "\nEstado de la nave:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
-					"La nave ha quedado inutilizable, hasta aquí ha llegado su aventura capitán. Abandonen la nave!" ;
+					"\nLa nave ha quedado inutilizable, hasta aquí ha llegado su aventura capitán. Abandonen la nave!
+					\n(BETATESTERS:puedes resucitar la nave usando /pilotar y los demás necesitan volver a /alistarse)" ;
+
+				//morirse
+				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
+/**
 
 
+
+
+				// TODO esquivar de todos los radares
+
+
+
+
+*/
 
 			 }
 		} else {
@@ -693,6 +706,7 @@ class Commander {
 
 	private function _do_esquivar($msg, $ship, $params, $last_action = null) {
 
+		$this->CI->load->library('Calculations');
 		/* Code to prevent cheating on command series 
 		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar esquivar requiere haber hecho 'esquivar'.");
@@ -703,6 +717,7 @@ class Commander {
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+		$target_ship = $this->CI->Ships->get($ship->target);
 		
 /**
 
@@ -715,6 +730,7 @@ class Commander {
 
 
 */
+		//if ($this->CI->calculations->ship_dodge($ship)) {
 
 		if ( false ){ //cambiar esto por el cálculo de esquive
 			//quitar el id de todos los que le targetean
@@ -798,7 +814,7 @@ class Commander {
 		$text = $username ." fijad el rumbo!";
 
 		$content = array(
-			'reply_to_message_id' => $messageId, 
+			//'reply_to_message_id' => $messageId, 
 			'reply_markup' => $keyboard, 
 			'chat_id' => $chat_id, 
 			'text' => $text
@@ -903,6 +919,11 @@ class Commander {
 		$user_id = $msg->fromId();
 		$username = $msg->fromUsername();
 		$first_name = $msg->fromFirstName();
+
+		if ($username == null){
+			$content = array('chat_id' => $chat_id, 'text' => 'Para ser miembro de la tripulación tienes que configurar un username en Ajustes');						
+			return $this->CI->telegram->sendMessage($content);
+		}
 
 		$joinerId = $msg->fromId();
 		$joinerfromUsername = $msg->fromUsername();

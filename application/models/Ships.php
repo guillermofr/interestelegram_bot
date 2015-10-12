@@ -103,6 +103,17 @@ class Ships extends MY_Model
         return $this->where(array('x' => $x,'y' => $y, 'chat_id !=' => $chat_id, 'active' => 1))->get_all();
     }
 
+
+    /**
+     * Obtiene un listado de naves en una posición, ignorando a la que ha lanzado la petición
+     */
+    public function get_all_active() {
+        // TODO: Caché
+        return $this->where(array('active' => 1))->get_all();
+    }
+
+
+
     /**
      * Obtiene un listado de naves fijables en el blanco.
      */
@@ -127,6 +138,8 @@ class Ships extends MY_Model
         if ($ship->target == null) return false;
         $target = $this->get($ship->target);
         if (empty($target)) return false;
+
+        if (!$target->active) return false;
 
         if ($ship->x == $target->x && $ship->y == $target->y) return true;
 
