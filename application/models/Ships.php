@@ -196,6 +196,27 @@ class Ships extends MY_Model
         return $ship;
     }
 
+
+    /**
+    * Desaparecer de todos los radares
+    */
+
+    public function untarget_ship($ship=null){
+        if ($ship == null) return null;
+        $ships = $this->where(array('target' => $ship->id))->get_all();
+        $this->update(array('target' => null), array('target' => $ship->id));
+        return $ships;
+    }
+    /**
+    * devuelve true si alguien te tiene seleccionado
+    */
+
+    public function needDodge($ship=null){
+        if ($ship == null) return null;
+        $ships = $this->count(array('target' => $ship->id));
+        return $ships;
+    }
+
     // get crew
     // get crew but captain
 

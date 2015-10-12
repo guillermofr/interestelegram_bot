@@ -559,10 +559,7 @@ class Commander {
 				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
 
-			/**
-			 TODO: Muerte
-			 */
-			 if ($target_ship->health == 0) {
+			if ($target_ship->health == 0) {
 
 			 	$text = "IMPACTO!!!";
 				$text .= "\nEl enemigo ha sido destruido!:".
@@ -579,19 +576,9 @@ class Commander {
 
 				//morirse
 				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
-/**
+				$this->CI->Ships->untarget_ship($target_ship); 
 
-
-
-
-				// TODO esquivar de todos los radares
-
-
-
-
-*/
-
-			 }
+			}
 		} else {
 			$text = "El ataque ha fallado!";
 			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
@@ -672,10 +659,21 @@ class Commander {
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
 		$messageId = $msg->messageId();
+		$needDodge = $this->CI->Ships->needDodge($ship);
+		
 		if ($user_id == $ship->captain ) {
+			if (!$needDodge){
+				$text = "Nadie te tiene seleccionado, no es necesario esquivar...";
+				$content = array(
+					'reply_to_message_id' => $messageId, 
+					'chat_id' => $chat_id, 
+					'text' => $text
+				);
+				return $this->CI->telegram->sendMessage($content);
+			}
 
 			$option = array( array("SI", "NO") );
-			$text = "El capitán quiere hacer maniobra de evasión ¿Ayudas en la maniobra?";
+			$text = "El capitán quiere hacer maniobra de evasión para esquivar $needDodge enemigo".(($needDodge==1)?"":"s")." ¿Ayudas en la maniobra?";
 
 			// Create custom keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
@@ -719,29 +717,21 @@ class Commander {
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 		$target_ship = $this->CI->Ships->get($ship->target);
 		
-/**
+		if ($this->CI->calculations->ship_dodge($ship)) {
 
-
-
-
-	TODO : FALTA EL CALCULO DE ESQUIVA Y LA FUNCIÓN QUE TE QUITA EL TARGET DE TODAS LAS NAVES
-
-
-
-
-*/
-		//if ($this->CI->calculations->ship_dodge($ship)) {
-
-		if ( false ){ //cambiar esto por el cálculo de esquive
+		//if ( false ){ //cambiar esto por el cálculo de esquive
 			//quitar el id de todos los que le targetean
-			//$this->CI->Ships->untarget_ship($ship->id); 
+			$shipsDodged = $this->CI->Ships->untarget_ship($ship); 
 			//avisar de exito
-			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos!";
+			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos! \xF0\x9F\x91\x8D";
+			$forEnemyText = "\xF0\x9F\x92\xA8 El enemigo seleccionado se ha escapado de tu objetivo!";
 		} else {
 			//avisar de pifia
-			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
+			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
+			$forEnemyText = null;
 		}
 
+		//informar al user
 		$content = array(
 			'reply_to_message_id' => $messageId, 
 			'reply_markup' => $keyboard, 
@@ -750,6 +740,18 @@ class Commander {
 		);
 
 		$output = $this->CI->telegram->sendMessage($content);
+
+		//informar a los enemigos
+		if (!empty($shipsDodged) && $forEnemyText != null){
+			foreach ($shipsDodged as $sD){
+				$content = array(
+					'chat_id' => $sD->chat_id, 
+					'text' => $forEnemyText
+				);
+
+				$output = $this->CI->telegram->sendMessage($content);
+			}
+		}
 	}
 
 	/**
