@@ -170,9 +170,9 @@ class Ships extends MY_Model
         if ($ship == null) return null;
 
         if ($ship->shield > 0) {
-            $ship->shield -= $damage;
+            $ship->shield = max(0, $ship->shield - $damage);
         } else if ($ship->health > 0) {
-            $ship->health -= $damage;
+            $ship->health = max(0, $ship->health - $damage);
         }
 
         $this->update(array(

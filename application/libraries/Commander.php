@@ -90,7 +90,7 @@ class Commander {
 						"...Check fish...Ok\n".
 						"¡La nave está lista!\n\n".
 						"Hola...? soy el ordenador de abordo...\n".
-						"¿ Hay alguien ahí ? Si hay alguien que escriba '/pilotar' ya!"
+						"¿ Hay alguien ahí ? Si hay alguien, que escriba '/pilotar' ya para ser el capitán. Los demás escribir /alistarse para ayudar al capitán."
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -556,6 +556,20 @@ class Commander {
 			 */
 			 if ($target_ship->health == 0) {
 
+			 	$text = "IMPACTO!!!";
+				$text .= "\nEl enemigo ha sido destruido!:".
+					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
+					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
+
+
+			 	$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
+				$target_text .= "\nEstado de la nave:".
+					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
+					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
+					"La nave ha quedado inutilizable, hasta aquí ha llegado su aventura capitán. Abandonen la nave!" ;
+
+
+
 			 }
 		} else {
 			$text = "El ataque ha fallado!";
@@ -698,10 +712,10 @@ class Commander {
 			//quitar el id de todos los que le targetean
 			//$this->CI->Ships->untarget_ship($ship->id); 
 			//avisar de exito
-			$text = $username ." has desaparecido del radar de tus enemigos!";
+			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos!";
 		} else {
 			//avisar de pifia
-			$text = $username ." la maniobra evasiva ha fallado y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
+			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
 		}
 
 		$content = array(
@@ -867,6 +881,82 @@ class Commander {
 			}
 		}
 	}
+
+
+	/**
+	  Acción pilotar. Crea la nave en base de datos y asigna al capitán. Detecta si el capitán ya se ha fijado.
+	 */
+	private function _alistarse($msg, $ship=null, $params = FALSE) {
+		$chat_id = $msg->chatId();
+		$chat_title = $msg->chatTitle();
+		$chat_title = ( !empty($chat_title) ) ? $msg->chatTitle() : ('ship-'.microtime());
+
+		$new_player = false;
+		$user_id = $msg->fromId();
+		$username = $msg->fromUsername();
+		$first_name = $msg->fromFirstName();
+
+		$joinerId = $msg->fromId();
+		$joinerfromUsername = $msg->fromUsername();
+		$joinerfromFirstName = $msg->fromFirstName();
+
+		$user = $this->CI->Users->get_user($joinerId);
+		if (!$user) {
+			$new_player = true;
+			$user = $this->CI->Users->create_user(array('id' => $joinerId, 'username' => $joinerfromUsername, 'first_name' => $joinerfromFirstName));
+		}
+
+
+		if ($ship == null) {
+			$output = array(
+				'chat_id' => $chat_id,
+				'text' => "Antes debe haber un capitán, usa /pilotar para convertirte en él."
+			);
+			return $this->CI->telegram->sendMessage($output);
+		}
+		
+		$captain = $this->CI->Users->get_user($ship->captain);
+
+		$crew_member = $this->CI->Crew->get_crew_member($ship->id, $joinerId);
+		if (empty($crew_member) ){
+			if (!$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joinerId))){
+				$output = array(
+					'chat_id' => $chat_id,
+					'text' => "El usuario @".$joinerfromUsername." no ha sido añadido a la tripulación. ".
+							"Es necesario que vuelvas a introducirle en el grupo para que cuente como tripulante."
+				);
+				return $this->CI->telegram->sendMessage($output);
+			};
+
+			$crew_count = $ship->total_crew + 1;
+			$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
+
+			$outputGroup = array(
+				'chat_id' => $chat_id,
+				'text' => "¡Ey Capitan! @".$joinerfromUsername." ahora es un nuevo miembro de la '".$ship->name."'.\n\n".
+						  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
+			);
+			$this->CI->telegram->sendMessage($outputGroup);
+			$outputMention = array(
+				'chat_id' => $joinerId,
+				'text' => "@".$joinerfromUsername."! Ahora eres miembro de una nave, la '".$ship->name."'.\n".
+						  "Permíteme presentarme, soy el ordenador de abordo\n.".
+						  "Durante tu periplo por el espacio junto al capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." podrás vivir aventuras trepidantes!".
+						  "Recuerda estar atento a las órdenes de tu capitan, te necesita para cumplir sus objetivos.".
+						  "Aunque siempre puedes fastidiarle el paseo y echarlo de su propia nave!! encuentra el cómo..."
+			);
+			$this->CI->telegram->sendMessage($outputMention);
+		} else {
+			$output = array(
+				'chat_id' => $chat_id,
+				'text' => "El usuario @".$joinerfromUsername." ya es miembro de la tripulación. "
+			);
+			return $this->CI->telegram->sendMessage($output);
+		}
+
+	}
+
+
 
 	/**
 		Acción test
