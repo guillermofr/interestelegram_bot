@@ -613,7 +613,6 @@ class Commander {
 
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 				$output = $this->CI->telegram->sendPhoto($content);
-				log_message('error', print_r($output, TRUE));
 			}
 			else {			
 				$content = array(

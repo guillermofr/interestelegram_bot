@@ -20,7 +20,6 @@ class Calculations {
 
 	private function _chance($chance) {
 		$rand = rand(0, 100);
-		log_message('error', 'chance '.$rand.' <= '.$chance);
 		return ($rand <= $chance);
 	}
 
@@ -31,7 +30,6 @@ class Calculations {
 		$multiplier = 5;
 		$diffCrew = $attackerShip->total_crew - $defenderShip->total_crew;
 
-		log_message('error', $attackerShip->total_crew.' vs '.$defenderShip->total_crew.' = '.($baseAgility + ($diffCrew * $multiplier)));
 		return (! $this->_chance($baseAgility + ($diffCrew * $multiplier)));
 	}
 
