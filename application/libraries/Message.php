@@ -136,7 +136,7 @@ class Message {
 	 * - in case the array contains the bot username, this user record will not be stored as a crew member.
 	 */
 	private function _parseJoin(& $message) {
-		if (isset($message['new_chat_participant']) && !empty($message['new_chat_participant'])) {
+		if (isset($message['new_chat_participant']) && !empty($message['new_chat_participant'])  && isset($message['new_chat_participant']['username'])) {
 			$this->isJoin = true;
 			$this->joiner = null;
 			if ($message['new_chat_participant']['username'] == $this->botUsername) $this->isBotJoin = true;
@@ -158,7 +158,7 @@ class Message {
 	 * - in case the array contains the bot username, this user record will not be stored as a crew member.
 	 */
 	private function _parseLeave(& $message) {
-		if (isset($message['left_chat_participant']) && !empty($message['left_chat_participant'])) {
+		if (isset($message['left_chat_participant']) && !empty($message['left_chat_participant']) && isset($message['left_chat_participant']['username'])) {
 			$this->isLeave = true;
 			$this->leaver = null;
 			if ($message['left_chat_participant']['username'] == $this->botUsername) $this->isBotLeave = true;
