@@ -33,10 +33,15 @@ class Webhook extends CI_Controller
 
         public function hook()
         {
-        	$rawData = file_get_contents("php://input");
-        	$message = json_decode($rawData, TRUE);
-        	$this->load->library('Processor');
-        	$this->processor->process($message);
+        	try {
+        		$rawData = file_get_contents("php://input");
+	        	$message = json_decode($rawData, TRUE);
+	        	$this->load->library('Processor');
+	        	$this->processor->process($message);
+        	} catch (Exception $e) {
+        		log_message('error', $e->getMessage());
+        	}
+        	
         }
 
         public function sethook()
