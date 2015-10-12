@@ -200,4 +200,28 @@ class Movement {
 		return $this->movementKeyboard[$ship->angle];
 	}
 
+	/**
+	* Returns a random position x
+	*/
+	public function generateRandomX() {
+		return rand(1,$this->mapSize);
+	}
+
+	/**
+	* Returns a random position y
+	*/
+	public function generateRandomY() {
+		return rand(1,$this->mapSize);
+	}
+
+	/**
+	* Returns a random position y
+	*/
+	public function generateRandomAngle() {
+		$movementDialsKeys = array_keys($this->movementDials);
+		return $movementDialsKeys[rand(0,count($movementDialsKeys)-1)];
+	}
+
+
+
 }

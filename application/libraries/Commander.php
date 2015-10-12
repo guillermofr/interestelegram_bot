@@ -258,6 +258,7 @@ class Commander {
 	  Acción pilotar. Crea la nave en base de datos y asigna al capitán. Detecta si el capitán ya se ha fijado.
 	 */
 	private function _pilotar($msg, $ship=null, $params = FALSE) {
+		$this->CI->load->library('Movement');
 		$chat_id = $msg->chatId();
 		$chat_title = $msg->chatTitle();
 		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
@@ -268,7 +269,14 @@ class Commander {
 		if (empty($ship)) {
 			if ($username != null) {
 				// create new ship.
-				$ship = $this->CI->Ships->create_ship(array('chat_id' => $chat_id, 'captain' => $user_id, 'name' => $chat_title, 'total_crew' => 1, 'active' => 1));
+				$ship = $this->CI->Ships->create_ship(array('chat_id' => $chat_id, 
+															'captain' => $user_id, 
+															'name' => $chat_title, 
+															'total_crew' => 1, 
+															'active' => 1, 
+															'x'=>$this->CI->movement->generateRandomX(),
+															'y'=>$this->CI->movement->generateRandomY(),
+															'angle'=>$this->CI->movement->generateRandomAngle() ));
 				// create user if does not exist
 				$user = $this->CI->Users->get_user($user_id);
 				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
@@ -914,7 +922,7 @@ class Commander {
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
-		
+
 		$captain = $this->CI->Users->get_user($ship->captain);
 
 		$crew_member = $this->CI->Crew->get_crew_member($ship->id, $joinerId);
