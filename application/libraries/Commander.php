@@ -531,7 +531,7 @@ class Commander {
 
 		$quantity = $last_action->required == 1 ? 'una bolea' : $last_action->required.' boleas';
 		$img = $this->CI->telegram->prepareImage(APPPATH.'../imgs/attack.png');
-		$img = "AgADBAADNKgxG3864gdqo4ey0GF1r7VxcjAABOFBKjmiSAABdrgSAQABAg";
+
 		$caption = "Atacando con ".$quantity." de torpedos de protones!";
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 		$output = $this->CI->telegram->sendPhoto($content);
@@ -761,12 +761,14 @@ class Commander {
 		$captain_id = $ship->captain;
 		$username = $this->CI->Users->get_name_by_id($captain_id);
 
+		/* Demasiado spam?
 		$this->CI->load->library('Mapdrawer');
 		$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
 		$img = $this->CI->telegram->prepareImage($imagePath);
 		$caption = "Mostrando posición actual";
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 		$output = $this->CI->telegram->sendPhoto($content);
+		*/
 
 		$username = "@".$username;
 		$keyboard = $this->CI->telegram->buildKeyBoard($this->CI->movement->generateKeyboard($ship), $onetime=TRUE, $resize=TRUE, $selective=TRUE);
