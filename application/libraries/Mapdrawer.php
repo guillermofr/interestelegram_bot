@@ -7,6 +7,7 @@ class Mapdrawer {
 	private $asteroids = array();
 	private $size = 100;
 	private $mapSize = 6;
+	private $shipscount = array();
 
 	public function __construct() {
 		$this->CI =& get_instance();
@@ -111,12 +112,30 @@ class Mapdrawer {
 		imagedestroy($asteroids);
 
 		$this->CI->load->model('Ships');
-		$ships = $this->CI->Ships->get_all_active();
-		foreach ($ships as $ship) {
-			if ($ship->id != $mainShip->id) $base = $this->addShip($base, $mainShip, $ship);
+		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip);
+		
+		$target = null;
+		if (is_array($ships)) {
+			foreach ($ships as $ship) {
+				if ($ship->id != $mainShip->id) $base = $this->addShip($base, $mainShip, $ship);
+				if ($ship->id == $mainShip->target) $target = $ship;
+			}
+		}
+
+		if ($mainShip->target != null) {
+			if ($target != null) {
+				$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target.png");
+				imagecopyresampled($base, $target_symbol, $this->translate($mainShip->x, $target->x) * $this->size, $this->remapY($this->translate($mainShip->y, $target->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+				imagedestroy($target_symbol);
+			} else {
+				$target = $this->CI->Ships->get($mainShip->target);
+				if (!empty($target)) $base = $this->addTargetIndicator($base, $mainShip, $target);
+			}			
 		}
 
 		$base = $this->addShip($base, $mainShip, $mainShip);
+
+		$base = $this->addCounts($base, $mainShip);
 
 		if (FALSE) {
 			header('Content-Type: image/png');
@@ -131,6 +150,8 @@ class Mapdrawer {
 	}
 
 	public function addShip($base, $mainShip, $currentShip) {
+		$this->shipscount[$currentShip->x.'-'.$currentShip->y] = isset($this->shipscount[$currentShip->x.'-'.$currentShip->y]) ? $this->shipscount[$currentShip->x.'-'.$currentShip->y]+1 : 1;
+
 		$type = $currentShip->id % 5;
 		$specialAngle = $currentShip->angle % 90 == 0;
 
@@ -177,6 +198,73 @@ class Mapdrawer {
 		}
 
 		imagedestroy($forbidden);
+		return $base;
+	}
+
+	private function addTargetIndicator($base, $ship, $target) {
+		$x = 0;
+		$y = 0;
+		if ($ship->x == $target->x) {
+			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved.png");
+			if ($ship->y > $target->y) {
+				$x = 1;
+				$y = 2;
+				$this->rotate($target_symbol, 180);
+			} else {
+				$x = 1;
+				$y = 0;
+			}
+		} else if ($ship->y == $target->y) {
+			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved.png");
+			if ($ship->x > $target->x) {
+				$x = 0;
+				$y = 1;
+				$this->rotate($target_symbol, 270);
+			} else {
+				$x = 2;
+				$y = 1;
+				$this->rotate($target_symbol, 90);
+			}
+		} else {
+			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved_rotated.png");
+			if ($ship->x > $target->x) {
+				if ($ship->y > $target->y) {
+					$x = 0;
+					$y = 2;
+					$this->rotate($target_symbol, 180);
+				} else {
+					$x = 0;
+					$y = 0;
+					$this->rotate($target_symbol, 270);
+				}
+			} else {
+				if ($ship->y > $target->y) {
+					$x = 2;
+					$y = 2;
+					$this->rotate($target_symbol, 90);
+				} else {
+					$x = 2;
+					$y = 0;
+				}
+			}
+		}
+
+		imagecopyresampled($base, $target_symbol, $x * $this->size, $y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		imagedestroy($target_symbol);
+
+		return $base;
+	}
+
+	private function addCounts($base, $mainShip) {
+		foreach ($this->shipscount as $key => $value) {
+			if ($value > 1) {
+				$parts = explode('-', $key);
+				if ($value > 4) $value = 5;
+				$item = imagecreatefrompng(APPPATH."../imgs/map/count{$value}.png");
+				imagecopyresampled($base, $item, $this->translate($mainShip->x, $parts[0]) * $this->size, $this->remapY($this->translate($mainShip->y, $parts[1])) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+				imagedestroy($item);
+			}
+		}
 		return $base;
 	}
 
