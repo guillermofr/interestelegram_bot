@@ -51,6 +51,24 @@ class Commander {
 	}
 
 
+	private function _isCheat($last_action, $command) {
+
+		if (is_null($last_action) || 
+			( 
+				!is_null($last_action) && 
+				( 
+					$last_action->prev_command != $command || 
+					( $last_action->prev_command == $command && !$last_action->fail ) 
+				) 
+			)
+		) 
+			return TRUE;
+		else 
+			return FALSE;
+		
+	}
+
+
 	/**
 	 * _joinShip
 	 * - Esta operación es respuesta a un evento en el grupo. Un nuevo usuario ha entrado y deberá formar parte de la tripulación
@@ -341,7 +359,9 @@ class Commander {
 					'captain_id' => $ship->captain, 
 					'message_id' => $message_id,
 					'command' => 'do_escanear',
-					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ),
+					'prev_command' => 'escanear'
+				));
 			}
 		} else {
 			$text = "Solo el capitán puede escanear, tripulante.";
@@ -357,11 +377,11 @@ class Commander {
 
 	private function _do_escanear($msg, $ship, $params = FALSE, $last_action = null) {
 
-		/* Code to prevent cheating on command series 
-		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
+		/* Code to prevent cheating on command series */
+		if ($this->_isCheat($last_action, 'escanear')) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "Listar requiere haber hecho 'escanear'.");
 			return $this->CI->telegram->sendMessage($content);
-		}*/
+		}
 
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
@@ -412,7 +432,9 @@ class Commander {
 					'captain_id' => $ship->captain, 
 					'message_id' => $message_id,
 					'command' => 'do_seleccionar',
-					'required' => 0));
+					'required' => 0,
+					'prev_command' => 'do_escanear'
+				));
 			}
 		} else {
 			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "No hay blancos posibles en rango capitán!"));
@@ -423,11 +445,11 @@ class Commander {
 
 	private function _do_seleccionar($msg, $ship, $params, $last_action = null) {
 
-		/* Code to prevent cheating on command series 
-		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'listar' && !$last_action->fail) ) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "seleccionar requiere haber hecho 'listar'.");
+		/* Code to prevent cheating on command series */
+		if ( $this->_isCheat($last_action, 'do_escanear') ) {
+			$content = array('chat_id' => $msg->chatId(), 'text' => "seleccionar requiere haber hecho 'escanear' y haber pasado la votación.");
 			return $this->CI->telegram->sendMessage($content);
-		}*/
+		}
 
 		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
@@ -511,7 +533,9 @@ class Commander {
 							'captain_id' => $ship->captain, 
 							'message_id' => $message_id,
 							'command' => 'do_atacar',
-							'required' => $param));
+							'required' => $param,
+							'prev_command' => 'atacar'
+						));
 					}
 				} else {
 					$text = $ship->target == null ? "Capitán no tenemos objetivo, utilice /escanear" : "Capitán la nave no se encuentra dentro de nuestro arco de fuego!";
@@ -535,6 +559,13 @@ class Commander {
 	}
 
 	private function _do_atacar($msg, $ship, $params = FALSE, $last_action = null){
+
+		/* Code to prevent cheating on command series */
+		if ( $this->_isCheat($last_action, 'atacar') ) {
+			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar un ataque requiere haber hecho 'atacar' y haber pasado la votación.");
+			return $this->CI->telegram->sendMessage($content);
+		}
+
 		$chat_id = $msg->chatId();
 
 		$quantity = $last_action->required == 1 ? 'una bolea' : $last_action->required.' boleas';
@@ -689,7 +720,9 @@ class Commander {
 					'captain_id' => $ship->captain, 
 					'message_id' => $message_id,
 					'command' => 'do_esquivar',
-					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ),
+					'prev_command' => 'esquivar'
+				));
 			}
 		} else {
 			$text = "Solo el capitán puede esquivar, tripulante.";
@@ -704,12 +737,13 @@ class Commander {
 
 	private function _do_esquivar($msg, $ship, $params, $last_action = null) {
 
-		$this->CI->load->library('Calculations');
-		/* Code to prevent cheating on command series 
-		if ( is_null($last_action) || ( !is_null($last_action) && $last_action->command != 'escanear' && !$last_action->fail) ) {
+		/* Code to prevent cheating on command series */
+		if ( $this->_isCheat($last_action, 'esquivar') ) {
 			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar esquivar requiere haber hecho 'esquivar'.");
 			return $this->CI->telegram->sendMessage($content);
-		}*/
+		}
+
+		$this->CI->load->library('Calculations');
 
 		$messageId = $msg->messageId();
 		$username = "@".$msg->fromUsername();
@@ -780,7 +814,9 @@ class Commander {
 					'captain_id' => $ship->captain, 
 					'message_id' => $message_id,
 					'command' => 'do_mover',
-					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ) ));
+					'required' => round( ($ship->total_crew / 2), 0, PHP_ROUND_HALF_UP ),
+					'prev_command' => 'mover'
+				));
 			}
 		} else {
 			$text = "Solo el capitán puede mover, tripulante.";
@@ -793,7 +829,14 @@ class Commander {
 		}
 	}
 
-	private function _do_mover($msg, $ship, $params) {
+	private function _do_mover($msg, $ship, $params, $last_action = NULL) {
+
+		/* Code to prevent cheating on command series */
+		if ( $this->_isCheat($last_action, 'mover') ) {
+			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar mover requiere haber hecho 'mover' y haber pasado la votación.");
+			return $this->CI->telegram->sendMessage($content);
+		}
+
 		$this->CI->load->library('Movement');
 
 		$messageId = $msg->messageId();
@@ -834,12 +877,20 @@ class Commander {
 				'captain_id' => $ship->captain, 
 				'message_id' => $message_id,
 				'command' => 'perform_mover',
-				'required' => 0
+				'required' => 0,
+				'prev_command' => 'do_mover'
 			));
 		}
 	}
 
-	private function _perform_mover($msg, $ship, $params) {
+	private function _perform_mover($msg, $ship, $params, $last_action = NULL) {
+		
+		/* Code to prevent cheating on command series */
+		if ( $this->_isCheat($last_action, 'do_mover') ) {
+			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar mover (fin) requiere haber hecho 'mover' y haber pasado la votación.");
+			return $this->CI->telegram->sendMessage($content);
+		}
+
 		$chat_id = $msg->chatId();
 		$user_id = $msg->fromId();
 		$messageId = $msg->messageId();
