@@ -19,6 +19,7 @@ class Processor {
 		$this->CI->config->load('images');
 		$this->botToken = $this->CI->config->item('botToken');
 		$this->botUsername = $this->CI->config->item('botUsername');
+		$this->debug = $this->CI->config->item('debug');
 
 		$params = array( $this->botToken );
 

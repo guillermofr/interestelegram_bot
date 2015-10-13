@@ -511,23 +511,23 @@ class Commander {
 
 
 	// Atajos para el ataque
-	private function _a1($msg, $ship, $params) { $this->_atacar($msg, $ship, '#1'); }
-	private function _a2($msg, $ship, $params) { $this->_atacar($msg, $ship, '#2'); }
-	private function _a3($msg, $ship, $params) { $this->_atacar($msg, $ship, '#3'); }
-	private function _a4($msg, $ship, $params) { $this->_atacar($msg, $ship, '#4'); }
-	private function _a5($msg, $ship, $params) { $this->_atacar($msg, $ship, '#5'); }
+	private function _a1($msg, $ship, $params) { $this->_atacar($msg, $ship, '1'); }
+	private function _a2($msg, $ship, $params) { $this->_atacar($msg, $ship, '2'); }
+	private function _a3($msg, $ship, $params) { $this->_atacar($msg, $ship, '3'); }
+	private function _a4($msg, $ship, $params) { $this->_atacar($msg, $ship, '4'); }
+	private function _a5($msg, $ship, $params) { $this->_atacar($msg, $ship, '5'); }
 
 	private function _atacar($msg, $ship, $params = FALSE){
 		$user_id = $msg->fromId();
 		$chat_id = $msg->chatId();
 		$messageId = $msg->messageId();
-		$param = str_replace('#', '', $params);
+		$param = str_replace('_', '', $params);
 		$param = intval($param);
 
 		if ($user_id == $ship->captain ) {
 
 			if (!is_numeric($param) || $param == 0) {
-				$text = "Capitán debéis indicar la potencia del ataque! (/atacar#2 , /atacar#5 ...)";
+				$text = "Capitán debéis indicar la potencia del ataque! (/atacar_2 , /atacar_5 ...)";
 				$content = array(
 					'reply_to_message_id' => $messageId, 
 					'chat_id' => $chat_id, 

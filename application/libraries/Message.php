@@ -39,7 +39,7 @@ class Message {
 	private $chatTitle = null;		// - chat title are relative to group messages.
 
 	// regular expressions
-	private $regExp_Command = '/^\/(\w*)(.*)/';
+	private $regExp_Command = '/^\/([^\W_]+)(.*)/u';
 
 	public function __construct($msg=array()) {
 		$this->CI =& get_instance();
