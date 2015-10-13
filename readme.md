@@ -36,13 +36,23 @@ Extiende de [MY_Model](https://github.com/avenirer/CodeIgniter-MY_Model). Falta 
 #### Comandos disponibles
 
 pilotar - Toma el mando de una nave como capitán 
+
 mover - Muevete por el espacio para buscar objetivos 
+
 escanear - Busca y selecciona tu objetivo 
+
 atacar - Ataca a tu objetivo 
+
 a1 - Atajo para atacar con daño 1 
+
 a3 - Atajo para atacar con daño 3 y 3 personas 
+
 a5 - Atajo para atacar con daño 5 y 5 personas 
+
 esquivar - Sal de los radares enemigos con una maniobra evasiva 
+
 informe - Informe de situación de tu nave 
+
 alistarse - Formar parte de la tripulación, por si estabas antes que el bot
+
 
