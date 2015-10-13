@@ -14,6 +14,8 @@ class Message {
 	private $isBotLeave = false;
 	private $joiner = null;
 	private $leaver = null;
+	private $isInvalidJoin = false;
+	private $isInvalidLeave = false;
 	private $isBot = false;
 	private $isFromBot = false;
 	private $isCommand = false;
@@ -58,7 +60,8 @@ class Message {
 	private function _clean_msg() {
 		// booleans to false.
 		$this->isJoin = $this->isLeave = $this->isBotJoin = $this->isBotLeave = $this->isReply =
-		$this->isBot = $this->isCommand = $this->isPrivate = $this->isGroup = $this->isTitleChange = false;
+		$this->isBot = $this->isCommand = $this->isPrivate = $this->isGroup = $this->isTitleChange = 
+		$this->isInvalidJoin = $this->isInvalidLeave = false;
 		// anyting else to null.
 		$this->text = $this->command = $this->params = $this->replyId = $this->updateId = $this->messageId = 
 		$this->fromId = $this->fromUsername = $this->fromFirstName = $this->date = $this->chatId = 
@@ -99,15 +102,8 @@ class Message {
 	private function _parseFrom(& $message) {
 		if (isset($message['from']) && !empty($message['from']) ){
 			$this->fromId = $message['from']['id'];
-			if (isset($message['from']['username']))
-				$this->fromUsername = $message['from']['username'];
-			else 
-				$this->fromUsername = null;
-
-			if (isset($message['from']['first_name']))
-				$this->fromFirstName = $message['from']['first_name'];
-			else 
-				$this->fromFirstName = null;
+			if (isset($message['from']['username'])) $this->fromUsername = $message['from']['username'];
+			if (isset($message['from']['first_name'])) $this->fromFirstName = $message['from']['first_name'];
 
 			if ($this->fromUsername == $this->botUsername) {
 				$this->isFromBot = true;
@@ -126,8 +122,8 @@ class Message {
 			$this->chatId = $message['chat']['id'];
 			if ($this->chatId >= 0) {
 				$this->isPrivate = true;
-				$this->chatUsername = $message['chat']['username'];
-				$this->chatFirstName = $message['chat']['first_name'];
+				$this->chatUsername = (isset($message['chat']['username']) ? $message['chat']['username'] : null);
+				$this->chatFirstName = (isset($message['chat']['first_name']) ? $message['chat']['first_name'] : null);
 			}
 			else {
 				$this->isGroup = true;
@@ -144,15 +140,30 @@ class Message {
 	 * - in case the array contains the bot username, this user record will not be stored as a crew member.
 	 */
 	private function _parseJoin(& $message) {
-		if (isset($message['new_chat_participant']) && !empty($message['new_chat_participant'])  && isset($message['new_chat_participant']['username'])) {
+		if (isset($message['new_chat_participant']) && !empty($message['new_chat_participant'])) {
 			$this->isJoin = true;
 			$this->joiner = null;
-			if ($message['new_chat_participant']['username'] == $this->botUsername) $this->isBotJoin = true;
+			$newUser = $message['new_chat_participant'];
+			$newUserId = ( isset($newUser['id']) ? $newUser['id'] : null );
+			$newUserUsername = ( isset($newUser['username']) ? $newUser['username'] : null );
+			$newUserFirstName = ( isset($newUser['first_name']) ? $newUser['first_name'] : null);
+
+			if ( is_null($newUserUsername) || $newUserUsername == '' ){
+				$this->joiner = (object)array(
+					'id' => $newUserId,
+					'first_name' => $newUserFirstName,
+					'username' => $newUserUsername
+				);
+				$this->isInvalidJoin = true;
+			}
+			elseif ($newUserUsername == $this->botUsername) {
+				$this->isBotJoin = true;
+			}
 			else {
 				$this->joiner = (object)array(
-					'id' => $message['new_chat_participant']['id'],
-					'first_name' => $message['new_chat_participant']['first_name'],
-					'username' => $message['new_chat_participant']['username']
+					'id' => $newUserId,
+					'first_name' => $newUserFirstName,
+					'username' => $newUserUsername
 				);
 			}
 		}
@@ -169,12 +180,27 @@ class Message {
 		if (isset($message['left_chat_participant']) && !empty($message['left_chat_participant']) && isset($message['left_chat_participant']['username'])) {
 			$this->isLeave = true;
 			$this->leaver = null;
-			if ($message['left_chat_participant']['username'] == $this->botUsername) $this->isBotLeave = true;
+			$leftUser = $message['left_chat_participant'];
+			$leftUserId = ( isset($leftUser['id']) ? $leftUser['id'] : null );
+			$leftUserUsername = ( isset($leftUser['username']) ? $leftUser['username'] : null );
+			$leftUserFirstName = ( isset($leftUser['first_name']) ? $leftUser['first_name'] : null);
+
+			if ( is_null($leftUserUsername) || $leftUserUsername == '' ){
+				$this->leaver = (object)array(
+					'id' => $leftUserId,
+					'first_name' => $leftUserFirstName,
+					'username' => $leftUserUsername
+				);
+				$this->isInvalidLeave = true;
+			}
+			elseif ($leftUserUsername == $this->botUsername) {
+				$this->isBotJoin = true;
+			}
 			else {
 				$this->leaver = (object)array(
-					'id' => $message['left_chat_participant']['id'],
-					'first_name' => $message['left_chat_participant']['first_name'],
-					'username' => $message['left_chat_participant']['username']
+					'id' => $leftUserId,
+					'first_name' => $leftUserFirstName,
+					'username' => $leftUserUsername
 				);
 			}
 		}
@@ -220,6 +246,8 @@ class Message {
 	public function isLeave() { return $this->isLeave; }
 	public function isBotJoin() { return $this->isBotJoin; }
 	public function isBotLeave() { return $this->isBotLeave; }
+	public function isInvalidJoin() { return $this->isInvalidJoin; }
+	public function isInvalidLeave() { return $this->isInvalidLeave; }
 	public function joiner() { return $this->joiner; }
 	public function leaver() { return $this->leaver; }
 	public function isTitleChange() { return $this->isTitleChange; }
@@ -242,6 +270,7 @@ class Message {
 	public function fromId() { return $this->fromId; }
 	public function fromUsername() { return $this->fromUsername; }
 	public function fromFirstName() { return $this->fromFirstName; }
+	public function isEmptyFromUsername() { return ( is_null($this->fromUsername) || $this->fromUsername == '' ); }
 	
 	public function chatId() { return $this->chatId; }
 	

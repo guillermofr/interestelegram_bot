@@ -34,6 +34,9 @@ class Processor {
 		$this->CI->load->library('Message', $msg);
 		$msg =& $this->CI->message;
 
+		/* Prevent users without username */
+		if ($msg->isEmptyFromUsername()) return $this->_empty_username_warning($msg);
+
 		if ($msg->isPrivate()) return $this->_welcome($msg);
 
 		$ship = $this->CI->Ships->get_ship_by_chat_id( $msg->chatId() );
@@ -48,6 +51,17 @@ class Processor {
 		}
 
 	}
+
+
+	private function _empty_username_warning(& $msg) {
+
+		return $this->CI->telegram->sendMessage(array(
+			'chat_id' => $msg->fromId(),
+			'text' => 'Para usar '.$this->botUsername.' es necesario tener configurado un username'
+		));
+
+	}
+
 
 	private function _welcome(& $msg) {
 

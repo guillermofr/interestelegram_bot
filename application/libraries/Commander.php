@@ -113,6 +113,17 @@ class Commander {
 			return $this->CI->telegram->sendMessage($output);
 		}
 
+
+		/* prevent invalid joins */
+		if ($msg->isInvalidJoin()){
+			$output = array(
+				'chat_id' => $joiner->id,
+				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un username.'
+			);
+			return $this->CI->telegram->sendMessage($output);
+		}
+
+
 		$user = $this->CI->Users->get_user($joiner->id);
 		if (!$user) {
 			$new_player = true;
@@ -190,6 +201,16 @@ class Commander {
 			return $this->CI->telegram->sendMessage($output);
 			
 		}
+
+		/* prevent invalid leave */
+		if ($msg->isInvalidLeave()){
+			$output = array(
+				'chat_id' => $joiner->id,
+				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un username.'
+			);
+			return $this->CI->telegram->sendMessage($output);
+		}
+
 
 		$user = $this->CI->Users->get_user($leaver->id);
 		if (!$user) {
