@@ -110,7 +110,8 @@ class Commander {
 						"...Check fish...Ok\n".
 						"¡La nave está lista!\n\n".
 						"Hola...? soy el ordenador de abordo...\n".
-						"¿ Hay alguien ahí ? Si hay alguien, que escriba '/pilotar' ya para ser el capitán. Los demás escribir /alistarse para ayudar al capitán."
+						"¿ Hay alguien ahí ? Si hay alguien, que escriba /pilotar ya para ser el capitán. Los demás pueden escribir /alistarse para ayudar al capitán.\n".
+						"Si necesitáis más información, utilizad /ayuda"
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -125,15 +126,22 @@ class Commander {
 			return $this->CI->telegram->sendMessage($output);
 		}
 
-
 		$user = $this->CI->Users->get_user($joiner->id);
 		if (!$user) {
 			$new_player = true;
 			$user = $this->CI->Users->create_user(array('id' => $joiner->id, 'username' => $joiner->username, 'first_name' => $joiner->first_name));
 		}
 
-		$captain = $this->CI->Users->get_user($ship->captain);
+		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
+		if (!$ship) {
+			$output = array(
+				'chat_id' => $chat_id,
+				'text' => "No puedo tener en cuenta a los nuevos tripulantes si nadie toma el mando primero: que alguien diga /pilotar !"
+			);
+			return $this->CI->telegram->sendMessage($output);
+		}
 
+		$captain = $this->CI->Users->get_user($ship->captain);
 		$crew_member = $this->CI->Crew->get_crew_member($ship->id, $joiner->id);
 		if (empty($crew_member) )
 			if (!$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joiner->id))){
@@ -217,22 +225,24 @@ class Commander {
 		}
 
 		$user = $this->CI->Users->get_user($leaver->id);
+
 		if (!$user) {
 			$new_player = true;
 			$user = $this->CI->Users->create_user(array('id' => $leaver->id, 'username' => $leaver->username, 'first_name' => $leaver->first_name));
 		}
 
-		if ($this->CI->Crew->get_crew_member(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
-			if (!$this->CI->Crew->delete_crew(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
+		if ($this->CI->Crew->get_crew_member($ship->id, $leaver->id)){
+			if (!$this->CI->Crew->delete_crew($ship->id, $leaver->id)){
+				/* Se puede entrar aquí? puedo hacer get y fallar el delete?
 				$output = array(
 					'chat_id' => $chat_id,
-					'text' => "El usuario @".$joiner->username." no ha sido eliminado de la tripulación. ".
+					'text' => "El usuario @".$leaver->username." no ha sido eliminado de la tripulación. ".
 							"Si fue añadido al grupo antes que yo es normal. Si no, para que deje de contar deberás volver a añadirle y volver a expulsarle."
 				);
 				return $this->CI->telegram->sendMessage($output);
+				*/
 			};
-		}
-		else return;
+		} else return;
 
 		$this->CI->load->library('Calculations');
 		$newHealth = $this->CI->calculations->ship_health($ship, -1);
@@ -282,15 +292,25 @@ class Commander {
 			if ( $user_id != $already_ship->captain ) {
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Grumete, no hay mucho más que hacer por ahora. Siempre puedes invitar colegas a la nave."
+					'text' => "Formas parte de la tripulación, tu misión es ayudar al capitan votando en las acciones que requieran tu participación. Ten en mente que sin tu ayuda el capitán no podrá hacer ciertas acciones. Eres indispensable para ganar."
 				);
 			}
 			else {			
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Capitán, no hay mucho más que hacer por ahora. ".
-							"¿Por qué no observamos juntos el espacio frente a nosotros? Acaricieme el ratón capitán...\n\n".
-							"Aunque bueno... siempre puedes aumentar la tripulación de la nave y no ser tan patético."
+					'text' => "Capitán, ahora pilotáis una nave en un sector del espacio hostil. Vuestro objetivo es sobrevivir, y para ello tal vez tengáis que luchar.\n".
+							"Cada tripulante incrementará la vida de vuestra nave, pero reducirá su capacidad para evitar ataques. Además, una nave con mucha tripulación necesita más colaboración para realizar tareas como /mover\n".
+							"Todas las acciones de la nave requieren una cantidad mínima de votos para realizarse. Eso significa que una nave pequeña solo puede lanzar ataques pequeños, aunque no necesita apoyos para moverse, mientras una nave grande puede lanzar grandes ataques y sus movimientos serán más lentos al necesitar más colaboración para completarlos.\n".
+							"Lo primero que debéis hacer es pedir un /informe para ver vuestro estado, o /escanear para intentar fijar en el blanco a una nave enemiga. Una vez fijada, un símbolo os indicará su posición si huye.\n".
+							"Vuestra nave puede atacar solo hacia el frente, en el arco de fuego señalado en rojo (incluye la misma casilla en la que te encuentras). Es importante que os coloquéis bien para poder atacar.\n"
+				);
+				$output = $this->CI->telegram->sendMessage($content);
+				$content = array(
+					'chat_id' => $chat_id, 
+					'text' => "Para atacar utiliza /atacar_1 /atacar_2 etc o /a1 /a2 dependiendo de cuanta potencia quieras utilizar. Recuerda que necesitarás que tu tripulación colabore si lanzas ataques grandes\n".
+							  "La probabilidad de impacto depende de la diferencia de tamaños de las naves. Una nave grande tendrá problemas para impactar a una pequeña, mientras que la pequeña tendrá menos fallos contra una mayor.\n".
+							  "Si te fijan en el blanco y quieres evitar que te ataquen, deberás huír o utilizar /esquivar para que la nave enemiga deje de tenerte fijada en el blanco.\n".
+							  "Si hay gente en el canal que no forma parte de la nave, deben utilizar /alistarse para participar. Si escribes / verás sugerencias de comandos para utilizar"
 				);
 			}
 
@@ -334,8 +354,13 @@ class Commander {
 
 				$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
 				$output = $this->CI->telegram->sendMessage($content);
-				$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
-				$output = $this->CI->telegram->sendMessage($content);
+
+				$this->CI->load->library('Mapdrawer');
+				$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
+				$img = $this->CI->telegram->prepareImage($imagePath);
+				
+				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
+				$output = $this->CI->telegram->sendPhoto($content);
 			} else {
 				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un username en Ajustes');						
 				$output = $this->CI->telegram->sendMessage($content);
@@ -431,10 +456,16 @@ class Commander {
 				$nearShips[] = $sectorShip->id."@".$captain_name;
 
 				$string = (strlen($sectorShip->name) > 20) ? substr($sectorShip->name,0,20).'...' : $sectorShip->name;
-				$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") ppl:".$sectorShip->total_crew;
+				$nearShipsDetail[] = $sectorShip->id.") ". $string." (@".$captain_name.") \xF0\x9F\x91\xA5x".$sectorShip->total_crew;
 
 			}
 		}
+
+		$this->CI->load->library('Mapdrawer');
+		$imagePath = $this->CI->mapdrawer->generateShipMap($ship, true);
+		$img = $this->CI->telegram->prepareImage($imagePath);
+		$content = array('chat_id' => $chat_id, 'photo' => $img);
+		$this->CI->telegram->sendPhoto($content);
 
 		if (count($nearShips) > 0) {
 			$nearShips[] = "Ninguno";
@@ -677,7 +708,7 @@ class Commander {
 
 				$this->CI->load->library('Mapdrawer');
 				$imagePath = $this->CI->mapdrawer->generateShipMap($Ship);
-
+				$img = $this->CI->telegram->prepareImage($imagePath);
 
 				$target = false;
 				if (!is_null($Ship->target)){
@@ -685,7 +716,6 @@ class Commander {
 					$target = "\n\xF0\x9F\x92\xA2: ".$TargetedShip->name;
 				}
 
-				$img = $this->CI->telegram->prepareImage($imagePath);
 				// http://apps.timwhitlock.info/emoji/tables/unicode
 				$caption = "Información de la nave:".
 							"\n\xF0\x9F\x9A\x80: ".$Ship->name.

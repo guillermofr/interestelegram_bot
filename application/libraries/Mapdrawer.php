@@ -93,7 +93,7 @@ class Mapdrawer {
 		);
 	}
 
-	public function generateShipMap($mainShip) {
+	public function generateShipMap($mainShip, $isScan = false) {
 		$centerX = $mainShip->x;
 		$centerY = $mainShip->y;
 		$initX = $mainShip->x -1;
@@ -105,11 +105,13 @@ class Mapdrawer {
 
 		$base = imagecreatefrompng(APPPATH.'../imgs/map/background.png');
 
-		$base = $this->markForbidden($base, $mainShip);
+		$this->markForbidden($base, $mainShip);
 
 		$asteroids = imagecreatefrompng(APPPATH."../imgs/map/asteroids_1_1.png");
 		imagecopyresampled($base, $asteroids, $this->translate($mainShip->x, 3) * $this->size, $this->remapY($this->translate($mainShip->y, 3)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
 		imagedestroy($asteroids);
+
+		if ($isScan) $this->addRadar($base, $mainShip);
 
 		$this->CI->load->model('Ships');
 		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip);
@@ -117,7 +119,7 @@ class Mapdrawer {
 		$target = null;
 		if (is_array($ships)) {
 			foreach ($ships as $ship) {
-				if ($ship->id != $mainShip->id) $base = $this->addShip($base, $mainShip, $ship);
+				if ($ship->id != $mainShip->id) $this->addShip($base, $mainShip, $ship);
 				if ($ship->id == $mainShip->target) $target = $ship;
 			}
 		}
@@ -133,9 +135,9 @@ class Mapdrawer {
 			}			
 		}
 
-		$base = $this->addShip($base, $mainShip, $mainShip);
+		$this->addShip($base, $mainShip, $mainShip);
 
-		$base = $this->addCounts($base, $mainShip);
+		$this->addCounts($base, $mainShip);
 
 		if (FALSE) {
 			header('Content-Type: image/png');
@@ -149,7 +151,7 @@ class Mapdrawer {
 		}
 	}
 
-	public function addShip($base, $mainShip, $currentShip) {
+	public function addShip(&$base, $mainShip, $currentShip) {
 		$this->shipscount[$currentShip->x.'-'.$currentShip->y] = isset($this->shipscount[$currentShip->x.'-'.$currentShip->y]) ? $this->shipscount[$currentShip->x.'-'.$currentShip->y]+1 : 1;
 
 		$type = $currentShip->id % 5;
@@ -160,8 +162,6 @@ class Mapdrawer {
 		
 		imagecopyresampled($base, $item, $this->translate($mainShip->x, $currentShip->x) * $this->size, $this->remapY($this->translate($mainShip->y, $currentShip->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
 		imagedestroy($item);
-
-		return $base;
 	}
 
 	private function translate($base, $value) {
@@ -174,7 +174,7 @@ class Mapdrawer {
 		return isset($y[$value])?$y[$value]:-1;
 	}
 
-	private function markForbidden($base, $ship) {
+	private function markForbidden(&$base, $ship) {
 		$forbidden = imagecreatefrompng(APPPATH."../imgs/map/forbidden.png");
 		if ($ship->y == 1) {
 			imagecopyresampled($base, $forbidden, 0 * $this->size, 2 * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
@@ -198,7 +198,6 @@ class Mapdrawer {
 		}
 
 		imagedestroy($forbidden);
-		return $base;
 	}
 
 	private function addTargetIndicator($base, $ship, $target) {
@@ -255,7 +254,7 @@ class Mapdrawer {
 		return $base;
 	}
 
-	private function addCounts($base, $mainShip) {
+	private function addCounts(&$base, $mainShip) {
 		foreach ($this->shipscount as $key => $value) {
 			if ($value > 1) {
 				$parts = explode('-', $key);
@@ -265,7 +264,16 @@ class Mapdrawer {
 				imagedestroy($item);
 			}
 		}
-		return $base;
+	}
+
+	private function addRadar(&$base, $mainShip) {
+		$specialAngle = $mainShip->angle % 90 == 0;
+		$radar = imagecreatefrompng($specialAngle ? APPPATH."../imgs/map/radar.png" : APPPATH."../imgs/map/radar_rotated.png");
+
+		$this->rotate($radar, $specialAngle ? $mainShip->angle : ($mainShip->angle-45));
+
+		imagecopyresampled($base, $radar, 0, 0, 0, 0, 300, 300, 300, 300);
+		imagedestroy($radar);
 	}
 
 }
