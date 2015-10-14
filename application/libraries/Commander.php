@@ -6,6 +6,8 @@ class Commander {
 	private $botToken = null;
 	private $botUsername = null;
 
+	private $shipInitialHealth = 5;
+
 	private $captain_methods = array(
 				'escanear', 
 				'informe', 
@@ -143,8 +145,11 @@ class Commander {
 				return $this->CI->telegram->sendMessage($output);
 			};
 
+		$this->CI->load->library('Calculations');
+		$newHealth = $this->CI->calculations->ship_health($ship, 1);
+
 		$crew_count = $ship->total_crew + 1;
-		$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
+		$this->CI->Ships->update_ship(array( 'total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health'] ), $ship->id);
 
 		$outputGroup = array(
 			'chat_id' => $chat_id,
@@ -211,6 +216,7 @@ class Commander {
 			return $this->CI->telegram->sendMessage($output);
 		}
 
+		log_message('error', print_r($leaver, TRUE));
 
 		$user = $this->CI->Users->get_user($leaver->id);
 		if (!$user) {
@@ -218,7 +224,7 @@ class Commander {
 			$user = $this->CI->Users->create_user(array('id' => $leaver->id, 'username' => $leaver->username, 'first_name' => $leaver->first_name));
 		}
 
-		if ($this->CI->Crew->get_crew_member(array('ship_id' => $ship->id, 'user_id' => $leaver->id)))
+		if ($this->CI->Crew->get_crew_member(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
 			if (!$this->CI->Crew->delete_crew(array('ship_id' => $ship->id, 'user_id' => $leaver->id))){
 				$output = array(
 					'chat_id' => $chat_id,
@@ -227,9 +233,14 @@ class Commander {
 				);
 				return $this->CI->telegram->sendMessage($output);
 			};
+		}
+		else return;
+
+		$this->CI->load->library('Calculations');
+		$newHealth = $this->CI->calculations->ship_health($ship, -1);
 
 		$crew_count = $ship->total_crew - 1;
-		$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
+		$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health']), $ship->id);
 
 		if ($ship->captain == $leaver->id) {
 			// el capitan abandona la nave!!
@@ -245,7 +256,7 @@ class Commander {
 		else {
 			$outputGroup = array(
 				'chat_id' => $chat_id,
-				'text' => "¡Ey Capitan! @".$leaver->username." abandonó su name.\n\n".
+				'text' => "¡Ey Capitan! @".$leaver->username." abandonó su nave.\n\n".
 						  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
 			);
 			$this->CI->telegram->sendMessage($outputGroup);
@@ -315,7 +326,9 @@ class Commander {
 															'active' => 1, 
 															'x'=>$this->CI->movement->generateRandomX(),
 															'y'=>$this->CI->movement->generateRandomY(),
-															'angle'=>$this->CI->movement->generateRandomAngle() ));
+															'angle'=>$this->CI->movement->generateRandomAngle(),
+															'health' => $this->shipInitialHealth,
+															'max_health' => $this->shipInitialHealth));
 				// create user if does not exist
 				$user = $this->CI->Users->get_user($user_id);
 				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
@@ -1031,8 +1044,11 @@ class Commander {
 				return $this->CI->telegram->sendMessage($output);
 			};
 
+			$this->CI->load->library('Calculations');
+			$newHealth = $this->CI->calculations->ship_health($ship, 1);
+
 			$crew_count = $ship->total_crew + 1;
-			$this->CI->Ships->update_ship(array('total_crew' => $crew_count), $ship->id);
+			$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health']), $ship->id);
 
 			$outputGroup = array(
 				'chat_id' => $chat_id,

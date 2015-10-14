@@ -8,6 +8,9 @@
 class Calculations {
 
 	private $CI = null;
+	private $baseAgility = 45;
+	private $agilityMultiplier = 5;
+	private $healthCrewIncrement = 5;
 
 	public function __construct() {
 		$this->CI =& get_instance();
@@ -23,16 +26,38 @@ class Calculations {
 		return ($rand <= $chance);
 	}
 
+
 	public function attack_success($attackerShip, $defenderShip) {
 		if (empty($attackerShip)) return false;
 		if (empty($defenderShip)) return false;
-		$baseAgility = 45;
-		$multiplier = 5;
 		$diffCrew = $attackerShip->total_crew - $defenderShip->total_crew;
 
-		return (! $this->_chance($baseAgility + ($diffCrew * $multiplier)));
+		return (! $this->_chance($this->baseAgility + ($diffCrew * $this->agilityMultiplier)));
 	}
 
+
+	/**
+	 * Ship_health
+	 * - this method will return the new ship health and max health for a ship based on its crew.
+	 * @param $ship 	Object 		The ship model object
+	 * @param $crew 	Integer 	Number of new crew members, could be a negative number.
+ 	 */
+	public function ship_health($ship, $crewIncrement) {
+
+		$actualCrew = $ship->total_crew;
+		$actualHP = $ship->health;
+		$actualMAXHP = $ship->max_health;
+		$increment = ( $crewIncrement * $this->healthCrewIncrement );
+
+		$max_health = $actualMAXHP + $increment;
+		$health = ( ( ( $actualCrew + $crewIncrement ) * $this->healthCrewIncrement ) - ( $actualCrew * $this->healthCrewIncrement ) + $actualHP );
+
+		return array(
+			'max_health' => ( $max_health <= 0 ) ? 1 : $max_health,
+			'health' => ( $health <= 0 ) ? 1 : $health
+		);
+
+	}
 
 
 	/**
