@@ -475,7 +475,18 @@ class Commander {
 
 			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
 
-			$option = array($nearShips);
+			$option = array();
+			$perRow = 2;
+			$tmp = array();
+			foreach ($nearShips as $opt) {
+				$tmp[] = $opt;
+				if (count($tmp) == $perRow) {
+					$option[] = $tmp;
+					$tmp = array();
+				}
+			}
+			if (count($tmp)) $option[] = $tmp;
+			
 			$chat_id = $msg->chatId();
 			$captain_id = $ship->captain;
 			$username = $this->CI->Users->get_name_by_id($captain_id);
