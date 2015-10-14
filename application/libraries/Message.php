@@ -148,23 +148,16 @@ class Message {
 			$newUserUsername = ( isset($newUser['username']) ? $newUser['username'] : null );
 			$newUserFirstName = ( isset($newUser['first_name']) ? $newUser['first_name'] : null);
 
+			$this->joiner = (object)array(
+				'id' => $newUserId,
+				'first_name' => $newUserFirstName,
+				'username' => $newUserUsername
+			);
 			if ( is_null($newUserUsername) || $newUserUsername == '' ){
-				$this->joiner = (object)array(
-					'id' => $newUserId,
-					'first_name' => $newUserFirstName,
-					'username' => $newUserUsername
-				);
 				$this->isInvalidJoin = true;
 			}
-			elseif ($newUserUsername == $this->botUsername) {
+			if ($newUserUsername == $this->botUsername) {
 				$this->isBotJoin = true;
-			}
-			else {
-				$this->joiner = (object)array(
-					'id' => $newUserId,
-					'first_name' => $newUserFirstName,
-					'username' => $newUserUsername
-				);
 			}
 		}
 	}
@@ -177,7 +170,7 @@ class Message {
 	 * - in case the array contains the bot username, this user record will not be stored as a crew member.
 	 */
 	private function _parseLeave(& $message) {
-		if (isset($message['left_chat_participant']) && !empty($message['left_chat_participant']) && isset($message['left_chat_participant']['username'])) {
+		if (isset($message['left_chat_participant']) && !empty($message['left_chat_participant'])) {
 			$this->isLeave = true;
 			$this->leaver = null;
 			$leftUser = $message['left_chat_participant'];
@@ -185,23 +178,16 @@ class Message {
 			$leftUserUsername = ( isset($leftUser['username']) ? $leftUser['username'] : null );
 			$leftUserFirstName = ( isset($leftUser['first_name']) ? $leftUser['first_name'] : null);
 
+			$this->leaver = (object)array(
+				'id' => $leftUserId,
+				'first_name' => $leftUserFirstName,
+				'username' => $leftUserUsername
+			);
 			if ( is_null($leftUserUsername) || $leftUserUsername == '' ){
-				$this->leaver = (object)array(
-					'id' => $leftUserId,
-					'first_name' => $leftUserFirstName,
-					'username' => $leftUserUsername
-				);
 				$this->isInvalidLeave = true;
 			}
-			elseif ($leftUserUsername == $this->botUsername) {
-				$this->isBotJoin = true;
-			}
-			else {
-				$this->leaver = (object)array(
-					'id' => $leftUserId,
-					'first_name' => $leftUserFirstName,
-					'username' => $leftUserUsername
-				);
+			if ($leftUserUsername == $this->botUsername) {
+				$this->isBotLeave = true;
 			}
 		}
 	}
