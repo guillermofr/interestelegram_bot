@@ -216,8 +216,6 @@ class Commander {
 			return $this->CI->telegram->sendMessage($output);
 		}
 
-		log_message('error', print_r($leaver, TRUE));
-
 		$user = $this->CI->Users->get_user($leaver->id);
 		if (!$user) {
 			$new_player = true;
