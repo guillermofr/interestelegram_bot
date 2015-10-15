@@ -651,7 +651,7 @@ class Commander {
 
 		$this->CI->load->library('Calculations');
 		$target_ship = $this->CI->Ships->get($ship->target);
-		if ($this->CI->calculations->attack_success($ship, $target_ship)) {
+		if ($ship->target != null && $this->CI->calculations->attack_success($ship, $target_ship)) {
 			$target_ship = $this->CI->Ships->deal_damage($target_ship, $last_action->required);
 
 			$text = "IMPACTO!!!";
