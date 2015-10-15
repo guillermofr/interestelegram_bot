@@ -679,10 +679,16 @@ class Commander {
 					"\nLa nave ha quedado inutilizable, hasta aquí ha llegado su aventura capitán. Abandonen la nave!
 					\n(BETATESTERS:puedes resucitar la nave usando /pilotar y los demás necesitan volver a /alistarse)" ;
 
-				//morirse
+				//morirse <-- seriously? morirsen!
 				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
-				$this->CI->Ships->untarget_ship($target_ship); 
+				$this->CI->Ships->untarget_ship($target_ship);
 
+				//calcular ranking
+				$score = 500 + intval(($target_ship->score - $ship->score)/5);
+				$this->CI->Ships->update_ship(array('score' => $ship->score + $score), $ship->id);
+				$score = $target_ship->score - 1000;
+				$pilot = $this->CI->Users->get_user($target_ship->captain);
+				$this->CI->Users->update_user(array('score' => $pilot->score + $score), $target_ship->captain);
 			}
 		} else {
 			$text = "El ataque ha fallado!";
@@ -716,6 +722,7 @@ class Commander {
 			if ($user_id == $already_ship->captain ) {
 
 				$Ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
+				$Captain = $this->CI->Users->get($user_id);
 
 				$this->CI->load->library('Mapdrawer');
 				$imagePath = $this->CI->mapdrawer->generateShipMap($Ship);
@@ -734,7 +741,9 @@ class Commander {
 							"\n\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health.
 							"\n\xF0\x9F\x94\xB5: ".$Ship->shield."/".$Ship->max_shield.
 							"\n\xF0\x9F\x92\xB0: ".$Ship->money.
-							"\n\xF0\x9F\x92\x8E: ".$Ship->minerals;
+							"\n\xF0\x9F\x92\x8E: ".$Ship->minerals.
+							"\n\xF0\x9F\x8E\xAE: ".$Ship->score.
+							"\n\xF0\x9F\x8F\x86: ".$Captain->score.'(+'.($Ship->score-1000).')';
 							//.print_r($Ship,true);
 
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
@@ -1114,7 +1123,41 @@ class Commander {
 
 	}
 
+	/**
+	  Acción ranking. Muestra un ranking rudimentario. Habrá que hacerlo bonito.
+	 */
+	private function _ranking($msg, $ship=null, $params = FALSE) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+		if ($ship) {
+			if ($user_id == $ship->captain ) {
+				$ships = $this->CI->Ships->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->get_all();
+				$text = "\xF0\x9F\x8E\xAE Ranking de naves activas:\n";
+				foreach ($ships as $pos => $shp) {
+					$captain = $this->CI->Users->get_name_by_id($shp->captain);
+					if (empty($captain)) $captain = 'Sin-piloto';
+					$text .= "\n".$shp->score.") {$shp->name} (@{$captain})";
+				}
 
+				$text .= "\n\nTu puntuación: ".$ship->score;
+
+				$users = $this->CI->Users->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->get_all();
+				$text .= "\n\n\xF0\x9F\x8F\x86 Ranking de capitanes:\n";
+				foreach ($users as $pos => $usr) {
+					$text .= "\n".$usr->score.") @{$usr->username}";
+				}
+
+				$current_user = $this->CI->Users->get_user($user_id);
+				$text .= "\n\nTu puntuación: ".$current_user->score;
+
+				$output = array(
+					'chat_id' => $chat_id,
+					'text' => $text
+				);
+				return $this->CI->telegram->sendMessage($output);
+			}
+		}
+	}
 
 	/**
 		Acción test
