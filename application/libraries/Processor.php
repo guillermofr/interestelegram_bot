@@ -157,18 +157,22 @@ class Processor {
 
 		//si no hay required no se muestra el conteo de datos
 		if ($last_action->required) {
+			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$output = array(
 				'chat_id' => $chatId,
+				'reply_markup' => $keyboard, 
 				'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
 			);
 			if (($response_value + $last_action->positives) == $last_action->required) {
 				$output['reply_markup'] = $this->CI->telegram->buildKeyBoardHide($selective=FALSE);
 			}
 			$o = $this->CI->telegram->sendMessage($output);
+			/* TODO: Remove this message?
 			// hide keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$content = array('chat_id' => $chatId, 'reply_markup' => $keyboard, 'reply_to_message_id' => $messageId, 'text' => 'tu voto se ha registrado');
 			$o = $this->CI->telegram->sendMessage($content);
+			*/
 		}
 
 		//apply action if success
