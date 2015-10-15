@@ -1132,7 +1132,7 @@ class Commander {
 		$user_id = $msg->fromId();
 		if ($ship) {
 			if ($user_id == $ship->captain ) {
-				$ships = $this->CI->Ships->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->get_all();
+				$ships = $this->CI->Ships->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->get_all(array('active' => 1));
 				$text = "\xF0\x9F\x8E\xAE Ranking de naves activas:\n";
 				foreach ($ships as $pos => $shp) {
 					$captain = $this->CI->Users->get_name_by_id($shp->captain);
