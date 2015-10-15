@@ -114,6 +114,8 @@ class Processor {
 
 		$response_value = ( $response == 'SI' ? 1 : 0 );
 
+		if (!$ship) return;
+
 		$last_action = $this->CI->Actions->get_last_action($ship->id);
 
 		if ($last_action->message_id != $replyMessageId) {
