@@ -666,10 +666,18 @@ class Commander {
 
 			if ($target_ship->health == 0) {
 
+				//calcular ranking
+				$score = 500 + intval(($target_ship->score - $ship->score)/5);
+				$this->CI->Ships->update_ship(array('score' => $ship->score + $score), $ship->id);
+				$playerScore = $target_ship->score - 1000;
+				$pilot = $this->CI->Users->get_user($target_ship->captain);
+				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
+
 			 	$text = "IMPACTO!!!";
 				$text .= "\nEl enemigo ha sido destruido!:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
-					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
+					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
+					"\n\nHemos obtenido +".$score." puntos!";
 
 
 			 	$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
@@ -682,13 +690,6 @@ class Commander {
 				//morirse <-- seriously? morirsen!
 				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
 				$this->CI->Ships->untarget_ship($target_ship);
-
-				//calcular ranking
-				$score = 500 + intval(($target_ship->score - $ship->score)/5);
-				$this->CI->Ships->update_ship(array('score' => $ship->score + $score), $ship->id);
-				$score = $target_ship->score - 1000;
-				$pilot = $this->CI->Users->get_user($target_ship->captain);
-				$this->CI->Users->update_user(array('score' => $pilot->score + $score), $target_ship->captain);
 			}
 		} else {
 			$text = "El ataque ha fallado!";
