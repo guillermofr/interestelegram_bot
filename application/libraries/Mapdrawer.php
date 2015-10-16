@@ -153,7 +153,7 @@ class Mapdrawer {
 
 		$this->addCounts($base, $mainShip);
 
-		if (TRUE) {
+		if (false) {
 			header('Content-Type: image/png');
 			imagepng($base);
 			imagedestroy($base);
