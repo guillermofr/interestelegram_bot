@@ -5,7 +5,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 		<title>INTERESTELEGRAM</title>
-		<meta name="description" content="App Showcase with Grid Overlay" />
+		<meta name="description" content="Juega con tus amigos y conquista la galaxia." />
 		<meta name="keywords" content="app, showcase, css transitions, perspective, 3d, grid, overlay, css3, jquery" />
 		<meta name="author" content="Codrops" />
 		<link rel="shortcut icon" href="../favicon.ico"> 
