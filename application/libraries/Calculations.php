@@ -8,7 +8,7 @@
 class Calculations {
 
 	private $CI = null;
-	private $baseAgility = 45;
+	private $baseAgility = 55;
 	private $agilityMultiplier = 5;
 	private $healthCrewIncrement = 5;
 
@@ -21,8 +21,11 @@ class Calculations {
 	 * - The ship calculations methods will require the Ship model entitiy and not its id.
 	 */
 
-	private function _chance($chance) {
+	private function _chance($chance, $min=0, $max=100) {
 		$rand = rand(0, 100);
+		if ($chance < $min) $chance = $min;
+		if ($chance > $max) $chance = $max;
+		log_message('error', '($rand'.$rand.' <= $chance'.$chance.')');
 		return ($rand <= $chance);
 	}
 
@@ -30,9 +33,20 @@ class Calculations {
 	public function attack_success($attackerShip, $defenderShip) {
 		if (empty($attackerShip)) return false;
 		if (empty($defenderShip)) return false;
-		$diffCrew = $attackerShip->total_crew - $defenderShip->total_crew;
+		$diffCrew = $defenderShip->total_crew - $attackerShip->total_crew;
 
-		return (! $this->_chance($this->baseAgility + ($diffCrew * $this->agilityMultiplier)));
+		$chance = $this->baseAgility + ($diffCrew * $this->agilityMultiplier);
+
+		$this->CI->load->model('Asteroids');
+		if ($this->CI->Asteroids->ship_is_in_asteroid($attackerShip)) {
+			$chance -= 60;
+		}
+
+		if ($this->CI->Asteroids->ship_is_in_asteroid($defenderShip)) {
+			$chance -= 40;
+		}
+
+		return $this->_chance($chance, 5, 95);
 	}
 
 
@@ -98,9 +112,12 @@ class Calculations {
 	public function ship_dodge($mainShip) {
 		if (empty($mainShip)) return false;
 
-		$targetedBy = 1;
+		$dodge = 50;
 
-		return (! $this->_chance(50));
+		$this->CI->load->model(array('Ships'));
+		$targetedBy = $this->CI->Ships->where(array('target' => $mainShip->id))->count();
+
+		return (! $this->_chance((50 - $targetedBy*10), 5, 50));
 	}
 
 
@@ -137,6 +154,24 @@ class Calculations {
 	public function ship_dodge_vs_other( $ship, $other, $other_type ) {}
 
 
+	public function coordinatesInArray($x, $y, $set) {
+		if (!is_array($set)) return false;
+		$flag = false;
+		foreach ($set as $value) {
+			$flag = $flag || ($value->x == $x && $value->y == $y);
+		}
+		return $flag;
+	}
+
+	public function scanFailsOnAsteroids() {
+		return $this->_chance(85);
+	}
+
+	public function moveAsteroid($hoursPast) {
+		$base = 100;
+
+		return $this->_chance($base + ($base * $hoursPast));
+	}
 
 }
 

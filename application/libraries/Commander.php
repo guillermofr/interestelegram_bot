@@ -17,12 +17,14 @@ class Commander {
 	public function __construct() {
 		$this->CI =& get_instance();
 
-		$this->CI->load->model('Ships');
-		$this->CI->load->model('Users');
-		$this->CI->load->model('Crew');
-		$this->CI->load->model('Actions');
-		$this->CI->load->model('Votes');
-
+		$this->CI->load->model(array(
+							'Ships',
+							'Users',
+							'Crew',
+							'Actions',
+							'Votes',
+							'Asteroids'));
+		$this->CI->load->library('Calculations');
 		$this->CI->config->load('bot');
 		$this->CI->config->load('images');
 		$this->botToken = $this->CI->config->item('botToken');
@@ -445,6 +447,11 @@ class Commander {
 		$ship = $this->CI->Ships->get_ship_by_chat_id($chat_id);
 
 		$sectorShips = $this->CI->Ships->get_target_lock_candidates($ship);
+
+		if ($this->CI->calculations->scanFailsOnAsteroids()) {
+			$sectorShips = $this->CI->Asteroids->hide_ships_in_asteroids($ship, 1, $sectorShips);
+		}
+
 		$nearShips = array();
 
 		if (is_array($sectorShips)) {
@@ -649,7 +656,6 @@ class Commander {
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 		$output = $this->CI->telegram->sendPhoto($content);
 
-		$this->CI->load->library('Calculations');
 		$target_ship = $this->CI->Ships->get($ship->target);
 		if ($ship->target != null && $this->CI->calculations->attack_success($ship, $target_ship)) {
 			$target_ship = $this->CI->Ships->deal_damage($target_ship, $last_action->required);
@@ -668,6 +674,7 @@ class Commander {
 
 				//calcular ranking
 				$score = 500 + intval(($target_ship->score - $ship->score)/5);
+				if ($score < 50) $score = 50;
 				$this->CI->Ships->update_ship(array('score' => $ship->score + $score), $ship->id);
 				$playerScore = $target_ship->score - 1000;
 				$pilot = $this->CI->Users->get_user($target_ship->captain);
@@ -680,7 +687,7 @@ class Commander {
 					"\n\nHemos obtenido +".$score." puntos!";
 
 
-			 	$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
+			 	$target_text = "\xF0\x9F\x92\x80 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
 				$target_text .= "\nEstado de la nave:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.

@@ -9,7 +9,7 @@ class Movement {
 
 	private $CI = null;
 
-	private $mapSize = 6;
+	private $mapSize = MAP_SIZE;
 
 	/**
 	 * Defines the available movements for each angle of rotation

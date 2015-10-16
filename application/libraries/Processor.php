@@ -124,10 +124,14 @@ class Processor {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$content = array(
 				'chat_id' => $chatId, 
-				'reply_markup' => $keyboard, 
 				'reply_to_message_id' => $messageId, 
 				'text' => '@'.$username.' el mensaje al que respondes ha caducado'
 			);
+
+			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
+				$content['reply_markup'] = $keyboard;
+			}
+
 			return $this->CI->telegram->sendMessage($content);
 
 		}
@@ -138,10 +142,14 @@ class Processor {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$content = array(
 				'chat_id' => $chatId, 
-				'reply_markup' => $keyboard, 
 				'reply_to_message_id' => $messageId, 
 				'text' => '@'.$username.' tu voto no se ha tenido en cuenta. Ya has votado o ha fallado.'
 			);
+
+			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
+				$content['reply_markup'] = $keyboard;
+			}
+
 			return $this->CI->telegram->sendMessage($content);
 
 		}
