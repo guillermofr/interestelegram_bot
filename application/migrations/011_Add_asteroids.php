@@ -31,7 +31,7 @@ class Migration_Add_asteroids extends CI_Migration {
                                 'constraint' => 9,
                                 'null' => TRUE,
                                 'default' => NULL
-                        );
+                        )
                 );
 
         public function up()
