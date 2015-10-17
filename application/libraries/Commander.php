@@ -349,7 +349,8 @@ class Commander {
 															'y'=>$this->CI->movement->generateRandomY(),
 															'angle'=>$this->CI->movement->generateRandomAngle(),
 															'health' => $this->shipInitialHealth,
-															'max_health' => $this->shipInitialHealth));
+															'max_health' => $this->shipInitialHealth,
+															'max_shield' => $this->shipInitialHealth));
 				// create user if does not exist
 				$user = $this->CI->Users->get_user($user_id);
 				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
