@@ -123,7 +123,7 @@ class Commander {
 		if ($msg->isInvalidJoin()){
 			$output = array(
 				'chat_id' => $joiner->id,
-				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un username.'
+				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un alias.'
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -221,7 +221,7 @@ class Commander {
 		if ($msg->isInvalidLeave()){
 			$output = array(
 				'chat_id' => $joiner->id,
-				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un username.'
+				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un alias.'
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -317,7 +317,7 @@ class Commander {
 			}
 
 		} else {
-			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
+			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un alias en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
 		}
 		
 		$output = $this->CI->telegram->sendMessage($content);
@@ -364,7 +364,7 @@ class Commander {
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
 				$output = $this->CI->telegram->sendPhoto($content);
 			} else {
-				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un username en Ajustes');						
+				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un alias en Ajustes');						
 				$output = $this->CI->telegram->sendMessage($content);
 			}
 		} else {
