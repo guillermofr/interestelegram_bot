@@ -6,7 +6,7 @@ class Mapdrawer {
 	private $ships = array();
 	private $asteroids = array();
 	private $size = 100;
-	private $mapSize = 6;
+	private $mapSize = MAP_SIZE;
 	private $shipscount = array();
 
 	public function __construct() {
@@ -107,47 +107,61 @@ class Mapdrawer {
 
 		$this->markForbidden($base, $mainShip);
 
-		$asteroids = imagecreatefrompng(APPPATH."../imgs/map/asteroids_1_1.png");
-		imagecopyresampled($base, $asteroids, $this->translate($mainShip->x, 3) * $this->size, $this->remapY($this->translate($mainShip->y, 3)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-		imagedestroy($asteroids);
-
 		if ($isScan) $this->addRadar($base, $mainShip);
 
 		$this->CI->load->model('Ships');
 		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip);
+
+		$this->CI->load->model('Asteroids');
+		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 1);
 		
 		$target = null;
 		if (is_array($ships)) {
 			foreach ($ships as $ship) {
-				if ($ship->id != $mainShip->id) $this->addShip($base, $mainShip, $ship);
+				if ($ship->id != $mainShip->id) {
+					// Oculta naves dentro de campos de asteroides, salvo si son objetivos
+					if (!$this->_coordinatesInSet($ship->x, $ship->y, $asteroids) || $ship->id == $mainShip->target) {
+						$this->addShip($base, $mainShip, $ship);
+					}
+				}
 				if ($ship->id == $mainShip->target) $target = $ship;
 			}
 		}
 
+		$this->addShip($base, $mainShip, $mainShip);
+
+		$this->addAsteroids($base, $mainShip, $asteroids);
+
 		if ($mainShip->target != null) {
 			if ($target != null) {
-				$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target.png");
-				imagecopyresampled($base, $target_symbol, $this->translate($mainShip->x, $target->x) * $this->size, $this->remapY($this->translate($mainShip->y, $target->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-				imagedestroy($target_symbol);
+				$this->addTargetMarker($base, $mainShip, $target->x, $target->y);
 			} else {
 				$target = $this->CI->Ships->get($mainShip->target);
-				if (!empty($target)) $base = $this->addTargetIndicator($base, $mainShip, $target);
+				if (!empty($target)) $this->addTargetIndicator($base, $mainShip, $target);
 			}			
 		}
 
-		$this->addShip($base, $mainShip, $mainShip);
+		// Draw target markers
+		if ($mainShip->target != null) {
+			if ($target != null) {
+				$this->addTargetMarker($base, $mainShip, $target->x, $target->y);
+			} else {
+				$target = $this->CI->Ships->get($mainShip->target);
+				if (!empty($target)) $this->addTargetIndicator($base, $mainShip, $target);
+			}			
+		}
 
 		$this->addCounts($base, $mainShip);
 
-		if (FALSE) {
+		if (false) {
 			header('Content-Type: image/png');
 			imagepng($base);
 			imagedestroy($base);
 		} else {
 			$timestamp = date('Ymdhis');
-			imagepng($base, APPPATH.'../imgs/map/scans/'.$timestamp.'.png');
+			imagepng($base, APPPATH.'../imgs/map/scans/'.$timestamp.'_'.$mainShip->id.'.png');
 			imagedestroy($base);
-			return APPPATH.'../imgs/map/scans/'.$timestamp.'.png';
+			return APPPATH.'../imgs/map/scans/'.$timestamp.'_'.$mainShip->id.'.png';
 		}
 	}
 
@@ -254,6 +268,12 @@ class Mapdrawer {
 		return $base;
 	}
 
+	private function addTargetMarker(&$base, $mainShip, $x, $y) {
+		$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target.png");
+		imagecopyresampled($base, $target_symbol, $this->translate($mainShip->x, $x) * $this->size, $this->remapY($this->translate($mainShip->y, $y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		imagedestroy($target_symbol);
+	}
+
 	private function addCounts(&$base, $mainShip) {
 		foreach ($this->shipscount as $key => $value) {
 			if ($value > 1) {
@@ -274,6 +294,35 @@ class Mapdrawer {
 
 		imagecopyresampled($base, $radar, 0, 0, 0, 0, 300, 300, 300, 300);
 		imagedestroy($radar);
+	}
+
+	private function addAsteroids(&$base, $mainShip, $asteroids) {
+		if (!is_array($asteroids)) return false;
+
+		$asteroid = imagecreatefrompng(APPPATH."../imgs/map/asteroids_1_1.png");
+
+		$target = null;
+		if ($mainShip->target != null) {
+			$target = $this->CI->Ships->get($mainShip->target);	
+		}
+
+		foreach ($asteroids as $astr) {
+			imagecopyresampled($base, $asteroid, $this->translate($mainShip->x, $astr->x) * $this->size, $this->remapY($this->translate($mainShip->y, $astr->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+			if ($target != null && $astr->x == $target->x && $astr->y == $target->y) {
+				$this->addTargetMarker($base, $mainShip, $target->x, $target->y);
+			}
+		}
+		
+		imagedestroy($asteroid);
+	}
+
+	private function _coordinatesInSet($x, $y, $set) {
+		if (!is_array($set)) return false;
+		$flag = false;
+		foreach ($set as $value) {
+			$flag = $flag || ($value->x == $x && $value->y == $y);
+		}
+		return $flag;
 	}
 
 }

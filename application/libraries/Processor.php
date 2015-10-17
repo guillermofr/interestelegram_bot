@@ -38,7 +38,11 @@ class Processor {
 		/* Prevent users without username */
 		if ($msg->isEmptyFromUsername()) return $this->_empty_username_warning($msg);
 
-		if ($msg->isPrivate()) return $this->_welcome($msg);
+		if ($msg->isPrivate()) {
+			if ($msg->command() == 'olvidar')	{
+				return $this->_olvidar($msg);
+			} else return $this->_welcome($msg);
+		} 
 
 		$ship = $this->CI->Ships->get_ship_by_chat_id( $msg->chatId() );
 		
@@ -68,7 +72,7 @@ class Processor {
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
 			Bienvenido a Interestelegram @".$msg->fromUsername().", tu aventura espacial!\n
-			Para jugar debes configurar un username en tu cuenta de Telegram en Ajustes. Hecho esto estarás preparado para empezar.\n
+			Para jugar debes configurar un alias en tu cuenta de Telegram en Ajustes. Hecho esto estarás preparado para empezar.\n
 			Crea un grupo de telegram con uno o más amigos.\n 
 			"));
 			
@@ -88,6 +92,19 @@ class Processor {
 			Recuerda que necesitas su participación para que tu nave funcione!"));
 
 		return true;
+	}
+
+	private function _olvidar($msg) {
+		$chat_id = $msg->chatId();
+		$user_id = $msg->fromId();
+
+		$this->CI->Users->delete($user_id);
+
+		$output = array(
+			'chat_id' => $chat_id,
+			'text' => 'Te acabamos de perder, como lágrimas en la lluvia...'
+		);
+		return $this->CI->telegram->sendMessage($output);
 	}
 
 	/* Only for group chats. */
@@ -124,10 +141,14 @@ class Processor {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$content = array(
 				'chat_id' => $chatId, 
-				'reply_markup' => $keyboard, 
 				'reply_to_message_id' => $messageId, 
 				'text' => '@'.$username.' el mensaje al que respondes ha caducado'
 			);
+
+			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
+				$content['reply_markup'] = $keyboard;
+			}
+
 			return $this->CI->telegram->sendMessage($content);
 
 		}
@@ -138,10 +159,14 @@ class Processor {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			$content = array(
 				'chat_id' => $chatId, 
-				'reply_markup' => $keyboard, 
 				'reply_to_message_id' => $messageId, 
 				'text' => '@'.$username.' tu voto no se ha tenido en cuenta. Ya has votado o ha fallado.'
 			);
+
+			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
+				$content['reply_markup'] = $keyboard;
+			}
+
 			return $this->CI->telegram->sendMessage($content);
 
 		}
