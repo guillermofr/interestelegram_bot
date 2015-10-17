@@ -23,8 +23,9 @@
     display: block;
     font-size: 60%;
     color: #c0c0c0;
-    float: right;
+    /*float: right;*/
     max-width: 400px;
+    margin: auto;
 }
 
 .ac-device {
@@ -195,6 +196,9 @@
 		left: 280px;
 		font-size: 2em;
 	}
+	.ac-wrapper h2 span { 
+		/*float: left;*/
+	}
 }
 
 @media screen and (max-width: 39.8125em) {
@@ -208,6 +212,12 @@
 	.ac-grid a {
 		width: 22%;
 	}
+
+	.container > header {
+		padding: 0px;
+	}
+
+
 }
 
 
@@ -228,6 +238,7 @@
 	.ac-device {
 		margin: 0 auto;
 		width: 288px;
+		margin-top:60px;
 	}
 
 	.ac-device h3 {
