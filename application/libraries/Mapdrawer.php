@@ -23,41 +23,6 @@ class Mapdrawer {
 		}
 	}
 
-	public function setShips($ships) {
-		$this->ships = $ships;
-	}
-
-	public function setAsteroids($asteroids) {
-		$this->asteroids = $asteroids;
-	}
-
-	public function generateMap() {
-		$base = imagecreatefrompng(APPPATH.'../imgs/map/background.png');
-
-		foreach ($this->asteroids as $asteroid) {
-			$item = imagecreatefrompng(APPPATH."../imgs/map/asteroids_{$asteroid->type}_{$asteroid->size}.png");
-			imagecopyresampled($base, $item, $asteroid->x * $this->size, $asteroid->y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-			imagedestroy($item);
-		}
-
-		foreach ($this->ships as $ship) {
-			$item = imagecreatefrompng(APPPATH."../imgs/map/ship_{$ship->type}.png");
-			$this->rotate($item, $ship->angle);
-			imagecopyresampled($base, $item, $ship->x * $this->size, $ship->y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-			imagedestroy($item);
-		}
-
-		$timestamp = date('Ymdhis');
-		//imagepng($base, APPPATH.'../imgs/map/scans/'.$timestamp.'.png');
-
-		header('Content-Type: image/png');
-
-		imagepng($base);
-		imagedestroy($base);
-
-		//return APPPATH.'../imgs/map/scans/'.$timestamp.'.png';
-	}
-
 	private function rotate(&$source, $degrees) {
 		imagealphablending($source, false);
 		imagesavealpha($source, true);
@@ -67,30 +32,36 @@ class Mapdrawer {
 		imagesavealpha($source, true);
 	}
 
-	public function __random() {
-		$this->asteroids = array(
-			(Object) array(
-				'type' => rand(1,2),
-				'size' => 1,
-				'x' => rand(0,2),
-				'y' => rand(0,2)
-			)
-		);
-		$angles = array(90, 180, 270, 0);
-		$this->ships = array(
-			(Object) array(
-				'type' => 1,
-				'x' => 1,
-				'y' => 1,
-				'angle' => $angles[rand(0,3)]
-			),
-			(Object) array(
-				'type' => rand(2,3),
-				'x' => rand(0,2),
-				'y' => rand(0,2),
-				'angle' => $angles[rand(0,3)]
-			)
-		);
+	private function addSquare(&$base, $mainShip, $path, $squared) {
+		if (is_string($path)) {
+			if (!is_file($path)) {
+				log_message('error', 'File does not exist: '.$path);
+				return;
+			}
+			$item = imagecreatefrompng($path);
+		} else $item = $path;
+		if (isset($squared->angle)) {
+			$specialAngle = $squared->angle % 90 == 0;
+			$this->rotate($item, $specialAngle ? $squared->angle : ($squared->angle-45));
+		}
+		imagecopyresampled($base, $item, $this->translate($mainShip->x, $squared->x) * $this->size, $this->remapY($this->translate($mainShip->y, $squared->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		imagedestroy($item);
+	}
+
+	private function addSquareXY(&$base, $mainShip, $path, $x, $y, $angle = null) {
+		if (is_string($path)) {
+			if (!is_file($path)) {
+				log_message('error', 'File does not exist: '.$path);
+				return;
+			}
+			$item = imagecreatefrompng($path);
+		} else $item = $path;
+		if ($angle != null) {
+			$specialAngle = $angle % 90 == 0;
+			$this->rotate($item, $specialAngle ? $angle : ($angle-45));
+		}
+		imagecopyresampled($base, $item, $this->translate($mainShip->x, $x) * $this->size, $this->remapY($this->translate($mainShip->y, $y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		imagedestroy($item);
 	}
 
 	public function generateShipMap($mainShip, $isScan = false) {
@@ -114,6 +85,9 @@ class Mapdrawer {
 
 		$this->CI->load->model('Asteroids');
 		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 1);
+
+		$this->CI->load->model('Powerups');
+		$powerups = $this->CI->Powerups->get_powerups_nearby($mainShip, 1);
 		
 		$target = null;
 		if (is_array($ships)) {
@@ -132,14 +106,7 @@ class Mapdrawer {
 
 		$this->addAsteroids($base, $mainShip, $asteroids);
 
-		if ($mainShip->target != null) {
-			if ($target != null) {
-				$this->addTargetMarker($base, $mainShip, $target->x, $target->y);
-			} else {
-				$target = $this->CI->Ships->get($mainShip->target);
-				if (!empty($target)) $this->addTargetIndicator($base, $mainShip, $target);
-			}			
-		}
+		$this->addPowerups($base, $mainShip, $powerups);
 
 		// Draw target markers
 		if ($mainShip->target != null) {
@@ -171,11 +138,20 @@ class Mapdrawer {
 		$type = $currentShip->id % 5;
 		$specialAngle = $currentShip->angle % 90 == 0;
 
-		$item = imagecreatefrompng($specialAngle ? APPPATH."../imgs/map/ship_type{$type}.png" : APPPATH."../imgs/map/ship_type{$type}_rotated.png");
-		$this->rotate($item, $specialAngle ? $currentShip->angle : ($currentShip->angle-45));
-		
-		imagecopyresampled($base, $item, $this->translate($mainShip->x, $currentShip->x) * $this->size, $this->remapY($this->translate($mainShip->y, $currentShip->y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-		imagedestroy($item);
+		$path = $specialAngle ? APPPATH."../imgs/map/ship_type{$type}.png" : APPPATH."../imgs/map/ship_type{$type}_rotated.png";
+
+		$this->addSquare($base, $mainShip, $path, $currentShip);
+
+		if ($currentShip->shield > 0) {
+			$shield = 'low';
+			if ($currentShip->shield == $currentShip->max_shield) {
+				$shield = 'full';
+			} else if ($currentShip->shield >= 5) {
+				$shield = 'med';
+			}
+			$shield = $specialAngle ? APPPATH."../imgs/map/shield_{$shield}.png" : APPPATH."../imgs/map/shield_{$shield}_rotated.png";
+			$this->addSquare($base, $mainShip, $shield, $currentShip);
+		}
 	}
 
 	private function translate($base, $value) {
@@ -214,12 +190,13 @@ class Mapdrawer {
 		imagedestroy($forbidden);
 	}
 
-	private function addTargetIndicator($base, $ship, $target) {
+	private function addTargetIndicator(&$base, $mainShip, $target) {
 		$x = 0;
 		$y = 0;
-		if ($ship->x == $target->x) {
+		$target_symbol = null;
+		if ($mainShip->x == $target->x) {
 			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved.png");
-			if ($ship->y > $target->y) {
+			if ($mainShip->y > $target->y) {
 				$x = 1;
 				$y = 2;
 				$this->rotate($target_symbol, 180);
@@ -227,9 +204,9 @@ class Mapdrawer {
 				$x = 1;
 				$y = 0;
 			}
-		} else if ($ship->y == $target->y) {
+		} else if ($mainShip->y == $target->y) {
 			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved.png");
-			if ($ship->x > $target->x) {
+			if ($mainShip->x > $target->x) {
 				$x = 0;
 				$y = 1;
 				$this->rotate($target_symbol, 270);
@@ -240,8 +217,8 @@ class Mapdrawer {
 			}
 		} else {
 			$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target_moved_rotated.png");
-			if ($ship->x > $target->x) {
-				if ($ship->y > $target->y) {
+			if ($mainShip->x > $target->x) {
+				if ($mainShip->y > $target->y) {
 					$x = 0;
 					$y = 2;
 					$this->rotate($target_symbol, 180);
@@ -251,7 +228,7 @@ class Mapdrawer {
 					$this->rotate($target_symbol, 270);
 				}
 			} else {
-				if ($ship->y > $target->y) {
+				if ($mainShip->y > $target->y) {
 					$x = 2;
 					$y = 2;
 					$this->rotate($target_symbol, 90);
@@ -262,16 +239,14 @@ class Mapdrawer {
 			}
 		}
 
-		imagecopyresampled($base, $target_symbol, $x * $this->size, $y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-		imagedestroy($target_symbol);
-
-		return $base;
+		if ($target_symbol != null) {
+			imagecopyresampled($base, $target_symbol, $x * $this->size, $y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		}
 	}
 
 	private function addTargetMarker(&$base, $mainShip, $x, $y) {
-		$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/target.png");
-		imagecopyresampled($base, $target_symbol, $this->translate($mainShip->x, $x) * $this->size, $this->remapY($this->translate($mainShip->y, $y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-		imagedestroy($target_symbol);
+		$target_symbol = APPPATH."../imgs/map/target.png";
+		$this->addSquareXY($base, $mainShip, $target_symbol, $x, $y);
 	}
 
 	private function addCounts(&$base, $mainShip) {
@@ -279,9 +254,8 @@ class Mapdrawer {
 			if ($value > 1) {
 				$parts = explode('-', $key);
 				if ($value > 4) $value = 5;
-				$item = imagecreatefrompng(APPPATH."../imgs/map/count{$value}.png");
-				imagecopyresampled($base, $item, $this->translate($mainShip->x, $parts[0]) * $this->size, $this->remapY($this->translate($mainShip->y, $parts[1])) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
-				imagedestroy($item);
+				$count = APPPATH."../imgs/map/count{$value}.png";
+				$this->addSquareXY($base, $mainShip, $count, $parts[0], $parts[1]);
 			}
 		}
 	}
@@ -323,6 +297,21 @@ class Mapdrawer {
 			$flag = $flag || ($value->x == $x && $value->y == $y);
 		}
 		return $flag;
+	}
+
+	private function addPowerups(&$base, $mainShip, $powerups) {
+		if (!is_array($powerups)) return false;
+
+		$this->CI->load->library('Calculations');
+
+		foreach ($powerups as $pwr) {
+			$rarity = $this->CI->calculations->getPowerUpRarityString($pwr->rarity);
+			$type = $this->CI->calculations->getPowerUpTypeString($pwr->type);
+
+			$power = APPPATH."../imgs/map/pu_{$rarity}_{$type}.png";
+
+			$this->addSquare($base, $mainShip, $power, $pwr);
+		}
 	}
 
 }

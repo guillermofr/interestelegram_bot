@@ -23,7 +23,8 @@ class Commander {
 							'Crew',
 							'Actions',
 							'Votes',
-							'Asteroids'));
+							'Asteroids',
+							'Powerups'));
 		$this->CI->load->library('Calculations');
 		$this->CI->config->load('bot');
 		$this->CI->config->load('images');
@@ -1000,12 +1001,39 @@ class Commander {
 							'angle'=>$ship->angle
 						),$ship->id); 
 
+						$powerups = $this->CI->Powerups->ship_over_powerups($ship);
+						$powerups_text = '';
+						if (is_array($powerups) && count($powerups)) {
+							$this->CI->calculations->consume_powerups($ship, $powerups);
+							foreach ($powerups as $pwr) {
+								switch ($pwr->type) {
+									case 0: // shield
+										$shield = ($pwr->rarity + 1) * 5;
+										$powerups_text .= "Hemos ganado {$shield} puntos de escudo!\n";
+										break;
+									case 1: // health
+										$health = ($pwr->rarity + 1) * 5;
+										$powerups_text .= "Hemos ganado {$health} puntos de vida!\n";
+										break;
+									case 2: // points
+										$score = 100 * ($pwr->rarity + 1);
+										$powerups_text .= "Hemos ganado {$score} puntos para el ranking!\n";
+										break;
+								}
+							}
+						}
+
 						$content = array(
 							'reply_to_message_id' => $messageId, 
 							'reply_markup' => $keyboard,
 							'chat_id' => $chat_id, 
 							'text' => "Fijando rumbo y coordenadas... generando impulso... \n¡SALTO COMPLETADO!"
 						);
+
+						if (!empty($powerups_text)) {
+							$content['text'] .= "\n\n".$powerups_text;
+						}
+
 						$output = $this->CI->telegram->sendMessage($content);
 
 						$this->CI->load->library('Mapdrawer');

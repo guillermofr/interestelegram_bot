@@ -234,7 +234,11 @@ class Api extends CI_Controller {
 			//$this->mapdrawer->setAsteroids($asteroids);
 			//$this->mapdrawer->setShips($ships);
 			//$this->mapdrawer->__random();
-			$this->mapdrawer->generateShipMap($ship);
+			//$this->mapdrawer->generateShipMap($ship);
+
+			$this->load->model('Powerups');
+
+			var_dump($this->Powerups->count_types());
 
 		} catch (Exception $e) {
 			var_dump($e);

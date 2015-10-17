@@ -21,6 +21,7 @@ class Cron extends CI_Controller {
 	public function index()
 	{
 		$this->moveAsteroids();
+		$this->addPowerups();
 	}
 
 	private function moveAsteroids() {
@@ -53,6 +54,27 @@ class Cron extends CI_Controller {
 							'y' => $y,
 							'timestamp' => $timestamp
 						), $asteroid['id']);
+				}
+			}
+		}
+	}
+
+	private function addPowerups() {
+		$this->load->model('Powerups');
+
+		$timestamp = date('i');
+
+		if ($timestamp % 10 != 0) return;
+
+		$types = array(0,1,2);
+
+		foreach ($types as $type) {
+			$count = $this->Powerups->count_by_type($type);
+			if (!isset($count[0]['count'])) $count = 0;
+			else $count = intval($count[0]['count']);
+			if ($count < 2) {
+				for ($i=$count; $i < 2; $i++) { 
+					$this->Powerups->insert(array('x' => rand(1, MAP_SIZE), 'y' => rand(1, MAP_SIZE), 'type' => $type));
 				}
 			}
 		}

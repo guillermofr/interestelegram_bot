@@ -67,6 +67,7 @@ class Calculations {
 		$health = ( ( ( $actualCrew + $crewIncrement ) * $this->healthCrewIncrement ) - ( $actualCrew * $this->healthCrewIncrement ) + $actualHP );
 
 		return array(
+			'max_shield' => ( ( $actualCrew + $crewIncrement ) * $this->healthCrewIncrement ),
 			'max_health' => ( $max_health <= 0 ) ? 1 : $max_health,
 			'health' => ( $health <= 0 ) ? 1 : $health
 		);
@@ -171,6 +172,63 @@ class Calculations {
 		$base = 100;
 
 		return $this->_chance($base + ($base * $hoursPast));
+	}
+
+	public function getPowerUpRarityString($rarity) {
+		switch ($rarity) {
+			case 0:
+				return 'common';
+				break;
+			case 1:
+				return 'rare';
+				break;
+			default:
+				return 'common';
+				break;
+		}
+	}
+
+	public function getPowerUpTypeString($type) {
+		switch ($type) {
+			case 0:
+				return 'shield';
+				break;
+			case 1:
+				return 'health';
+				break;
+			case 2:
+				return 'points';
+				break;
+			default:
+				return 'shield';
+				break;
+		}
+	}
+
+	public function consume_powerups($ship, $powerups) {
+		$this->CI->load->model(array('Ships', 'Powerups'));
+		foreach ($powerups as $pwr) {
+			$this->CI->Powerups->consume($pwr->id);
+			switch ($pwr->type) {
+				case 0: // shield
+					$shield = ($pwr->rarity + 1) * 5;
+					$ship->shield += $shield;
+					if ($ship->shield > $ship->max_shield) $ship->shield = $ship->max_shield;
+					$this->CI->Ships->update(array('shield' => $ship->shield), $ship->id);
+					break;
+				case 1: // health
+					$health = ($pwr->rarity + 1) * 5;
+					$ship->health += $health;
+					if ($ship->health > $ship->max_health) $ship->health = $ship->max_health;
+					$this->CI->Ships->update(array('health' => $ship->health), $ship->id);
+					break;
+				case 2: // points
+					$score = 100 * ($pwr->rarity + 1);
+					$ship->score += $score;
+					$this->CI->Ships->update(array('score' => $ship->score), $ship->id);
+					break;
+			}
+		}
 	}
 
 }
