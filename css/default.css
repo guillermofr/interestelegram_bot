@@ -60,9 +60,10 @@ a:hover {
     position: relative;
     border-bottom: 2px solid;
     padding-bottom: 30px;
-    margin-bottom: 58px;
+    /*margin-bottom: 58px;*/
 }
 .inner {
+
 	max-width: 65em;
 	width: 100%;
 	margin: 0 auto;
@@ -155,3 +156,13 @@ a:hover, a:focus {
     color: #2a6496;
     text-decoration: none !important;
 }
+
+div#google_translate_element {
+    text-align: right;
+}
+
+.goog-te-gadget img {
+		    vertical-align: middle;
+		    border: none;
+		    margin: 2px 3px 0px;
+		}

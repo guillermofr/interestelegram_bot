@@ -27,6 +27,12 @@
 		<script src="js/modernizr.custom.js"></script>
 	</head>
 	<body>
+			<div id="google_translate_element"></div><script type="text/javascript">
+			function googleTranslateElementInit() {
+			  new google.translate.TranslateElement({pageLanguage: 'es', includedLanguages: 'en,es,fr,it,ru', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+			}
+			</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+			        
 			<!-- Codrops top bar -->
 			<div class="codrops-top clearfix">
 				
@@ -47,7 +53,7 @@
 				<div class="col-xs-12">
 					<h1>¿Quiénes somos?</h1>
 
-					
+
 				
 				</div>
 				

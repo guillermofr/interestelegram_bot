@@ -7,6 +7,7 @@
 	-webkit-perspective-origin: 50% 25%;
 	-moz-perspective-origin: 50% 25%;
 	perspective-origin: 50% 25%;
+	    margin-top: 40px;
 }
 
 .ac-wrapper h2 {
