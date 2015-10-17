@@ -23,7 +23,7 @@
     display: block;
     font-size: 60%;
     color: #c0c0c0;
-    /*float: right;*/
+    float: right;
     max-width: 400px;
     margin: auto;
 }
@@ -197,7 +197,7 @@
 		font-size: 2em;
 	}
 	.ac-wrapper h2 span { 
-		/*float: left;*/
+		float: left;
 	}
 }
 
@@ -215,6 +215,10 @@
 
 	.container > header {
 		padding: 0px;
+	}
+
+	.ac-wrapper h2 span { 
+		float: none;
 	}
 
 

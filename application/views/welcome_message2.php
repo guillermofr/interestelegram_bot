@@ -11,6 +11,15 @@
 		<link rel="shortcut icon" href="../favicon.ico"> 
 		<link rel="stylesheet" type="text/css" href="css/default.css" />
 		<link rel="stylesheet" type="text/css" href="css/landing.css" />
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
+		<style>
+
+		*{
+			font-family: 'Roboto', sans-serif;
+		}
+
+		</style>
+
 		<script src="js/modernizr.custom.js"></script>
 	</head>
 	<body>
@@ -23,10 +32,10 @@
 				<div class="inner">
 					<!--h1><span></span></h1-->
 					<nav class="codrops-demos">
-						<a class="current-demo" href="#">Inicio</a>
-						<a href="#">Ayuda</a>
-						<a href="#">Ranking</a>
-						<a href="#">Contacto</a>
+						<a class="current-demo" href="/">Inicio</a>
+						<a href="/index.php/help">Jugar</a>
+						<a href="/index.php/ranking">Ranking</a>
+						<a href="/index.php/contacto">Contacto</a>
 					</nav>
 				</div>
 			</header>
