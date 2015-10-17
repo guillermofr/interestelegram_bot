@@ -160,7 +160,7 @@ class Commander {
 		$newHealth = $this->CI->calculations->ship_health($ship, 1);
 
 		$crew_count = $ship->total_crew + 1;
-		$this->CI->Ships->update_ship(array( 'total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health'] ), $ship->id);
+		$this->CI->Ships->update_ship(array( 'total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health'], 'max_shield' => $newHealth['max_shield'] ), $ship->id);
 
 		$outputGroup = array(
 			'chat_id' => $chat_id,
@@ -251,7 +251,7 @@ class Commander {
 		$newHealth = $this->CI->calculations->ship_health($ship, -1);
 
 		$crew_count = $ship->total_crew - 1;
-		$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health']), $ship->id);
+		$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health'], 'max_shield' => $newHealth['max_shield']), $ship->id);
 
 		if ($ship->captain == $leaver->id) {
 			// el capitan abandona la nave!!
@@ -1133,7 +1133,7 @@ class Commander {
 			$newHealth = $this->CI->calculations->ship_health($ship, 1);
 
 			$crew_count = $ship->total_crew + 1;
-			$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health']), $ship->id);
+			$this->CI->Ships->update_ship(array('total_crew' => $crew_count, 'health' => $newHealth['health'], 'max_health' => $newHealth['max_health'], 'max_shield' => $newHealth['max_shield']), $ship->id);
 
 			$outputGroup = array(
 				'chat_id' => $chat_id,
