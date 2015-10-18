@@ -8,7 +8,8 @@
 		<meta name="description" content="Juega con tus amigos y conquista la galaxia." />
 		<meta name="keywords" content="app, showcase, css transitions, perspective, 3d, grid, overlay, css3, jquery" />
 		<meta name="author" content="Codrops" />
-		<link rel="shortcut icon" href="../favicon.ico"> 
+		<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 		<link rel="stylesheet" type="text/css" href="css/default.css" />
 		<link rel="stylesheet" type="text/css" href="css/landing.css" />
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
