@@ -17,11 +17,39 @@
 		<!--[if lt IE 9]>
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
+		<link href='https://fonts.googleapis.com/css?family=Orbitron|Audiowide' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
 		<style>
 
+		img {
+			margin: 23px 0px;
+		}
+
+		h2 img {
+			margin: 0px;
+			width: 78px;
+		}
+
 		*{
 			font-family: 'Roboto', sans-serif;
+		}
+
+		h2 {
+		    border-bottom: 2px solid #AA83BB;
+    		margin-bottom: 34px;	
+    		font-family: 'Audiowide', cursive;
+    		color: #AA83BB;
+    		font-size: 40px;
+		
+		}
+
+		a.ct-logo {
+		    display: block;
+		    width: 187px;
+		    height: 62px;
+		    outline: none;
+		    background: transparent url(http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/themes/codropstheme03/images/cs.png) no-repeat 0px 0px;
+		    text-indent: -9000px;
 		}
 
 		</style>
@@ -51,11 +79,23 @@
 			</header>
 		<div class="container">	
 			<div class="main row-fluid">
-				<div class="col-xs-12">
-					<h1>¿Quiénes somos?</h1>
+				<div class="col-xs-offset-2 col-xs-8">
+					<h2>¿Quiénes somos?</h2>
+
+					<p>TODO</p>
+
+					<h2>¿Quién ha dibujado los sprites?</h2>
+
+					<p>El set de sprites no lo hemos hecho nosotros, hemos usado un pack bastante completo 
+						de naves hecho por un señor que se dedica a eso y al cual le hemos remunerado por su trabajo.</p>
+						<p>Esta persona en concreto es kenney y se puede encontrar su trabajo en su <a href="http://kenney.nl/assets">página web</a></p>
+						<center><a href=""><img src="http://kenney.nl/img/logo.png"/></a></center>
 
 
-				
+					<h2>¿De dónde hemos sacado la web?</h2>
+					<p>Agradecemos los recursos gráficos de CSS y HTML que podemos encontrar en la página de codrops, de ahí hemos sacado el landing.</p>
+					<center><a class="ct-logo" href="http://tympanus.net/codrops/" rel="home">Codrops</a></center>
+						
 				</div>
 				
 			</div><!-- /main -->

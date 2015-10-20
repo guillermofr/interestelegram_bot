@@ -18,11 +18,30 @@
 		<!--[if lt IE 9]>
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
+				<link href='https://fonts.googleapis.com/css?family=Orbitron|Audiowide' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
 		<style>
 
+		img {
+			margin: 23px 0px;
+		}
+
+		h2 img {
+			margin: 0px;
+			width: 78px;
+		}
+
 		*{
 			font-family: 'Roboto', sans-serif;
+		}
+
+		h2 {
+		    border-bottom: 2px solid #AA83BB;
+    		margin-bottom: 34px;	
+    		font-family: 'Audiowide', cursive;
+    		color: #AA83BB;
+    		font-size: 40px;
+		
 		}
 
 		</style>
@@ -52,8 +71,8 @@
 			</header>
 		<div class="container">	
 			<div class="main row-fluid">
-				<div class="col-xs-12">
-					<h1>Ranking</h1>
+				<div class="col-xs-offset-2 col-xs-8">
+					<h2>Ranking</h2>
 
 					
 				

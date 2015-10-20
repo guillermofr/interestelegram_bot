@@ -17,6 +17,7 @@
 		<!--[if lt IE 9]>
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
+		<link href='https://fonts.googleapis.com/css?family=Orbitron|Audiowide' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
 		<style>
 
@@ -36,6 +37,9 @@
 		h2 {
 		    border-bottom: 2px solid #AA83BB;
     		margin-bottom: 34px;	
+    		font-family: 'Audiowide', cursive;
+    		color: #AA83BB;
+    		font-size: 40px;
 		
 		}
 		</style>
@@ -66,7 +70,7 @@
 		<div class="container">	
 			<div class="main row-fluid">
 				<div class="col-sm-offset-2 col-sm-8">
-					<h1>¡Bienvenidos a Interestelegram!</h1>
+
 
 
 					<h2>Inicio del juego: <img src="/imgs/map/ship_type1.png"/> </h2> 
