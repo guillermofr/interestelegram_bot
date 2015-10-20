@@ -553,7 +553,7 @@ class Commander {
 				// Avisar al objetivo targeteado
 				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo! Usa /esquivar para librarte de sus ataques."));
 				
-				$text = $username ." hemos fijado en el blanco a ".$target[1]. " con éxito";
+				$text = $username ." hemos fijado en el blanco a ".$target[1]. " con éxito, estámos listos para /atacar";
 			} else {
 				// La nave no está en rango
 				$text = $username ." la nave de ".$target[1]. " está demasiado lejos para seleccionarla.";
@@ -589,7 +589,7 @@ class Commander {
 		if ($user_id == $ship->captain ) {
 
 			if (!is_numeric($param) || $param == 0) {
-				$text = "Capitán debéis indicar la potencia del ataque! (/atacar_2 , /atacar_5 ...)";
+				$text = "Capitán debéis indicar la potencia del ataque! (/atacar_1 , /atacar_5 ...) o con (/a1, /a2, /a5 ...)";
 				$content = array(
 					'reply_to_message_id' => $messageId, 
 					'chat_id' => $chat_id, 
@@ -693,12 +693,24 @@ class Commander {
 				$target_text .= "\nEstado de la nave:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
-					"\nLa nave ha quedado inutilizable, hasta aquí ha llegado su aventura capitán. Abandonen la nave!
-					\n(BETATESTERS:puedes resucitar la nave usando /pilotar y los demás necesitan volver a /alistarse)" ;
+					"\nLos pedazos de tu lamentable nave se esparcen por el espacio, hasta aquí ha llegado tu aventura capitán!
+					\n(BETATESTERS: puedes resucitar la nave usando \n/pilotar , la tripulación necesita volver a \n/alistarse para que el ordenador de abordo los tome en cuenta.)" ;
 
 				//morirse <-- seriously? morirsen!
 				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
 				$this->CI->Ships->untarget_ship($target_ship);
+
+				//poner explosión
+
+				$this->CI->load->library('Mapdrawer');
+				$imagePath = $this->CI->mapdrawer->generateShipMap($target_ship,false,true);
+				$img = $this->CI->telegram->prepareImage($imagePath);
+
+				$caption = "Boom!:";
+
+				$content = array('chat_id' => $target_ship->chat_id, 'photo' => $img, 'caption' => $caption );
+				$output = $this->CI->telegram->sendPhoto($content);
+
 			}
 		} else {
 			$text = "El ataque ha fallado!";
@@ -850,7 +862,7 @@ class Commander {
 			$shipsDodged = $this->CI->Ships->untarget_ship($ship); 
 			//avisar de exito
 			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos! \xF0\x9F\x91\x8D";
-			$forEnemyText = "\xF0\x9F\x92\xA8 El enemigo seleccionado se ha escapado de tu objetivo!";
+			$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro del enemigo, tenemos que volver a /seleccionar uno!";
 		} else {
 			//avisar de pifia
 			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
@@ -1040,7 +1052,7 @@ class Commander {
 						$this->CI->load->library('Mapdrawer');
 						$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
 						$img = $this->CI->telegram->prepareImage($imagePath);
-						$caption = "Mostrando nueva posición";
+						$caption = "Acción /mover realizada satisfactoriamente";
 						$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 						$output = $this->CI->telegram->sendPhoto($content);
 
@@ -1169,19 +1181,20 @@ class Commander {
 		if ($ship) {
 			if ($user_id == $ship->captain ) {
 				$ships = $this->CI->Ships->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->where(array('active' => 1))->get_all();
-				$text = "\xF0\x9F\x8E\xAE Ranking de naves activas:\n";
+				$alive_count_ships = $this->CI->Ships->where(array('active' => 1))->count();
+				$text = "\xF0\x9F\x8E\xAE Top 3 de las $alive_count_ships naves operativas:\n";
 				foreach ($ships as $pos => $shp) {
 					$captain = $this->CI->Users->get_name_by_id($shp->captain);
 					if (empty($captain)) $captain = 'Sin-piloto';
-					$text .= "\n".$shp->score.") {$shp->name} (@{$captain})";
+					$text .= "\n".(++$pos).") ".$shp->score."p | {$shp->name} de @{$captain}";
 				}
 
 				$text .= "\n\nTu puntuación: ".$ship->score;
 
-				$users = $this->CI->Users->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(3)->get_all();
+				$users = $this->CI->Users->order_by('score', 'DESC')->order_by('id', 'ASC')->limit(5)->get_all();
 				$text .= "\n\n\xF0\x9F\x8F\x86 Ranking de capitanes:\n";
 				foreach ($users as $pos => $usr) {
-					$text .= "\n".$usr->score.") @{$usr->username}";
+					$text .= "\n".(++$pos).") @{$usr->username} con ".$usr->score."p ";
 				}
 
 				$current_user = $this->CI->Users->get_user($user_id);

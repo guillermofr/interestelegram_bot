@@ -64,7 +64,7 @@ class Mapdrawer {
 		imagedestroy($item);
 	}
 
-	public function generateShipMap($mainShip, $isScan = false) {
+	public function generateShipMap($mainShip, $isScan = false, $isDead = false) {
 		$centerX = $mainShip->x;
 		$centerY = $mainShip->y;
 		$initX = $mainShip->x -1;
@@ -108,6 +108,7 @@ class Mapdrawer {
 
 		$this->addPowerups($base, $mainShip, $powerups);
 
+		
 		// Draw target markers
 		if ($mainShip->target != null) {
 			if ($target != null) {
@@ -119,6 +120,8 @@ class Mapdrawer {
 		}
 
 		$this->addCounts($base, $mainShip);
+		
+		if ($isDead) $this->addDead($base, $mainShip);
 
 		if (false) {
 			header('Content-Type: image/png');
@@ -268,6 +271,14 @@ class Mapdrawer {
 
 		imagecopyresampled($base, $radar, 0, 0, 0, 0, 300, 300, 300, 300);
 		imagedestroy($radar);
+	}
+
+	private function addDead(&$base, $mainShip) {
+		
+		$explosion = imagecreatefrompng(APPPATH."../imgs/map/self_destruction.png");
+
+		imagecopyresampled($base, $explosion, 0, 0, 0, 0, 300, 300, 300, 300);
+		imagedestroy($explosion);
 	}
 
 	private function addAsteroids(&$base, $mainShip, $asteroids) {
