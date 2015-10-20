@@ -667,7 +667,7 @@ class Commander {
 				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
 			
-			$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de alcanzar con su ataque!!';
+			$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de alcanzar con su ataque!!';
 			$target_text .= "\nEstado de la nave:".
 				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;

@@ -77,14 +77,16 @@ class Processor {
 			"));
 			
 		//foto de invitar amigos
-		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $this->CI->config->item('img_help__crearGrupo')));		
+		$img = $this->CI->telegram->prepareImage(APPPATH.'../imgs/help1.jpg');
+		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $img));		
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
 			Una vez creado, en el perfil del bot encontrarás como añadirlo a tu grupo.\n
 			"));
 		
 		//foto de invitar bot
-		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $this->CI->config->item('img_help__invitarBot')));
+		$img = $this->CI->telegram->prepareImage(APPPATH.'../imgs/help2.jpg');
+		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $img));
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
 			Él os guiará en vuestro grupo y lo transformará en una nave espacial lista para jugar.\n
