@@ -89,12 +89,12 @@
 					<p>El set de sprites no lo hemos hecho nosotros, hemos usado un pack bastante completo 
 						de naves hecho por un señor que se dedica a eso y al cual le hemos remunerado por su trabajo.</p>
 						<p>Esta persona en concreto es kenney y se puede encontrar su trabajo en su <a href="http://kenney.nl/assets">página web</a></p>
-						<center><a href=""><img src="http://kenney.nl/img/logo.png"/></a></center>
+						<center><a target="_blank" href="http://kenney.nl/assets/space-shooter-redux"><img src="http://kenney.nl/img/logo.png"/></a></center>
 
 
 					<h2>¿De dónde hemos sacado la web?</h2>
 					<p>Agradecemos los recursos gráficos de CSS y HTML que podemos encontrar en la página de codrops, de ahí hemos sacado el landing.</p>
-					<center><a class="ct-logo" href="http://tympanus.net/codrops/" rel="home">Codrops</a></center>
+					<center><a target="_blank" class="ct-logo" href="http://tympanus.net/codrops/2013/04/01/app-showcase-with-grid-overlay/" rel="home">Codrops</a></center>
 						
 				</div>
 				
