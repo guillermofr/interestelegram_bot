@@ -44,6 +44,11 @@
 		
 		}
 
+		a:hover, a:focus {
+		    color: #AA83BB;
+		    text-decoration: underline;
+		}
+
 		</style>
 		<script src="js/modernizr.custom.js"></script>
 	</head>

@@ -51,6 +51,10 @@
 		    background: transparent url(http://codropspz.tympanus.netdna-cdn.com/codrops/wp-content/themes/codropstheme03/images/cs.png) no-repeat 0px 0px;
 		    text-indent: -9000px;
 		}
+		a:hover, a:focus {
+		    color: #AA83BB;
+		    text-decoration: underline;
+		}
 
 		</style>
 		<script src="js/modernizr.custom.js"></script>
@@ -95,7 +99,16 @@
 					<h2>¿De dónde hemos sacado la web?</h2>
 					<p>Agradecemos los recursos gráficos de CSS y HTML que podemos encontrar en la página de codrops, de ahí hemos sacado el landing.</p>
 					<center><a target="_blank" class="ct-logo" href="http://tympanus.net/codrops/2013/04/01/app-showcase-with-grid-overlay/" rel="home">Codrops</a></center>
-						
+					<br/>	
+					<br/>	
+					<h2>¿Quieres ayudar?</h2>
+					<p>Si tienes conocimientos de PHP y te apetece aportar mecánicas nuevas o solucionar algún posible bug, el proyecto está colgado en github y 
+						estamos abiertos a colaboraciones.</p>
+
+					<p><a href="https://github.com/guillermofr/interestelegram_bot">https://github.com/guillermofr/interestelegram_bot</a></p>
+
+					<center><img target="_blank" src="/imgs/map/self_destruction.png"/></center>
+
 				</div>
 				
 			</div><!-- /main -->
