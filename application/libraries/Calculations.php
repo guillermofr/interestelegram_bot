@@ -110,15 +110,13 @@ class Calculations {
 
 
 	*/
-	public function ship_dodge($mainShip) {
+	public function ship_dodge($mainShip, $attackerShip=null) {
 		if (empty($mainShip)) return false;
+		if (empty($attackerShip)) return false;
 
-		$dodge = 50;
+		$distance = round (sqrt( pow($mainShip->x - $attackerShip->x, 2) + pow($mainShip->y - $attackerShip->y, 2) ),1);
 
-		$this->CI->load->model(array('Ships'));
-		$targetedBy = $this->CI->Ships->where(array('target' => $mainShip->id))->count();
-
-		return (! $this->_chance((50 - $targetedBy*10), 5, 50));
+		return (! $this->_chance($distance*10, 5, 100));
 	}
 
 
