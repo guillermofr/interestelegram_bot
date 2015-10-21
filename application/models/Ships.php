@@ -206,9 +206,8 @@ class Ships extends MY_Model
 
     public function untarget_ship($ship=null){
         if ($ship == null) return null;
-        $ships = $this->where(array('target' => $ship->id))->get_all();
-        $this->update(array('target' => null), array('target' => $ship->id));
-        return $ships;
+        $this->update(array('target' => null), $ship->id);
+        return $ship;
     }
     /**
     * devuelve true si alguien te tiene seleccionado
