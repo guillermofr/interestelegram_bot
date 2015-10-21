@@ -862,7 +862,7 @@ class Commander {
 			$shipsDodged = $this->CI->Ships->untarget_ship($ship); 
 			//avisar de exito
 			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos! \xF0\x9F\x91\x8D";
-			$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro del enemigo, tenemos que volver a /seleccionar uno!";
+			$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro del enemigo, tenemos que volver a /escanear objetivos!";
 		} else {
 			//avisar de pifia
 			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
