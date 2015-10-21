@@ -184,8 +184,9 @@ class Ships extends MY_Model
 
         if ($ship->shield > 0) {
             $ship->shield = max(0, $ship->shield - $damage);
-            if ($ship->shield - $damage < 0) { // If shield gets to 0 and theres more damage to do
-                $ship->health = max(0, $ship->health + ($ship->shield - $damage));
+            if ($ship->shield < 0) { // If shield gets to 0 and theres more damage to do
+                $ship->health = max(0, $ship->health + $ship->shield); // As shield is negative...
+                $ship->shield = 0;
             }
         } else if ($ship->health > 0) {
             $ship->health = max(0, $ship->health - $damage);

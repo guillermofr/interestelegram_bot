@@ -677,7 +677,7 @@ class Commander {
 				//calcular ranking
 				$score = 500 + intval(($target_ship->score - $ship->score)/5);
 				if ($score < 50) $score = 50;
-				$this->CI->Ships->update_ship(array('score' => $ship->score + $score), $ship->id);
+				$this->CI->Ships->update_ship(array('score' => $ship->score + $score, 'target' => null), $ship->id);
 				$playerScore = $target_ship->score - 1000;
 				$pilot = $this->CI->Users->get_user($target_ship->captain);
 				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
