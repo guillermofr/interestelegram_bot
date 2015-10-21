@@ -116,7 +116,7 @@ class Calculations {
 
 		$distance = round (sqrt( pow($mainShip->x - $attackerShip->x, 2) + pow($mainShip->y - $attackerShip->y, 2) ),1);
 
-		return (! $this->_chance($distance*10, 5, 100));
+		return ($this->_chance($distance*10, 5, 100));
 	}
 
 

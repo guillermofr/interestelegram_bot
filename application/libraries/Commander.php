@@ -874,7 +874,7 @@ class Commander {
 					$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro de @".$ship_captain_name.", tenemos que volver a /escanear objetivos!";
 				} else {
 					//avisar de pifia
-					$texts .= "@".$ship_captain_name." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de @".$enemy_captain_name."! Vuelve a usar /esquivar las veces que quieras o huye \n\n";
+					$texts .= "@".$ship_captain_name." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de @".$enemy_captain_name."! Debemos alejarnos más de él! Vuelve a usar /esquivar las veces que quieras o huye \n\n";
 				}
 			}
 		} else {
