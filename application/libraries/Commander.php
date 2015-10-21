@@ -786,7 +786,7 @@ class Commander {
 
 
 	/**
-		Acción test
+		Acción esquivar
 	*/
 
 	private function _esquivar($msg, $ship, $params = FALSE){
@@ -853,28 +853,41 @@ class Commander {
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-		$target_ship = $this->CI->Ships->get($ship->target);
-		
-		if ($this->CI->calculations->ship_dodge($ship)) {
+		$enemies = $this->CI->Ships->where(array('target' => $ship->id)->get_all();
 
-		//if ( false ){ //cambiar esto por el cálculo de esquive
-			//quitar el id de todos los que le targetean
-			$shipsDodged = $this->CI->Ships->untarget_ship($ship); 
-			//avisar de exito
-			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." has desaparecido del radar de tus enemigos! \xF0\x9F\x91\x8D";
-			$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro del enemigo, tenemos que volver a /escanear objetivos!";
+		$shipsDodged = array();
+		$texts = "";
+		$forEnemyText = null;
+
+		if (is_array($enemies)) {
+			$ship_captain_name = $this->CI->Users->get_name_by_id($ship->captain);
+			foreach($enemies as $enemy) {
+				$enemy_captain_name = $this->CI->Users->get_name_by_id($enemy->captain);
+				if ($this->CI->calculations->ship_dodge($ship, $enemy)) {
+
+					//quitar el id de todos los que le targetean
+					$this->CI->Ships->untarget_ship($enemy); 
+					$shipsDodged[] = $enemy;
+
+					//avisar de exito
+					$texts .= "@".$ship_captain_name." has desaparecido del radar de @".$enemy_captain_name."! \xF0\x9F\x91\x8D \n\n";
+					$forEnemyText = "\xF0\x9F\x92\xA8 Hemos perdido el rastro de @".$ship_captain_name.", tenemos que volver a /escanear objetivos!";
+				} else {
+					//avisar de pifia
+					$texts .= "@".$ship_captain_name." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de @".$enemy_captain_name."! Vuelve a usar /esquivar las veces que quieras o huye \n\n";
+				}
+			}
 		} else {
-			//avisar de pifia
-			$text = "@".$this->CI->Users->get_name_by_id($ship->captain) ." la maniobra evasiva ha fallado \xF0\x9F\x91\x8E y aún sigues en el radar de tus enemigos! Vuelve a usar /esquivar las veces que quieras o huye";
+			$texts = "Ningún enemigo nos tiene en su radar en este momento capitán.";
 			$forEnemyText = null;
 		}
-
+		
 		//informar al user
 		$content = array(
 			'reply_to_message_id' => $messageId, 
 			'reply_markup' => $keyboard, 
 			'chat_id' => $chat_id, 
-			'text' => $text
+			'text' => $texts
 		);
 
 		$output = $this->CI->telegram->sendMessage($content);
