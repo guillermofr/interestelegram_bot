@@ -853,7 +853,7 @@ class Commander {
 		$username = "@".$msg->fromUsername();
 		$chat_id = $msg->chatId();
 		$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-		$enemies = $this->CI->Ships->where(array('target' => $ship->id)->get_all();
+		$enemies = $this->CI->Ships->where(array('target' => $ship->id))->get_all();
 
 		$shipsDodged = array();
 		$texts = "";
