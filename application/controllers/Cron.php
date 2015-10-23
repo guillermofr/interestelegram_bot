@@ -22,6 +22,7 @@ class Cron extends CI_Controller {
 	{
 		$this->moveAsteroids();
 		$this->addPowerups();
+		//$this->shipsMining();
 	}
 
 	private function moveAsteroids() {
@@ -79,4 +80,15 @@ class Cron extends CI_Controller {
 			}
 		}
 	}
+
+
+	/*private function shipsMining(){
+		//para cada asteroide que exista 
+
+		//buscamos los players que están en las mismas coordenadas 
+
+		//le sumamos 1 a la carga de minerales, comprobando que no se pase del max de la carga
+	}*/
+
+
 }
