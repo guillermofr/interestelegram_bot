@@ -24,6 +24,10 @@
 		img {
 			margin: 23px 0px;
 		}
+		.contacto img {
+			margin: 0px;
+			display: block;
+		}
 
 		h2 img {
 			margin: 0px;
@@ -56,6 +60,13 @@
 		    text-decoration: underline;
 		}
 
+		a {
+		    color: #AA83BB;
+		    
+		}
+
+
+
 		</style>
 		<script src="js/modernizr.custom.js"></script>
 	</head>
@@ -86,7 +97,28 @@
 				<div class="col-xs-offset-2 col-xs-8">
 					<h2>¿Quiénes somos?</h2>
 
-					<p>TODO</p>
+					<p>Este juego ha surgido como proyecto para hechar unas risas entre 3 colegas, si queréis poneros en contacto con alguno de nosotros podéis hacerlo mediante Telegram con los siguientes alias:</p>
+					<center>
+						<div class="row-fluid contacto">
+							<div class="col-sm-4">
+
+								<a href="https://telegram.me/NdeNahun"><img target="_blank" src="/imgs/map/target.png"/><br/>@NdeNahun</a> 
+							</div>
+							<div class="col-sm-4">
+									
+								<a href="https://telegram.me/killer415"><img target="_blank" src="/imgs/map/target.png"/><br/>@kiLLeR415</a>
+							</div>
+							<div class="col-sm-4">
+
+								<a href="https://telegram.me/mrtavo"><img target="_blank" src="/imgs/map/target.png"/><br/>@mrTavo</a>
+							</div>
+						</div>
+					</center>
+					<br clear="left">
+					<br clear="left">
+					<br clear="left">
+
+					<p>Para comentar fallos o mejoras, la mejor forma es mediante <b><a href="https://github.com/guillermofr/interestelegram_bot/issues">github</a></b></p>
 
 					<h2>¿Quién ha dibujado los sprites?</h2>
 

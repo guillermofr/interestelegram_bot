@@ -689,7 +689,7 @@ class Commander {
 					"\n\nHemos obtenido +".$score." puntos!";
 
 
-			 	$target_text = "\xF0\x9F\x92\x80 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
+			 	$target_text = "\xF0\x9F\x92\x80 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
 				$target_text .= "\nEstado de la nave:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
@@ -714,7 +714,7 @@ class Commander {
 			}
 		} else {
 			$text = "El ataque ha fallado!";
-			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de '.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
+			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
 		}
 
 		$content = array(

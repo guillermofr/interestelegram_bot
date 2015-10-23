@@ -144,7 +144,7 @@ class Processor {
 			$content = array(
 				'chat_id' => $chatId, 
 				'reply_to_message_id' => $messageId, 
-				'text' => '@'.$username.' el mensaje al que respondes ha caducado'
+				'text' => '@'.$username.' has respondido demasiado tarde!'
 			);
 
 			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
@@ -187,21 +187,27 @@ class Processor {
 		//si no hay required no se muestra el conteo de datos
 		if ($last_action->required) {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
+			
+			if (($response_value + $last_action->positives) == $last_action->required) {
+				$text = "Votación superada";
+			} else {
+				$text = "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})";
+			}
+
+
 			$output = array(
 				'chat_id' => $chatId,
 				'reply_markup' => $keyboard, 
-				'text' => "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})"
+				'text' => $text
 			);
 			if (($response_value + $last_action->positives) == $last_action->required) {
 				$output['reply_markup'] = $this->CI->telegram->buildKeyBoardHide($selective=FALSE);
 			}
-			$o = $this->CI->telegram->sendMessage($output);
-			/* TODO: Remove this message?
-			// hide keyboard
-			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
-			$content = array('chat_id' => $chatId, 'reply_markup' => $keyboard, 'reply_to_message_id' => $messageId, 'text' => 'tu voto se ha registrado');
-			$o = $this->CI->telegram->sendMessage($content);
-			*/
+
+			if (($response_value + $last_action->positives) <= $last_action->required) {
+				$o = $this->CI->telegram->sendMessage($output);
+			}
+			
 		}
 
 		//apply action if success
