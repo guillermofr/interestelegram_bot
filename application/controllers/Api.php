@@ -194,12 +194,19 @@ class Api extends CI_Controller {
 		//$filename = realpath(APPPATH.'../imgs/'.'space-ship.jpg');
 		//require_once(APPPATH.'libraries/CURLFile.php');
 		//$img = new CURLFile($filename, 'image/jpg', 'space-ship.jpg');
-		$img = $this->telegram->prepareImage(APPPATH.'../imgs/'.'space-ship.jpg');
+		$this->load->model('Ships');
+		$ship = $this->Ships->get(1);
+
+		$this->load->library('Mapdrawer');
+		$pathimg = $this->mapdrawer->generateShipMap($ship);
+		$img = $this->telegram->prepareImage($pathimg);
+
 		// $img = 'AgADBAADqacxG3864gf8EKgg3EpKRVXNijAABMy2MMSlqhpUJGAAAgI'; // file_id
-		$caption = 'Bienvenido a la Milano, comandante killer415. Un crucero ligero de clase Firefly. Tripulación actual: 1.';
+		$caption = 'Pruebas de caché';
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 
 		$output = $this->telegram->sendPhoto($content);
+		$this->telegram->updateImage($pathimg, json_decode($output));
 
 		echo '<pre>'.print_r($output, TRUE);
 	}
@@ -234,11 +241,7 @@ class Api extends CI_Controller {
 			//$this->mapdrawer->setAsteroids($asteroids);
 			//$this->mapdrawer->setShips($ships);
 			//$this->mapdrawer->__random();
-			//$this->mapdrawer->generateShipMap($ship);
-
-			$this->load->model('Powerups');
-
-			var_dump($this->Powerups->count_types());
+			$this->mapdrawer->generateShipMap($ship);
 
 		} catch (Exception $e) {
 			var_dump($e);

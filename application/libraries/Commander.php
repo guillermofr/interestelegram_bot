@@ -365,6 +365,8 @@ class Commander {
 				
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
 				$output = $this->CI->telegram->sendPhoto($content);
+
+				$this->CI->telegram->updateImage($imagePath, $output);
 			} else {
 				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un alias en Ajustes');						
 				$output = $this->CI->telegram->sendMessage($content);
@@ -474,7 +476,8 @@ class Commander {
 		$imagePath = $this->CI->mapdrawer->generateShipMap($ship, true);
 		$img = $this->CI->telegram->prepareImage($imagePath);
 		$content = array('chat_id' => $chat_id, 'photo' => $img);
-		$this->CI->telegram->sendPhoto($content);
+		$output = $this->CI->telegram->sendPhoto($content);
+		$this->CI->telegram->updateImage($imagePath, $output);
 
 		if (count($nearShips) > 0) {
 			$nearShips[] = "Ninguno";
@@ -652,11 +655,14 @@ class Commander {
 		$chat_id = $msg->chatId();
 
 		$quantity = $last_action->required == 1 ? 'una bolea' : $last_action->required.' boleas';
-		$img = $this->CI->telegram->prepareImage(APPPATH.'../imgs/attack.png');
+		$imagePath = APPPATH.'../imgs/attack.png';
+		$img = $this->CI->telegram->prepareImage($imagePath);
 
 		$caption = "Atacando con ".$quantity." de torpedos de protones!";
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 		$output = $this->CI->telegram->sendPhoto($content);
+
+		$this->CI->telegram->updateImage($imagePath, $output);
 
 		$target_ship = $this->CI->Ships->get($ship->target);
 		if ($ship->target != null && $this->CI->calculations->attack_success($ship, $target_ship)) {
@@ -678,6 +684,7 @@ class Commander {
 				$score = 500 + intval(($target_ship->score - $ship->score)/5);
 				if ($score < 50) $score = 50;
 				$this->CI->Ships->update_ship(array('score' => $ship->score + $score, 'target' => null), $ship->id);
+				$this->CI->Ships->update(array('target' => null), array('target' => $target_ship->id)); // remove target from any other ship
 				$playerScore = $target_ship->score - 1000;
 				$pilot = $this->CI->Users->get_user($target_ship->captain);
 				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
@@ -710,6 +717,8 @@ class Commander {
 
 				$content = array('chat_id' => $target_ship->chat_id, 'photo' => $img, 'caption' => $caption );
 				$output = $this->CI->telegram->sendPhoto($content);
+
+				$this->CI->telegram->updateImage($imagePath, $output);
 
 			}
 		} else {
@@ -770,6 +779,8 @@ class Commander {
 
 				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 				$output = $this->CI->telegram->sendPhoto($content);
+
+				$this->CI->telegram->updateImage($imagePath, $output);
 			}
 			else {			
 				$content = array(
@@ -1068,6 +1079,7 @@ class Commander {
 						$caption = "Acción /mover realizada satisfactoriamente";
 						$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 						$output = $this->CI->telegram->sendPhoto($content);
+						$this->CI->telegram->updateImage($imagePath, $output);
 
 						break;
 					

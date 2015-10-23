@@ -213,9 +213,30 @@ class Telegram {
 	}
 
 	public function prepareImage($path) {
+		$CI =& get_instance();
+		$CI->load->model('Images_cache');
+		$cache = $CI->Images_cache->get_by_path($path);
+		if ($cache != null && is_object($cache)) {
+			if (!empty($cache->telegram_id)) {
+				return $cache->telegram_id;
+			}
+		} else {
+			$CI->Images_cache->add_image($path);
+		}
 		require_once(APPPATH.'libraries/CURLFile.php');
 		$filename = realpath($path);
 		return new CURLFile($filename, 'image/png', basename($path));
+	}
+
+	public function updateImage($path, $output) {
+		if (strpos($path, '.png') === false) return;
+		if (!is_object($output)) $output = json_decode($output);
+		$CI =& get_instance();
+		$CI->load->model('Images_cache');
+		if (isset($output->result) && isset($output->result->photo)) {
+			$image_id = $output->result->photo[count($output->result->photo)-1]->file_id;
+			$CI->Images_cache->set_telegram_id($path, $image_id);
+		}
 	}
 
 	public function prepareCert($path) {
