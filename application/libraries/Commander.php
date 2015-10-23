@@ -589,7 +589,7 @@ class Commander {
 		if ($user_id == $ship->captain ) {
 
 			if (!is_numeric($param) || $param == 0) {
-				$text = "Capitán debéis indicar la potencia del ataque! (/atacar_1 , /atacar_5 ...) o con (/a1, /a2, /a5 ...)";
+				$text = "Capitán debéis indicar la potencia del ataque! ( /atacar_1 , /atacar_5 ... ) o con ( /a1 , /a2 , /a5 ... )";
 				$content = array(
 					'reply_to_message_id' => $messageId, 
 					'chat_id' => $chat_id, 
