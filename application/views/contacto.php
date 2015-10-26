@@ -97,7 +97,7 @@
 				<div class="col-xs-offset-2 col-xs-8">
 					<h2>¿Quiénes somos?</h2>
 
-					<p>Este juego ha surgido como proyecto para hechar unas risas entre 3 colegas, si queréis poneros en contacto con alguno de nosotros podéis hacerlo mediante Telegram con los siguientes alias:</p>
+					<p>Este juego ha surgido como proyecto para echar unas risas entre 3 colegas, si queréis poneros en contacto con alguno de nosotros podéis hacerlo mediante Telegram con los siguientes alias:</p>
 					<center>
 						<div class="row-fluid contacto">
 							<div class="col-sm-4">
