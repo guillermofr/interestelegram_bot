@@ -149,6 +149,8 @@ class Mapdrawer {
 
 		if ($isScan) $this->addRadar($base, $mainShip);
 
+		$this->addMineralSaleIndicator($base, $mainShip);
+
 		$ships = $data->os;
 		$asteroids = $data->as;
 		$powerups = $data->pu;
@@ -534,6 +536,34 @@ class Mapdrawer {
 		if ($mainShip->x <= 2 && $mainShip->y <= 2) {
 			$mine = APPPATH."../imgs/map/mine.png";
 			$this->addSquareXYSize($base, $mainShip, $mine, 1, 1, 0, 100);
+		}
+	}
+
+	/**
+	 * Adds the target pointer depending on the position of the targeted ship
+	 */
+	private function addMineralSaleIndicator(&$base, $mainShip) {
+		if ($mainShip->minerals > 0 && !($mainShip->x == 1 && $mainShip->y == 1)) {
+			$x = 0;
+			$y = 0;
+			$target_symbol = null;
+			if ($mainShip->x == 1) {
+				$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/mine_loc_bot.png");
+				$x = 1;
+				$y = 2;
+			} else if ($mainShip->y == 1) {
+				$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/mine_loc_left.png");
+				$x = 0;
+				$y = 1;
+			} else {
+				$target_symbol = imagecreatefrompng(APPPATH."../imgs/map/mine_loc_corner.png");
+				$x = 0;
+				$y = 2;
+			}
+
+			if ($target_symbol != null) {
+				imagecopyresampled($base, $target_symbol, $x * $this->size, $y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+			}
 		}
 	}
 
