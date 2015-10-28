@@ -72,7 +72,6 @@ class Processor {
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
 			Bienvenido a Interestelegram @".$msg->fromUsername().", tu aventura espacial!\n
-			Para jugar debes configurar un alias en tu cuenta de Telegram en Ajustes. Hecho esto estarás preparado para empezar.\n
 			Crea un grupo de telegram con uno o más amigos.\n 
 			"));
 			
