@@ -84,6 +84,28 @@ class Mapdrawer {
 		imagedestroy($item);
 	}
 
+	private function addSquareXYSize(&$base, $mainShip, $path, $x, $y, $angle = null, $offset = null) {
+		if (is_string($path)) {
+			if (!is_file($path)) {
+				log_message('error', 'File does not exist: '.$path);
+				return;
+			}
+			$item = imagecreatefrompng($path);
+		} else $item = $path;
+		if ($angle != null) {
+			$specialAngle = $angle % 90 == 0;
+			$this->rotate($item, $specialAngle ? $angle : ($angle-45));
+		}
+		if ($offset != null) {
+			$size = $this->size + 2*$offset;
+			imagecopyresampled($base, $item, ($this->translate($mainShip->x, $x) * $this->size)-$offset, ($this->remapY($this->translate($mainShip->y, $y)) * $this->size)-$offset, 0, 0, $size, $size, $size, $size);
+		} else {
+			imagecopyresampled($base, $item, $this->translate($mainShip->x, $x) * $this->size, $this->remapY($this->translate($mainShip->y, $y)) * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+		}
+
+		imagedestroy($item);
+	}
+
 	/**
 	 * Generates a map relative to a ship that will be placed in the center
 	 * The ship targeted by this ship will be highlighted too
@@ -122,6 +144,8 @@ class Mapdrawer {
 		$base = imagecreatefrompng(APPPATH.'../imgs/map/background.png');
 
 		$this->markForbidden($base, $mainShip);
+
+		$this->showStarports($base, $mainShip);
 
 		if ($isScan) $this->addRadar($base, $mainShip);
 
@@ -504,6 +528,13 @@ class Mapdrawer {
 		}
 
 		return $data;
+	}
+
+	function showStarports(&$base, $mainShip) {
+		if ($mainShip->x <= 2 && $mainShip->y <= 2) {
+			$mine = APPPATH."../imgs/map/mine.png";
+			$this->addSquareXYSize($base, $mainShip, $mine, 1, 1, 0, 100);
+		}
 	}
 
 }
