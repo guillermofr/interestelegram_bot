@@ -229,6 +229,60 @@ class Calculations {
 		}
 	}
 
+
+	public function getMineralTypeString($type) {
+		switch ($type) {
+			case 0:
+				return 'interestelegraminium';
+				break;
+			default:
+				return 'dust';
+				break;
+		}
+	}
+
+	public function obtainMinerals($minerals = false) {
+
+		$this->CI->load->model(array('Ships', 'Minerals'));
+
+		$remindfull = array(); //listado de naves llenas a las que vamos a mandar mensaje
+		$full = array(); // listado de naves llenas
+		$empty = array(); // listado de naves llenandose
+
+		foreach ($minerals as $mineral){
+
+		//buscamos los players que están en las mismas coordenadas 
+		//le sumamos 1 a la carga de minerales, comprobando que no se pase del max de la carga
+			
+			$update_data = array('minerals' => 'minerals + 1');
+			$this->CI->Ships->update($update_data,array( 'x' =>$mineral->x , 'y'=>$mineral->y , 'minerals < max_minerals '=> null ),false);
+
+			$fullships = $this->CI->Ships->where(array( 'x' =>$mineral->x , 'y'=>$mineral->y , 'minerals = max_minerals '=> null ))->get_all();
+			if (!empty($fullships)){
+				$full = array_merge($full, $fullships);
+			}
+			$remindfullships = $this->CI->Ships->where(array( 'x' =>$mineral->x , 'y'=>$mineral->y , 'minerals = max_minerals '=> null , 'dont_remind_full_minerals' => 0 ))->get_all();
+			if (!empty($remindfullships)){
+				$remindfull = array_merge($remindfull, $remindfullships);
+			}
+			$emptyships = $this->CI->Ships->where(array( 'x' =>$mineral->x , 'y'=>$mineral->y , 'minerals < max_minerals '=> null ))->get_all();
+			if (!empty($emptyships)){
+				$empty = array_merge($empty, $emptyships);
+			}
+
+
+			$this->CI->Minerals->consume($mineral,count($emptyships[0]));
+
+
+		}
+
+
+		return array('full' => $remindfull , 'empty' => $empty);
+
+
+	}
+
+
 }
 
 /* EOF */

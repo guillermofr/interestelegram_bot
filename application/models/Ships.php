@@ -220,7 +220,5 @@ class Ships extends MY_Model
         return $ships;
     }
 
-    // get crew
-    // get crew but captain
 
 }

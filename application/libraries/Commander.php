@@ -24,7 +24,8 @@ class Commander {
 							'Actions',
 							'Votes',
 							'Asteroids',
-							'Powerups'));
+							'Powerups',
+							'Minerals'));
 		$this->CI->load->library('Calculations');
 		$this->CI->config->load('bot');
 		$this->CI->config->load('images');
@@ -772,7 +773,7 @@ class Commander {
 							"\n\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health.
 							"\n\xF0\x9F\x94\xB5: ".$Ship->shield."/".$Ship->max_shield.
 							"\n\xF0\x9F\x92\xB0: ".$Ship->money.
-							"\n\xF0\x9F\x92\x8E: ".$Ship->minerals.
+							"\n\xF0\x9F\x92\x8E: ".$Ship->minerals."/".$Ship->max_minerals.
 							"\n\xF0\x9F\x8E\xAE: ".$Ship->score.
 							"\n\xF0\x9F\x8F\x86: ".$Captain->score.'(+'.($Ship->score-1000).')';
 							//.print_r($Ship,true);
@@ -1038,6 +1039,8 @@ class Commander {
 							'angle'=>$ship->angle
 						),$ship->id); 
 
+
+						//powerups
 						$powerups = $this->CI->Powerups->ship_over_powerups($ship);
 						$powerups_text = '';
 						if (is_array($powerups) && count($powerups)) {
@@ -1060,6 +1063,19 @@ class Commander {
 							}
 						}
 
+						//minerals
+						$minerals = $this->CI->Minerals->ship_over_minerals($ship);
+						$minerals_text = '';
+						if (is_array($minerals) && count($minerals)) {
+							foreach ($minerals as $mineral) {
+								switch ($mineral->type) {
+									case 0: // interestelegraminium
+										$minerals_text .= "\xF0\x9F\x92\x8E\xF0\x9F\x9A\xBF Has empezado a minar un asteroide de interestelegraminium!\n";
+										break;
+								}
+							}
+						}
+
 						$content = array(
 							'reply_to_message_id' => $messageId, 
 							'reply_markup' => $keyboard,
@@ -1069,6 +1085,9 @@ class Commander {
 
 						if (!empty($powerups_text)) {
 							$content['text'] .= "\n\n".$powerups_text;
+						}
+						if (!empty($minerals_text)) {
+							$content['text'] .= "\n\n".$minerals_text;
 						}
 
 						$output = $this->CI->telegram->sendMessage($content);

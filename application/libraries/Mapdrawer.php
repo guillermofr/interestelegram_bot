@@ -128,6 +128,7 @@ class Mapdrawer {
 		$ships = $data->os;
 		$asteroids = $data->as;
 		$powerups = $data->pu;
+		$minerals = $data->m;
 		
 		$target = null;
 		if (is_array($ships)) {
@@ -142,11 +143,14 @@ class Mapdrawer {
 			}
 		}
 
+		$this->addMinerals($base, $mainShip, $minerals);
+
 		$this->addShip($base, $mainShip, $mainShip);
 
 		$this->addAsteroids($base, $mainShip, $asteroids);
 
 		$this->addPowerups($base, $mainShip, $powerups);
+
 
 		
 		// Draw target markers
@@ -394,6 +398,24 @@ class Mapdrawer {
 	}
 
 	/**
+	 * Draws an array of minerals in the map
+	 */
+	private function addMinerals(&$base, $mainShip, $minerals) {
+		if (!is_array($minerals)) return false;
+
+		$this->CI->load->library('Calculations');
+
+		foreach ($minerals as $mineral) {
+			//$rarity = $this->CI->calculations->getPowerUpRarityString($mineral->rarity); //TODO, SPRITE DIFERENTE POR CANTIDAD QUE QUEDA?
+			$type = $this->CI->calculations->getMineralTypeString($mineral->type);
+
+			$image = APPPATH."../imgs/map/m_{$type}.png";
+
+			$this->addSquare($base, $mainShip, $image, $mineral);
+		}
+	}
+
+	/**
 	 * Hold in this array all the data to be drawn, to allow a cache system
 	 */
 	private function prepareData($mainShip) {
@@ -411,6 +433,7 @@ class Mapdrawer {
 				'os' => array(), // otherShips
 				'as' => array(), // asteroids
 				'pu' => array(), // power ups
+				'm' => array(), // minerals
 			);
 
 		$this->CI->load->model('Ships');
@@ -452,6 +475,19 @@ class Mapdrawer {
 					'type' => $powerup->type,
 					'x' => $powerup->x,
 					'y' => $powerup->y
+				);
+			}
+		}
+
+
+		$this->CI->load->model('Minerals');
+		$minerals = $this->CI->Minerals->get_minerals_nearby($mainShip, 1);
+		if (is_array($minerals)) {
+			foreach ($minerals as $mineral) {
+				$data['m'][] = array(
+					'type' => $mineral->type,
+					'x' => $mineral->x,
+					'y' => $mineral->y
 				);
 			}
 		}

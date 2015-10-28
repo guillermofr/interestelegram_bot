@@ -22,7 +22,8 @@ class Cron extends CI_Controller {
 	{
 		$this->moveAsteroids();
 		$this->addPowerups();
-		//$this->shipsMining();
+		$this->addMinerals();
+		$this->obtainMinerals();
 	}
 
 	private function moveAsteroids() {
@@ -68,27 +69,71 @@ class Cron extends CI_Controller {
 		if ($timestamp % 10 != 0) return;
 
 		$types = array(0,1,2);
+		$amount = 2;  //esto debería ir en un config
 
 		foreach ($types as $type) {
 			$count = $this->Powerups->count_by_type($type);
 			if (!isset($count[0]['count'])) $count = 0;
 			else $count = intval($count[0]['count']);
-			if ($count < 2) {
-				for ($i=$count; $i < 2; $i++) { 
+			if ($count < $amount) {
+				for ($i=$count; $i < $amount; $i++) { 
 					$this->Powerups->insert(array('x' => rand(1, MAP_SIZE), 'y' => rand(1, MAP_SIZE), 'type' => $type));
 				}
 			}
 		}
 	}
 
+	private function addMinerals() {
+		$this->load->model('Minerals');
 
-	/*private function shipsMining(){
-		//para cada asteroide que exista 
+		$types = array(0);
+		$amount = 4;  //esto debería ir en un config
 
-		//buscamos los players que están en las mismas coordenadas 
+		foreach ($types as $type) {
+			$count = $this->Minerals->count_by_type($type);
+			if (!isset($count[0]['count'])) $count = 0;
+			else $count = intval($count[0]['count']);
+			if ($count < $amount) {
+				for ($i=$count; $i < $amount; $i++) { 
+					$this->Minerals->insert(array('x' => rand(1, MAP_SIZE), 'y' => rand(1, MAP_SIZE), 'type' => $type));
+				}
+			}
+		}
+	}
 
-		//le sumamos 1 a la carga de minerales, comprobando que no se pase del max de la carga
-	}*/
 
+	private function obtainMinerals(){
+		$this->load->model('Minerals');
+		$this->load->model('Ships');
+		$this->load->library('Calculations');
+		$minerals = $this->Minerals->get_all();
+
+		$MineralShips = $this->calculations->obtainMinerals($minerals);
+
+		$this->config->load('bot');
+		$params = array( $this->config->item('botToken') );
+		$this->load->library('Telegram', $params);
+
+		foreach ($MineralShips['full'] as $user) {
+			$output = array(
+				'chat_id' => $user->chat_id,
+				'text' => "\xF0\x9F\x94\x9A\xF0\x9F\x92\x8E Tu nave está a reventar de mineral interestelegraminium, acércate a la estación para cambiar los minerales por dinero."
+			);
+			$this->telegram->sendMessage($output);
+
+			$this->Ships->update(array('dont_remind_full_minerals' => 1),$user->id);
+
+
+		}
+
+		foreach ($MineralShips['empty'] as $user) {
+			$output = array(
+				'chat_id' => $user->chat_id,
+				'text' => "\xF0\x9F\x92\x8E\xE2\x9D\x95 Acabas de recolectar 1 unidad de interestelegraminium, podrás cambiarlo por dinero en la estación."
+			);
+			$this->telegram->sendMessage($output);
+		}
+
+	}
 
 }
