@@ -406,7 +406,7 @@ class Commander {
 		$messageId = $msg->messageId();
 		
 		if ($user_id == $ship->captain ) {
-			$option = array( array("SI", "NO") );
+			$option = $this->CI->calculations->trollKeyboardV1();
 			$text = "El capitán quiere escanear el sector en busca de objetivos ¿Ayudas a escanear?";
 
 			// Create custom keyboard
@@ -603,7 +603,7 @@ class Commander {
 			} else {
 				if ($this->CI->Ships->can_i_attack($ship)) {
 
-					$option = array( array("SI", "NO") );
+					$option = $this->CI->calculations->trollKeyboardV1();
 					$text = "El capitán quiere atacar con potencia ".$param." ¿Apoyas el ataque?";
 
 					// Create custom keyboard
@@ -819,7 +819,7 @@ class Commander {
 				return $this->CI->telegram->sendMessage($content);
 			}
 
-			$option = array( array("SI", "NO") );
+			$option = $this->CI->calculations->trollKeyboardV1();
 			$text = "El capitán quiere hacer maniobra de evasión para esquivar $needDodge enemigo".(($needDodge==1)?"":"s")." ¿Ayudas en la maniobra?";
 
 			// Create custom keyboard
@@ -926,7 +926,7 @@ class Commander {
 		$user_id = $msg->fromId();
 		$messageId = $msg->messageId();
 		if ($user_id == $ship->captain ) {
-			$option = array( array("SI", "NO") );
+			$option = $this->CI->calculations->trollKeyboardV1();
 			$text = "El capitán quiere mover la nave a otro sector \n¿Ayudas con la maniobra?";
 
 			// Create custom keyboard
@@ -1076,6 +1076,19 @@ class Commander {
 							}
 						}
 
+						$starport = $this->CI->Minerals->ship_over_starport($ship);
+						$starport_text = '';
+						if ($starport) {
+							$starport_text .= "Aterrizas en el comercio de minerales!\n";
+							$obtainedMoney = $this->CI->Ships->vender_todo($ship);
+							if ($obtainedMoney){
+								$starport_text .= "Has cambiado tus minerales por $obtainedMoney dineros!\n";
+							} else {
+								$starport_text .= "Aquí parece que pagan si les traes minerales de interestelegraminium, busca unos cuantos y vuelve.\n";
+							}
+						}
+
+
 						$content = array(
 							'reply_to_message_id' => $messageId, 
 							'reply_markup' => $keyboard,
@@ -1089,6 +1102,10 @@ class Commander {
 						if (!empty($minerals_text)) {
 							$content['text'] .= "\n\n".$minerals_text;
 						}
+						if (!empty($starport_text)) {
+							$content['text'] .= "\n\n".$starport_text;
+						}
+
 
 						$output = $this->CI->telegram->sendMessage($content);
 
@@ -1258,7 +1275,7 @@ class Commander {
 	*/
 	private function _test($msg, $ship, $params = FALSE){
 
-		$option = array( array("SI", "NO") );
+		$option = $this->CI->calculations->trollKeyboardV1();
 		$chat_id = $msg->chatId();
 		$text = "¿Nos vamos de paseo?";
 

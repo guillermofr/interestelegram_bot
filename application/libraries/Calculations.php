@@ -275,13 +275,16 @@ class Calculations {
 
 
 		}
-
-
 		return array('full' => $remindfull , 'empty' => $empty);
-
-
 	}
 
+
+	public function trollKeyboardV1(){
+		if ($this->_chance(50))
+			return array( array("SI", "NO") );
+		else 
+			return array( array("NO", "SI") );
+	}
 
 }
 

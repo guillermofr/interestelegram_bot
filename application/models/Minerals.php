@@ -44,6 +44,11 @@ class Minerals extends MY_Model
         return $this->where(array('x' => $ship->x, 'y' => $ship->y))->get_all();
     }
 
+    public function ship_over_starport($ship = null) {
+        if (empty($ship)) return false;
+        return ($ship->x == 1 && $ship->y == 1);
+    }
+
     public function count_by_type($type) {
         return $this->db->query("SELECT type, count(id) as 'count' FROM minerals WHERE `type` = {$type} GROUP BY `type`")->result_array();
     }
@@ -61,5 +66,7 @@ class Minerals extends MY_Model
 		}
 
     }
+
+
 
 }

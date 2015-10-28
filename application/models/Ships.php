@@ -220,5 +220,17 @@ class Ships extends MY_Model
         return $ships;
     }
 
+    public function vender_todo($ship = null){
+        if ($ship == null) return 0;
+        
+        $addMoney = $ship->minerals * 100;
+        $updatedMoney = $ship->money + $addMoney;
+
+        $update_data = array('minerals' => 0,'money' => $updatedMoney,'dont_remind_full_minerals' => 0);
+        $this->update($update_data,array( 'id' => $ship->id ));  
+
+        return $addMoney;  
+    }
+
 
 }
