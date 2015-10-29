@@ -453,7 +453,8 @@ class Mapdrawer {
 						'max_shield' => $mainShip->max_shield,
 						'target' => $mainShip->target,
 						'x' => $mainShip->x,
-						'y' => $mainShip->y
+						'y' => $mainShip->y,
+						'm' => $mainShip->minerals > 0
 					),
 				'os' => array(), // otherShips
 				'as' => array(), // asteroids
