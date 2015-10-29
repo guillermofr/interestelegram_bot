@@ -684,16 +684,17 @@ class Commander {
 				//calcular ranking
 				$score = 500 + intval(($target_ship->score - $ship->score)/5);
 				if ($score < 50) $score = 50;
-				$this->CI->Ships->update_ship(array('score' => $ship->score + $score, 'target' => null), $ship->id);
-				$this->CI->Ships->update(array('target' => null), array('target' => $target_ship->id)); // remove target from any other ship
-				$playerScore = $target_ship->score - 1000;
-				$pilot = $this->CI->Users->get_user($target_ship->captain);
 				//recover cargo and moneyz
 				$cargo = ceil($target_ship->minerals / 3);
 				$ship->minerals += $cargo;
 				if ($ship->minerals > $ship->max_minerals) $ship->minerals = $ship->max_minerals;
 				$moneyz = ceil($target_ship->money / 3);
-				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore, 'minerals' => $ship->minerals, 'money' => $ship->money + $moneyz), $target_ship->captain);
+				
+				$this->CI->Ships->update_ship(array('score' => $ship->score + $score, 'target' => null, 'minerals' => $ship->minerals, 'money' => $ship->money + $moneyz), $ship->id);
+				$this->CI->Ships->update(array('target' => null), array('target' => $target_ship->id)); // remove target from any other ship
+				$playerScore = $target_ship->score - 1000;
+				$pilot = $this->CI->Users->get_user($target_ship->captain);
+				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
 
 			 	$text = "IMPACTO!!!";
 				$text .= "\nEl enemigo ha sido destruido!:".
