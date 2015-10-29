@@ -118,16 +118,27 @@ class Mapdrawer {
 		$data = $this->prepareData($mainShip);
 		$data['scan'] = $isScan ? 1 : 0;
 		$data['dead'] = $isDead ? 1 : 0;
+		$cache = $this->dataToCache($data);
 
 		$data = json_encode($data);
-		$dataHash = md5($data);
+		$cache = json_encode($cache);
+		$dataHash = md5($cache);
 
 		$scanPath = APPPATH.'../imgs/map/scans/'.$dataHash.'.png';
 
 		$cache = $this->CI->Images_cache->get_by_path($scanPath);
-		if (!$debug && $cache != null && is_object($cache) && !empty($cache->telegram_id)) {
-			return $scanPath;
+		if ($cache != null && is_object($cache) && !empty($cache->telegram_id)) {
+			if (!$debug) {
+				return $scanPath;
+			} else {
+				$base = imagecreatefrompng($scanPath);
+				header('Content-Type: image/png');
+				imagepng($base);
+				imagedestroy($base);
+				return;
+			}
 		}
+
 
 		// Fast transformation to objects
 		$data = json_decode($data);
@@ -154,6 +165,8 @@ class Mapdrawer {
 		$powerups = $data->pu;
 		$minerals = $data->m;
 		
+		$this->addMinerals($base, $mainShip, $minerals);
+
 		$target = null;
 		if (is_array($ships)) {
 			foreach ($ships as $ship) {
@@ -166,8 +179,6 @@ class Mapdrawer {
 				if ($ship->id == $mainShip->target) $target = $ship;
 			}
 		}
-
-		$this->addMinerals($base, $mainShip, $minerals);
 
 		$this->addShip($base, $mainShip, $mainShip);
 
@@ -193,6 +204,9 @@ class Mapdrawer {
 		if ($isDead) $this->addDead($base, $mainShip);
 
 		if ($debug) {
+			$this->CI->Images_cache->add_image($scanPath);
+			$this->CI->Images_cache->set_telegram_id($scanPath, 123);
+			imagepng($base, $scanPath);
 			header('Content-Type: image/png');
 			imagepng($base);
 			imagedestroy($base);
@@ -332,6 +346,7 @@ class Mapdrawer {
 
 		if ($target_symbol != null) {
 			imagecopyresampled($base, $target_symbol, $x * $this->size, $y * $this->size, 0, 0, $this->size, $this->size, $this->size, $this->size);
+			imagedestroy($target_symbol);
 		}
 	}
 
@@ -530,6 +545,86 @@ class Mapdrawer {
 		}
 
 		return $data;
+	}
+
+	function dataToCache($data) {
+		function __ship_type($id) {
+			return ($id % 9) + 1;
+		}
+		
+		$cache = array(
+				'ms' => array( // mainShip
+						'id' => __ship_type($data['ms']['id']),
+						'angle' => $data['ms']['angle'],
+						'shield' => $data['ms']['shield'],
+						'm' => $data['ms']['m']
+					),
+				'os' => array(), // otherShips
+				'as' => array(), // asteroids
+				'pu' => array(), // power ups
+				'm' => array(), // minerals
+			);
+
+		// If im close to a wall, I need coordinates
+		if ($data['ms']['x'] == 1 || $data['ms']['x'] == MAP_SIZE || $data['ms']['y'] == 1 || $data['ms']['y'] == MAP_SIZE) {
+			$cache['ms']['x'] = $data['ms']['x'];
+			$cache['ms']['y'] = $data['ms']['y'];
+		}
+
+		if (isset($data['scan'])) {
+			$cache['scan'] = $data['scan'];
+		}
+
+		if (isset($data['dead'])) {
+			$cache['dead'] = $data['dead'];
+		}
+
+		if (isset($data['t'])) {
+			$cache['tr'] = array(
+				'x' => $this->translate($data['ms']['x'],$data['t']['x']),
+				'y' => $this->translate($data['ms']['y'],$data['t']['y'])
+			);
+		}
+
+		foreach ($data['os'] as $value) {
+			$cache['os'] = array(
+					'id' => __ship_type($value['id']),
+					'angle' => $value['angle'],
+					'shield' => $value['shield'],
+					'x' => $this->translate($data['ms']['x'],$value['x']),
+					'y' => $this->translate($data['ms']['y'],$value['y'])
+				);
+		}
+
+		foreach ($data['os'] as $value) {
+			$cache['os'] = array(
+					'id' => __ship_type($value['id']),
+					'angle' => $value['angle'],
+					'shield' => $value['shield'],
+					'x' => $this->translate($data['ms']['x'],$value['x']),
+					'y' => $this->translate($data['ms']['y'],$value['y'])
+				);
+		}
+
+		$cache['pu'] = $data['pu'];
+		foreach ($cache['pu'] as &$pu) {
+			$pu['x'] = $this->translate($data['ms']['x'],$pu['x']);
+			$pu['y'] = $this->translate($data['ms']['y'],$pu['y']);
+		}
+
+		$cache['m'] = $data['m'];
+		foreach ($cache['m'] as &$m) {
+			$m['x'] = $this->translate($data['ms']['x'],$m['x']);
+			$m['y'] = $this->translate($data['ms']['y'],$m['y']);
+		}
+
+		$cache['as'] = $data['as'];
+		foreach ($cache['as'] as &$as) {
+			$as['x'] = $this->translate($data['ms']['x'],$as['x']);
+			$as['y'] = $this->translate($data['ms']['y'],$as['y']);
+		}
+
+		return $cache;
 	}
 
 	function showStarports(&$base, $mainShip) {

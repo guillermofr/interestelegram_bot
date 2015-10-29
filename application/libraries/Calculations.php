@@ -25,7 +25,7 @@ class Calculations {
 		$rand = rand(0, 100);
 		if ($chance < $min) $chance = $min;
 		if ($chance > $max) $chance = $max;
-		log_message('error', '($rand'.$rand.' <= $chance'.$chance.')');
+		//log_message('error', '($rand'.$rand.' <= $chance'.$chance.')');
 		return ($rand <= $chance);
 	}
 
