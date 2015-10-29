@@ -149,8 +149,6 @@ class Mapdrawer {
 
 		if ($isScan) $this->addRadar($base, $mainShip);
 
-		$this->addMineralSaleIndicator($base, $mainShip);
-
 		$ships = $data->os;
 		$asteroids = $data->as;
 		$powerups = $data->pu;
@@ -188,6 +186,7 @@ class Mapdrawer {
 				if (!empty($target)) $this->addTargetIndicator($base, $mainShip, $target);
 			}			
 		}
+		$this->addMineralSaleIndicator($base, $mainShip);
 
 		$this->addCounts($base, $mainShip);
 		
