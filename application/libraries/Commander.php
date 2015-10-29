@@ -688,13 +688,20 @@ class Commander {
 				$this->CI->Ships->update(array('target' => null), array('target' => $target_ship->id)); // remove target from any other ship
 				$playerScore = $target_ship->score - 1000;
 				$pilot = $this->CI->Users->get_user($target_ship->captain);
-				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
+				//recover cargo and moneyz
+				$cargo = ceil($target_ship->minerals / 3);
+				$ship->minerals += $cargo;
+				if ($ship->minerals > $ship->max_minerals) $ship->minerals = $ship->max_minerals;
+				$moneyz = ceil($target_ship->money / 3);
+				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore, 'minerals' => $ship->minerals, 'money' => $ship->money + $moneyz), $target_ship->captain);
 
 			 	$text = "IMPACTO!!!";
 				$text .= "\nEl enemigo ha sido destruido!:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
-					"\n\nHemos obtenido +".$score." puntos!";
+					"\n\nHemos obtenido +".$score." puntos!".
+					(($cargo>0)?("\nHemos recuperado +".$cargo." minerales!"):'').
+					(($moneyz>0)?("\nHemos recuperado +".$moneyz." dineros!"):'');
 
 
 			 	$target_text = "\xF0\x9F\x92\x80 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
