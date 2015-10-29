@@ -26,12 +26,35 @@ class Webhook extends CI_Controller
 			$this->lastUpdate = $message['update_id'] + 1;
 			echo print_r($message, TRUE);
 
-			$this->processor->process($message);
+			$chat_id = $message['message']['chat']['id'];
+			$content = array('chat_id' => $chat_id, 'text' => 'La Beta ha finalizado. Para seguir jugando, echa a este bot e invita a @interestelegram_bot !');						
+			$output = $this->telegram->sendMessage($content);
+
+			//$this->processor->process($message);
 
 			echo '<script>setTimeout(function(){ window.location = \''.$this->config->item('botPath').'/index.php/webhook/index/'.$this->lastUpdate.'\'; }, '.$this->refreshMillis.');</script>';
         }
 
         public function hook()
+        {
+        	try {
+        		$rawData = file_get_contents("php://input");
+	        	$message = json_decode($rawData, TRUE);
+
+	        	$params = array(
+					'APIKEY'
+				);
+				$this->load->library('Telegram', $params);
+	        	$chat_id = $message['message']['chat']['id'];
+				$content = array('chat_id' => $chat_id, 'text' => 'La Beta ha finalizado. Para seguir jugando, echa a este bot e invita a @interestelegram_bot !');						
+				$output = $this->telegram->sendMessage($content);
+        	} catch (Exception $e) {
+        		log_message('error', $e->getMessage());
+        	}
+        	
+        }
+
+        public function hook2()
         {
         	try {
         		$rawData = file_get_contents("php://input");
@@ -53,7 +76,7 @@ class Webhook extends CI_Controller
 
 			$this->load->library('Telegram', $params);
 
-			$output = $this->telegram->setWebhook('https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook', $this->telegram->prepareCert(APPPATH.'../cert/YOURPUBLIC.pem'));
+			$output = $this->telegram->setWebhook('https://'.$_SERVER['SERVER_NAME'].'/index.php/webhook/hook2', $this->telegram->prepareCert(APPPATH.'../cert/YOURPUBLIC.pem'));
         }
 
 }
