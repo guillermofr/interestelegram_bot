@@ -79,7 +79,7 @@
 
 					<h2>Inicio del juego: <img src="/imgs/map/ship_type1.png"/> </h2> 
 					<p>Para iniciar una partida hay que crear un grupo e invitar al bot al grupo. </p>
-						<center><p><a href="https://telegram.me/interbeta_bot"><img src="/images/help/logo.png"/></a></p></center>
+						<center><p><a href="https://telegram.me/interestelegram_bot"><img src="/images/help/logo.png"/></a></p></center>
 					<p>El bot en ese momento te explicará ciertas cosas sobre la dinámica del juego y esperará que el capitán tome el control.</p>
 					<p>El primero que activa el bot con el comando “Pilotar” se convierte en Capitán.</p>
 					<p>El capitán puede ceder permanentemente el mando a otra persona con otro comando.</p>
