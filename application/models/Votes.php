@@ -40,15 +40,16 @@ class Votes extends MY_Model
     /**
      * Crea una acción
      */
-    public function create_vote($values=array()) {
+    public function create_vote($values=array(), $msg = null) {
         $keys = array_keys($values);
         if (!in_array('action_id', $keys) || 
             !in_array('user_id', $keys) 
             ) {
             return false;
         }
-
-        if ($this->where(array('action_id' => $values['action_id'], 'user_id' => $values['user_id']))->count() > 0 ) return null;
+        if (!$msg->isPrivate()) {
+            if ($this->where(array('action_id' => $values['action_id'], 'user_id' => $values['user_id']))->count() > 0 ) return null;
+        }
 
         return ( $this->insert($values) ? $this->get_vote($this->db->insert_id()) : false );
     }

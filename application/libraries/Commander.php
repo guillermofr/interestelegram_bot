@@ -333,7 +333,7 @@ class Commander {
 		$this->CI->load->library('Movement');
 		$chat_id = $msg->chatId();
 		$chat_title = $msg->chatTitle();
-		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('ship-'.microtime());
+		$chat_title = ( !empty($chat_title) ) ? $chat_title : ('nave de '.$msg->fromUsername());
 		$username = $msg->fromUsername();
 		$first_name = $msg->fromFirstName();
 		$user_id = $msg->fromId();

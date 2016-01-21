@@ -267,4 +267,9 @@ class Message {
 	public function isGroup() { return $this->isGroup; }
 	public function chatTitle() { return $this->chatTitle; }
 
+	public function replyce($replyId) { 
+		$this->isReply = true;
+		$this->replyId = $replyId;
+	}
+
 }

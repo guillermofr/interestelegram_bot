@@ -38,11 +38,11 @@ class Processor {
 		/* Prevent users without username */
 		if ($msg->isEmptyFromUsername()) return $this->_empty_username_warning($msg);
 
-		if ($msg->isPrivate()) {
+		/*if ($msg->isPrivate()) {
 			if ($msg->command() == 'olvidar')	{
 				return $this->_olvidar($msg);
 			} else return $this->_welcome($msg);
-		} 
+		}*/
 
 		$ship = $this->CI->Ships->get_ship_by_chat_id( $msg->chatId() );
 		
@@ -52,7 +52,16 @@ class Processor {
 		elseif ($msg->isLeave()) $this->CI->commander->leaveShip( $ship, $msg );
 		elseif ($msg->isTitleChange()) $this->_processTitleChange( $ship, $msg );
 		else {
+			if ($msg->isPrivate()) {
+				
+					$last_action = $this->CI->Actions->get_last_action($ship->id);
+					if ($last_action->closedAt == null){
+						$msg->replyce($last_action->message_id);
+						$this->_processReply( $ship, $msg );
+					}
+				
 
+			}
 		}
 
 	}
@@ -154,7 +163,7 @@ class Processor {
 
 		}
 
-		if ( ! $this->CI->Votes->create_vote( array('action_id' => $last_action->id, 'user_id' => $user_id, 'vote' => $response_value) ) ) {
+		if ( ! $this->CI->Votes->create_vote( array('action_id' => $last_action->id, 'user_id' => $user_id, 'vote' => $response_value), $msg ) ) {
 
 			// hide keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
