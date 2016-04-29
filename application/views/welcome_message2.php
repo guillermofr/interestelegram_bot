@@ -34,10 +34,10 @@
 				<div class="inner">
 					<!--h1><span></span></h1-->
 					<nav class="codrops-demos">
-						<a class="current-demo" href="/">Inicio</a>
-						<a href="/index.php/help">Jugar</a>
+						<a class="current-demo" href="/">Home</a>
+						<a href="/index.php/help">How to play</a>
 						<a href="/index.php/ranking">Ranking</a>
-						<a href="/index.php/contacto">Contacto</a>
+						<a href="/index.php/contacto">Contact</a>
 					</nav>
 				</div>
 
@@ -50,27 +50,27 @@ function googleTranslateElementInit() {
 }
 </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 				<div id="ac-wrapper" class="ac-wrapper">
-					<h2>Interestelegram<span>Juega con tus amigos y conquista la galaxia.</span></h2>
+					<h2>Interestelegram<span>Play with your friends and conquer the galaxy.</span></h2>
 					<div class="ac-device">
 						<a href="#"><img src="images/screen1.png"/></a>
-						<h3 class="ac-title">Gratis a través de Telegram</h3>
+						<h3 class="ac-title">Free on Telegram</h3>
 						<nav>
 							<span>&lt;</span>
 							<span>&gt;</span>
 						</nav>
 					</div>
 					<div class="ac-grid">
-						<a href="#"><img src="images/screen1.png"/><span>Gratis a través de Telegram</span></a>
-						<a href="#"><img src="images/screen2.png"/><span>Explora el universo.</span></a>
-						<a href="#"><img src="images/screen3.png"/><span>Ataca a otros jugadores.</span></a>
-						<a href="#"><img src="images/screen4.png"/><span>Persigue a otras naves.</span></a>
-						<a href="#"><img src="images/screen5.png"/><span>Compite en el ranking.</span></a>
-						<a href="#"><img src="images/screen6.png"/><span>Consigue recursos de tu entorno.</span></a>
-						<a href="#"><img src="images/screen7.png"/><span>Mejora tu nave y arrasa.</span></a>
-						<a href="#"><img src="images/screen8.png"/><span>Coopera con amigos.</span></a>
+						<a href="#"><img src="images/screen1.png"/><span>Free on telegram</span></a>
+						<a href="#"><img src="images/screen2.png"/><span>Explore the universe.</span></a>
+						<a href="#"><img src="images/screen3.png"/><span>Attack other players.</span></a>
+						<a href="#"><img src="images/screen4.png"/><span>Pursue other ships.</span></a>
+						<a href="#"><img src="images/screen5.png"/><span>Compete in the ranking.</span></a>
+						<a href="#"><img src="images/screen6.png"/><span>Get resources from your environment.</span></a>
+						<a href="#"><img src="images/screen7.png"/><span>Improve your ship and kill em all.</span></a>
+						<a href="#"><img src="images/screen8.png"/><span>Cooperate with friends.</span></a>
 					</div>
 				</div>	
-				<p>Las imágenes ofrecidas no se corresponden con la realidad.</p>			
+				<p>The images offered do not correspond to reality.</p>			
 			</div>
 		</div><!-- /container -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

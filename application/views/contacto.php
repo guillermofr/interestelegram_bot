@@ -85,19 +85,19 @@
 				<div class="inner">
 					<!--h1><span></span></h1-->
 					<nav class="codrops-demos">
-						<a href="/">Inicio</a>
-						<a href="/index.php/help">Jugar</a>
+						<a href="/">Home</a>
+						<a href="/index.php/help">How to play</a>
 						<a href="/index.php/ranking">Ranking</a>
-						<a class="current-demo" href="/index.php/contacto">Contacto</a>
+						<a class="current-demo" href="/index.php/contacto">Contact</a>
 					</nav>
 				</div>
 			</header>
 		<div class="container">	
 			<div class="main row-fluid">
 				<div class="col-xs-offset-2 col-xs-8">
-					<h2>¿Quiénes somos?</h2>
+					<h2>Who are we?</h2>
 
-					<p>Este juego ha surgido como proyecto para echar unas risas entre 3 colegas, si queréis poneros en contacto con alguno de nosotros podéis hacerlo mediante Telegram con los siguientes alias:</p>
+					<p>This game has a pourpose to have fun programming and playing with friends, if you want to get in touch with any of us, you can do it on Telegram with the following aliases:</p>
 					<center>
 						<div class="row-fluid contacto">
 							<div class="col-sm-4">
@@ -118,24 +118,22 @@
 					<br clear="left">
 					<br clear="left">
 
-					<p>Para comentar fallos o mejoras, la mejor forma es mediante <b><a href="https://github.com/guillermofr/interestelegram_bot/issues">github</a></b></p>
+					<p>Failures or improvements to discuss the best way is through<b><a href="https://github.com/guillermofr/interestelegram_bot/issues">github</a></b></p>
 
-					<h2>¿Quién ha dibujado los sprites?</h2>
+					<h2>Who has drawn these sprites?</h2>
 
-					<p>El set de sprites no lo hemos hecho nosotros, hemos usado un pack bastante completo 
-						de naves hecho por un señor que se dedica a eso y al cual le hemos remunerado por su trabajo.</p>
-						<p>Esta persona en concreto es kenney y se puede encontrar su trabajo en su <a href="http://kenney.nl/assets">página web</a></p>
-						<center><a target="_blank" href="http://kenney.nl/assets/space-shooter-redux"><img src="http://kenney.nl/img/logo.png"/></a></center>
+					<p>The set of sprites have not been done by us, we used a fairly complete pack of ships made by a man who is dedicated to that.We have paid for their really good work.</p>
+						<p>This particular person is kenney and you can find his work on his website <a href="http://kenney.nl/assets">website</a></p>
+						<center><a target="_blank" href="http://kenney.nl/assets/space-shooter-redux"><img src="http://kenney.nl/data/img/logo.png"/></a></center>
 
 
-					<h2>¿De dónde hemos sacado la web?</h2>
-					<p>Agradecemos los recursos gráficos de CSS y HTML que podemos encontrar en la página de codrops, de ahí hemos sacado el landing.</p>
+					<h2>And the amazing web?</h2>
+					<p>We thank codrops for HTML resources that can be found on his page, from where we have taken the landing.</p>
 					<center><a target="_blank" class="ct-logo" href="http://tympanus.net/codrops/2013/04/01/app-showcase-with-grid-overlay/" rel="home">Codrops</a></center>
 					<br/>	
 					<br/>	
-					<h2>¿Quieres ayudar?</h2>
-					<p>Si tienes conocimientos de PHP y te apetece aportar mecánicas nuevas o solucionar algún posible bug, el proyecto está colgado en github y 
-						estamos abiertos a colaboraciones.</p>
+					<h2>You want to help?</h2>
+					<p>If you have knowledge of PHP and you want to bring new mechanics or solve any potential bug, the project is completely on github and we are open to collaborations.</p>
 
 					<p><a href="https://github.com/guillermofr/interestelegram_bot">https://github.com/guillermofr/interestelegram_bot</a></p>
 

@@ -67,10 +67,10 @@
 				<div class="inner">
 					<!--h1><span></span></h1-->
 					<nav class="codrops-demos">
-						<a href="/">Inicio</a>
-						<a href="/index.php/help">Jugar</a>
+						<a href="/">Home</a>
+						<a href="/index.php/help">How to play</a>
 						<a class="current-demo" href="/index.php/ranking">Ranking</a>
-						<a  href="/index.php/contacto">Contacto</a>
+						<a  href="/index.php/contacto">Contact</a>
 					</nav>
 				</div>
 			</header>
@@ -78,7 +78,7 @@
 			<div class="main row-fluid">
 				<div class="col-xs-offset-2 col-xs-8">
 					<h2>Ranking</h2>
-
+					<p>Not available yet  =(</p>
 					
 				
 				</div>

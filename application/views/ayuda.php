@@ -64,10 +64,10 @@
 				<div class="inner">
 					<!--h1><span></span></h1-->
 					<nav class="codrops-demos">
-						<a href="/">Inicio</a>
-						<a class="current-demo" href="/index.php/help">Jugar</a>
+						<a href="/">Home</a>
+						<a class="current-demo" href="/index.php/help">How to play</a>
 						<a href="/index.php/ranking">Ranking</a>
-						<a href="/index.php/contacto">Contacto</a>
+						<a href="/index.php/contacto">Contact</a>
 					</nav>
 				</div>
 			</header>
@@ -77,42 +77,40 @@
 
 
 
-					<h2>Inicio del juego: <img src="/imgs/map/ship_type1.png"/> </h2> 
-					<p>Para iniciar una partida hay que crear un grupo e invitar al bot al grupo. </p>
+					<h2>Start of the game: <img src="/imgs/map/ship_type1.png"/> </h2> 
+					<p>To start a game you have to create a group and invite the bot to the group.</p>
 						<center><p><a href="https://telegram.me/interestelegram_bot"><img src="/images/help/logo.png"/></a></p></center>
-					<p>El bot en ese momento te explicará ciertas cosas sobre la dinámica del juego y esperará que el capitán tome el control.</p>
-					<p>El primero que activa el bot con el comando “Pilotar” se convierte en Capitán.</p>
-					<p>El capitán puede ceder permanentemente el mando a otra persona con otro comando.</p>
+					<p>The bot then will explain certain things about the dynamics of the game and wait for the captain to take control.</p>
+					<p>The first activates the bot with the "Piloting" command becomes Captain.</p>
+					<p>The captain can permanently cede control to another person with another command.</p>
 
 
-					<h2>Crecimiento del juego: <img src="/imgs/map/ship_type3.png"/></h2>
-					<p>Los grupos no se limitan en cantidad de gente. Cuanta más gente, más poderosas serán sus armas. (Límite 200 por telegram) </p>
-					<p>El bot será el que informe a la tripulación de impactos, comunicaciones, disparos, y estado de la nave (Vida, escudo y dinero). </p>
-					<p>Cuando una nave muere, el bot te informa que la nave está inutilizable y que lo mejor será abandonar la nave. La nave que te ha matado será bonificada con puntos.</p>
+					<h2>Growth of the game: <img src="/imgs/map/ship_type3.png"/></h2>
+					<p>The groups are not limited in number of people. The more people, the more powerful their weapons. </p>
+					<p>The bot will inform the crew information about impacts, communications, fire, and state of the ship (Life, shield and money).</p>
+					<p>When a ship dies, the bot informs you that the ship is unusable and we'd better abandon ship. The ship that killed you will be subsidized with points. (You can respawn the same ship while game is in beta)</p>
 
-					<h2>Dinero <img src="/imgs/map/ship_type4.png"/></h2>
-					<p>Se podrá minar en zonas de minería para obtener créditos interplanetarios. Este dinero servirá para comprar módulos nuevos en la nave, reparaciones, escudos.</p>
+					<h2>Money <img src="/imgs/map/ship_type4.png"/></h2>
+					<p>The way you obtain money is mining on gray asteroids and selling at shop. The shop is located at left bottom of Map. You can buy ship models with that money.</p>
 
-					<h2>Jugabilidad <img src="/imgs/map/ship_type0.png"/></h2>
-					<p>El capitán de la nave dará órdenes vía comandos para ejecutar acciones. Cada acción será votada por la tripulación para realizarse mediante SI o NO. Cada tipo de acción requerirá un % de votos según el tamaño de la tripulación.</p>
+					<h2>Playability  <img src="/imgs/map/ship_type0.png"/></h2>
+					<p>The captain will command via commands to perform actions. Each action will be voted by the crew with YES or NO. Each type of action will require a % of votes according to the size of the crew.</p>
 
-					<p>Cuanto mayor sea una nave, mayor será sus estadísticas, más vida y menos agilidad para esquivar. </p>
+					<p>The higher a ship, the greater their statistics, more life and less agility to dodge.</p>
 
-					<h3>Stats de la nave</h3>
-					<p>La nave tendrá vida y escudo.
-					La vida será:
-					5 + (tripulación * 5)</p>
+					<h3>Ship Stats</h3>
+					<p>The ship will have life and shield. Life will be 5 + (crew * 5)</p>
 
-					<p>El escudo será un consumible que absorberá daño.</p>
+					<p>The shield will absorb a consumable damage.</p>
 
-					<p>Un ataque de 5 quita 5 puntos de vida o 5 puntos de escudo.</p>
-					<p>Si una nave se queda sin puntos de vida el bot queda desactivado en ese canal. Mostrará un mensaje diciendo que la nave hay que evacuarla porque todos los controles han sido destrozados, foto y algún detalle fotográfico para indicar fin de partida.</p>
+					<p>An attack of 5 removes 5 points of life or 5 points of shield.</p>
+					<p>If a ship runs out of life the bot will disable the ship. It will display a message saying that the ship must evacuate because all the controls have been destroyed, photo and some photographic detail to indicate endgame.</p>
 
-					<p>Aumentar el tamaño de la nave aumentar su vida y poder hacer ataques mayores, minar más recursos, etc, pero complica el éxito en la coordinación para las acciones y reduce la evasión.</p>
+					<p>Increase the size of the ship, will increase its life and to make stronger attacks, also mine more resources, etc, but complicates success in coordinating actions and reduce evasion.</p>
 
 
-					<h2>Combate y movimiento <img src="/imgs/map/target.png"/></h2>
-					<p>Las naves pueden moverse solo hacia adelante: de frente izquierda, de frente y de frente derecha. Además tendrán disponible una maniobra para girar 180 grados que avanzará dos casillas. Este último movimiento tendrá un % de posibilidades de fallar, convirtiéndose en un movimiento recto básico en caso de pifia.</p>
+					<h2>Combat and movement <img src="/imgs/map/target.png"/></h2>
+					<p>Ships can only move forward: front left, front and right front. They will also have available a maneuver to rotate 180 degrees and advance two squares. This latest move will have a % chance to miss, becoming a basic straight movement if fail.</p>
 					
 					</div>
 					<center>
@@ -125,7 +123,7 @@
 					</center>
 					<div class="col-sm-offset-2 col-sm-8">
 
-					<p>Estos movimientos implican una planificación mayor. Un giro de 90 grados a la derecha por ejemplo, implica encadenar dos movimientos consecutivos.</p>
+					<p>These movements involve more planning. Rotated 90 degrees clockwise for example, involves stringing two consecutive movements.</p>
 
 					</div>
 					<center>
@@ -133,7 +131,7 @@
 							<img src="/images/help/image05.png"/>
 						</div>
 						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
-							<p>Una nave podrá fijar en el blanco a cualquier nave en su área de visión, pero solo podrá disparar a naves que se encuentren en su arco de fuego.</p>
+							<p>A ship may target any ship in its viewing area, but can only shoot ships within its arc of fire.</p>
 						</div>
 					</center>
 					<div class="col-sm-offset-2 col-sm-8">
@@ -143,7 +141,7 @@
 					</div>
 					<center>
 						<div class="col-sm-6 text-right" >
-							<p style="max-width: 340px;margin-top: 49px;float:right;">El arco de fuego en diagonal es distinto.</p>
+							<p style="max-width: 340px;margin-top: 49px;float:right;">The arc of fire in diagonal is different</p>
 						</div>
 						<div class="col-sm-6 text-left">
 							<img src="/images/help/image02.png"/>
@@ -161,9 +159,9 @@
 						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
 							
 
-							<p>En la imagen, la nave azul tiene la posibilidad de fijar en el blanco a las naves roja y verde, mientras que la nave negra está fuera de alcance.</p>
+							<p>In the image, the blue ship has the ability to target red and green ships, while the black ship is out of reach.</p>
 
-							<p>Cuando una nave (A) fija en el blanco a otra nave (B) la nave A podrá realizar ataques sobre B.</p>
+							<p>When a ship (A) target another ship (B) (A) ship can attack B.</p>
 
 							
 						</div>
@@ -175,7 +173,7 @@
 					</div>
 					<center>
 						<div class="col-sm-6 text-right">
-							<p style="max-width: 340px;margin-top: 49px;float:right;">La nave A tendrá un indicador visual de la posición de la nave B mientras esta permanezca fijada, incluso si se sale de su rango de visión.</p>
+							<p style="max-width: 340px;margin-top: 49px;float:right;">A ship will have a visual indicator of the position of the enemy B while this remains targeted, even if out of his range of vision.</p>
 						</div>
 						<div class="col-sm-6 text-left">
 							
@@ -195,19 +193,17 @@
 							
 
 
-							<p>La nave B podrá ejecutar una acción con gran posibilidad de fallo para evadir y eliminar el blanco fijado.</p>
+							<p>The ship B can perform an action with high miss chance to evade and remove the target.</p>
 
 						</div>
 					</center>
 					<div class="col-sm-offset-2 col-sm-8">
 
 
-					<p>La combinación de estas mecánicas favorece a la nave atacante: </p>
-					<p>Dado que una nave que te toma la cola tiene ventaja ofensiva ya que no va a recibir fuego enemigo hasta que la otra nave gire (con la posibilidad de fallar la maniobra y permanecer en arco del enemigo).
-					dado que el blanco fijado le otorga información adicional sobre su objetivo, incluso cuando está fuera de su vista.</p>
-					<p>Obligar al jugador a pensar su siguiente movimiento:</p>
-					<p>El atacante deberá predecir la posición de su objetivo para seguirlo con éxito y seguir disparándole.</p>
-					<p>El defensor deberá decidir entre huír para salir de arco de fuego o intentar la acción de evasión para librarse del blanco fijado.</p>
+					<p>The combination of these mechanical favors the attacking ship: </p>
+	
+					<p>The attacker must predict the position of your target to follow him successfully and continue shooting.</p>
+					<p>The defender must decide whether to flee the arc of fire or attempt evasive action to get rid of the target.</p>
 
 
 				</div>
@@ -217,7 +213,7 @@
 						</div>
 						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
 				
-							<p>Los enemigos se pueden ocultar detras de las rocas y no verse a simple vista. Tendremos que escanear el sector para detectar a los que se esconden.</p>
+							<p>The enemies can hide behind rocks and become invisible to other players. We'll have to scan the sector to detect those hiding ships. But carefull when you are hidding, because asteroids move!</p>
 						</div>
 					</center>
 				<div class="col-sm-offset-2 col-sm-8">
@@ -229,7 +225,7 @@
 						</div>
 						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
 				
-							<p>Una vez seleccionado nuestro enemigo ya no se podrá esconder en las rocas.
+							<p>Once selected our enemy can no longer hide in the rocks.</p>
 						</div>
 					</center>
 				<div class="col-sm-offset-2 col-sm-8">
