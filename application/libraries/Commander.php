@@ -46,11 +46,11 @@ class Commander {
 		$ship = $arguments[1] ? $arguments[1] : null;
 
 		if (!method_exists($this, "_{$method}")) {
-			return $this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$method.'" no está contemplado o no tienes permisos para usarlo.'));
+			return $this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'The command "'.$method.'" does not exists.'));
 		}
 
 		if (in_array($method, $this->captain_methods) && ( is_null($ship) || $ship->captain != $msg->fromId() ) ){
-			return $this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'El comando "'.$method.'" no está contemplado o no tienes permisos para usarlo.'));
+			return $this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => 'The command "'.$method.'" does not exists.'));
 		}
 		else return call_user_func_array(array($this, "_{$method}"), $arguments);
 
@@ -113,9 +113,9 @@ class Commander {
 						"...Check improved human virtual reality interface...Failure (no VR yet)\n".
 						"...Check fish...Ok\n".
 						"¡La nave está lista!\n\n".
-						"Hola...? soy el ordenador de abordo...\n".
-						"¿ Hay alguien ahí ? Si hay alguien, que escriba /pilotar ya para ser el capitán. Los demás pueden escribir /alistarse para ayudar al capitán.\n".
-						"Si necesitáis más información, utilizad /ayuda"
+						"Hola...? ¿Hello...? I am the IA...\n".
+						"¿ someone live ? Please type /pilotar to be captain. The crew type /alistarse to support your captain at combat.\n".
+						"If you nedd more info , type /ayuda"
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -125,7 +125,7 @@ class Commander {
 		if ($msg->isInvalidJoin()){
 			$output = array(
 				'chat_id' => $joiner->id,
-				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un alias.'
+				'text' => 'To use '.$this->botUsername.' you need an alias on telegram.'
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -140,7 +140,7 @@ class Commander {
 		if (!$ship) {
 			$output = array(
 				'chat_id' => $chat_id,
-				'text' => "No puedo tener en cuenta a los nuevos tripulantes si nadie toma el mando primero: que alguien diga /pilotar !"
+				'text' => "We need a captain before creating new crew: someone have to type /pilotar !"
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -151,8 +151,8 @@ class Commander {
 			if (!$this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $joiner->id))){
 				$output = array(
 					'chat_id' => $chat_id,
-					'text' => "El usuario @".$joiner->username." no ha sido añadido a la tripulación. ".
-							"Es necesario que vuelvas a introducirle en el grupo para que cuente como tripulante."
+					'text' => "User @".$joiner->username." have not added to crew. ".
+							"You need to be invited again to group to be part of the crew."
 				);
 				return $this->CI->telegram->sendMessage($output);
 			};
@@ -165,17 +165,16 @@ class Commander {
 
 		$outputGroup = array(
 			'chat_id' => $chat_id,
-			'text' => "¡Ey Capitan! @".$joiner->username." ahora es un nuevo miembro de la '".$ship->name."'.\n\n".
-					  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
+			'text' => "¡Ey Captain! @".$joiner->username." is a new member of the '".$ship->name."'.\n\n".
+					  "Captain @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", your crew have ".$crew_count." members!"
 		);
 		$this->CI->telegram->sendMessage($outputGroup);
 		$outputMention = array(
 			'chat_id' => $joiner->id,
-			'text' => "@".$joiner->username."! Ahora eres miembro de una nave, la '".$ship->name."'.\n".
-					  "Permíteme presentarme, soy el ordenador de abordo\n.".
-					  "Durante tu periplo por el espacio junto al capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." podrás vivir aventuras trepidantes!".
-					  "Recuerda estar atento a las órdenes de tu capitan, te necesita para cumplir sus objetivos.".
-					  "Aunque siempre puedes fastidiarle el paseo y echarlo de su propia nave!! encuentra el cómo..."
+			'text' => "@".$joiner->username."! you are a new crew member of the ship '".$ship->name."'.\n".
+					  "Let me introduce myself first, im the Artificial intelligence of this ship\n.".
+					  "Your mission is to obey the captain @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." orders to stay alive!\n".
+					  "Im glad to have you here, more people, more fun!"
 		);
 		$this->CI->telegram->sendMessage($outputMention);
 
@@ -208,12 +207,10 @@ class Commander {
 
 			$output = array(
 				'chat_id' => $captain->id,
-				'text' => "@".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." has eliminado el ordenador de abordo de tu nave '".$ship->name."'.\n".
-						"Esto tendrá implicaciones, tu nave desaparecerá y quedará a la deriva.\n".
-						"Sin contar con que tu y toda tu tripulación habéis muerto... so sad...\n".
-						"Ehm, bueno... ".$ship->total_crew." bajas tampoco son tantas, el espacio es muy basto.\n".
-						"Ya no será accesible y otras naves se aprovecharán de sus recursos.\n".
-						"Ánimo. Podría ser peor... cogiste tu toalla verdad? verdad!?"
+				'text' => "@".( isset($captain->username) ? $captain->username : 'no-hay-capitan' )." has deleted the control IA of the '".$ship->name."'.\n".
+						"This is a dissaster!! the ship is totally disabled.\n".
+						"And all your crew will die soon... so sad...\n".
+						"Ehm, well... ".$ship->total_crew." dead people in a tin can.\n"
 			);
 			return $this->CI->telegram->sendMessage($output);
 			
@@ -223,7 +220,7 @@ class Commander {
 		if ($msg->isInvalidLeave()){
 			$output = array(
 				'chat_id' => $joiner->id,
-				'text' => 'Para poder usar '.$this->botUsername.' es necesario que configures un alias.'
+				'text' => 'To play '.$this->botUsername.' you need to set an alias on Telegram.'
 			);
 			return $this->CI->telegram->sendMessage($output);
 		}
@@ -259,24 +256,24 @@ class Commander {
 			$this->CI->Ships->update_ship(array('captain' => null), $ship->id);
 			$output = array(
 				'chat_id' => $chat_id,
-				'text' => "¡Oh Dios! ¡Oh Diooos! El capitán se ha ido y vamos a la deriva.\n\n".
-						  "Que no cunda el pánico, cualquiera en la tripulación puede intentar tomar el control usando '/pilotar'\n\n".
-						  "Por cierto, ya estaba cansado de ese tal @".$leaver->username.". Menudo paquete..."
+				'text' => "¡Oh God! ¡Oh my God! There is no captain!.\n\n".
+						  "Please someone of the crew have to take control of the spaceship, type '/pilotar'\n\n".
+						  "We all miss you @".$leaver->username.". Forever..."
 			);
 			$this->CI->telegram->sendMessage($output);
 		}
 		else {
 			$outputGroup = array(
 				'chat_id' => $chat_id,
-				'text' => "¡Ey Capitan! @".$leaver->username." abandonó su nave.\n\n".
-						  "Capitan @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", su nave ahora tiene ".$crew_count." miembros!"
+				'text' => "¡Ey Captain! @".$leaver->username." opens the worng door and now is floating in space.\n\n".
+						  "Captain @".( isset($captain->username) ? $captain->username : 'no-hay-capitan' ).", your ship has now ".$crew_count." members!"
 			);
 			$this->CI->telegram->sendMessage($outputGroup);
 			$outputMention = array(
 				'chat_id' => $leaver->id,
-				'text' => "@".$leaver->username."! has abandonado la nave '".$ship->name."'".
-						  " y ya no recibirás más mensajes relacionados con ella.\n\n".
-						  "No olvides tu toalla. Adios y gracias por el pescado."
+				'text' => "@".$leaver->username."! you are out of the starship '".$ship->name."'".
+						  " you will not receive future messages of that ship.\n\n".
+						  "Did you leave your towel at your room?"
 			);
 			$this->CI->telegram->sendMessage($outputMention);
 		}
@@ -296,30 +293,37 @@ class Commander {
 			if ( $user_id != $already_ship->captain ) {
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Formas parte de la tripulación, tu misión es ayudar al capitan votando en las acciones que requieran tu participación. Ten en mente que sin tu ayuda el capitán no podrá hacer ciertas acciones. Eres indispensable para ganar."
+					'text' => "You are now part of the crew, your mission aboard is help your captain with the actions. The captain is useless without your help, so you are very important in this game."
 				);
 			}
 			else {			
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Capitán, ahora pilotáis una nave en un sector del espacio hostil. Vuestro objetivo es sobrevivir, y para ello tal vez tengáis que luchar.\n".
-							"Cada tripulante incrementará la vida de vuestra nave, pero reducirá su capacidad para evitar ataques. Además, una nave con mucha tripulación necesita más colaboración para realizar tareas como /mover\n".
-							"Todas las acciones de la nave requieren una cantidad mínima de votos para realizarse. Eso significa que una nave pequeña solo puede lanzar ataques pequeños, aunque no necesita apoyos para moverse, mientras una nave grande puede lanzar grandes ataques y sus movimientos serán más lentos al necesitar más colaboración para completarlos.\n".
-							"Lo primero que debéis hacer es pedir un /informe para ver vuestro estado, o /escanear para intentar fijar en el blanco a una nave enemiga. Una vez fijada, un símbolo os indicará su posición si huye.\n".
-							"Vuestra nave puede atacar solo hacia el frente, en el arco de fuego señalado en rojo (incluye la misma casilla en la que te encuentras). Es importante que os coloquéis bien para poder atacar.\n"
+					'text' => "Captain!, you are now the pilot of the starship. Your goal is to survive in space, watch out for pirates!\n".
+					"You have to know some rules:\n".
+					"Each person you add to your crew, will increase your starship's stats, like life and shield, but will decrease your flee against attacks\n".
+					"Actions require your crew participation, some actions like move can be done only by captain if the starship is small, but will be dependant on crew if your starship is bigger. Same with attacks.\n".
+					"You can get your ship info with /informe and also check your environment with /escanear to lock on your enemies and pursue them.\n".
+					"Your ship can only atack to targets placed on your red arc of fire, also can attack enemies on your same map tile. Watch out for asteroids, people can hide there."
 				);
 				$output = $this->CI->telegram->sendMessage($content);
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Para atacar utiliza /atacar_1 /atacar_2 etc o /a1 /a2 dependiendo de cuanta potencia quieras utilizar. Recuerda que necesitarás que tu tripulación colabore si lanzas ataques grandes\n".
-							  "La probabilidad de impacto depende de la diferencia de tamaños de las naves. Una nave grande tendrá problemas para impactar a una pequeña, mientras que la pequeña tendrá menos fallos contra una mayor.\n".
-							  "Si te fijan en el blanco y quieres evitar que te ataquen, deberás huír o utilizar /esquivar para que la nave enemiga deje de tenerte fijada en el blanco.\n".
-							  "Si hay gente en el canal que no forma parte de la nave, deben utilizar /alistarse para participar. Si escribes / verás sugerencias de comandos para utilizar"
+					'text' => "To attack other people's starships, you have to target it before use /atacar_1 /atacar_2 or /a1 /a2 where the number is the power of your attack\n".
+					"Remember that your attack have a probability of fail, higher with smaller starships\n".
+					"If you are the target of your enemy, your only way to avoid their attacks is typing the command /esquivar, if your command is successfull your enemy will have to target you again before shoot\n".
+					"If you have people in your telegram group that is not part of the crew, they have to type /alistarse to take part of the crew\n".
+					"Easy tip is to type / and telegram will show you all available commands"
 				);
 			}
 
 		} else {
-			$content = array('chat_id' => $chat_id, 'text' => "Bienvenido a Interestelegram, tu aventura espacial!\n\nPara jugar debes configurar un alias en tu cuenta de Telegram en Ajustes. Después, crea un grupo e invita a este bot.\n\nUtiliza el comando /pilotar para iniciar la partida convirtiendote en el piloto de la nave.\n\nTu nave necesita tripulación, así que invita a toda la gente que quieras al grupo. Recuerda que necesitas su participación para que tu nave funcione!");
+			$content = array('chat_id' => $chat_id, 'text' => 
+				"Welcome to INTERESTELEGRAM , a game about starship battles\n 
+				You have to ways to play:\n
+				SINGLEPLAYER: Just talk directly to bot and type /pilotar. Bot will give you a 1-player starship to play with\n
+				COOPERATIVE: Create a Telegram group, and invite the interestelegram_bot to join. The bot will transform your group into a Starship where you can invite all people you want as a crew, remember type /pilotar before you invite your frieds, because first to type that will become the captain!\n
+				");
 		}
 		
 		$output = $this->CI->telegram->sendMessage($content);
@@ -357,19 +361,19 @@ class Commander {
 				if (!$user) $user = $this->CI->Users->create_user(array('id' => $user_id, 'username' => $username, 'first_name' => $first_name));
 				$crew = $this->CI->Crew->create_crew(array('ship_id' => $ship->id, 'user_id' => $user->id));
 
-				$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
+				$content = array('chat_id' => $chat_id, 'text' => 'Ascending @'.$username.' to captain');
 				$output = $this->CI->telegram->sendMessage($content);
 
 				$this->CI->load->library('Mapdrawer');
 				$imagePath = $this->CI->mapdrawer->generateShipMap($ship);
 				$img = $this->CI->telegram->prepareImage($imagePath);
 				
-				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => 'La "'.$chat_title.'" ha despegado con una tripulación de un solo miembro, el capitán '.$username.".\n\nBuena suerte!");
+				$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => 'The starship "'.$chat_title.'" has taken off with only one person, the awesome captain '.$username.".\n\nGood luck!");
 				$output = $this->CI->telegram->sendPhoto($content);
 
 				$this->CI->telegram->updateImage($imagePath, $output);
 			} else {
-				$content = array('chat_id' => $chat_id, 'text' => 'Para ser piloto necesitas configurar un alias en Ajustes');						
+				$content = array('chat_id' => $chat_id, 'text' => 'You need an alias on Telegram to be Captain');						
 				$output = $this->CI->telegram->sendMessage($content);
 			}
 		} else {
@@ -381,15 +385,15 @@ class Commander {
 				if (empty($captain)) {
 					$this->CI->Ships->update_ship(array('captain' => $user_id), $ship->id);
 
-					$content = array('chat_id' => $chat_id, 'text' => 'Ascendiendo a @'.$username.' a piloto de la nave');
+					$content = array('chat_id' => $chat_id, 'text' => 'Ascending @'.$username.' to captain');
 					$output = $this->CI->telegram->sendMessage($content);
 				}
 				else {
-					$content = array('chat_id' => $chat_id, 'text' => 'La "'.$chat_title.'" ya tiene piloto, el capitán '.( isset($captain->username) ? $captain->username : 'no-hay-capitan' ));						
+					$content = array('chat_id' => $chat_id, 'text' => 'This ship "'.$chat_title.'" has already a captain, the captain '.( isset($captain->username) ? $captain->username : 'no-hay-capitan' ));						
 					$output = $this->CI->telegram->sendMessage($content);	
 				}
 			} else {
-				$content = array('chat_id' => $chat_id, 'text' => 'Capitán, ya pilotáis la "'.$chat_title.'". Alguna otra orden?');						
+				$content = array('chat_id' => $chat_id, 'text' => 'Captain, you already pilot "'.$chat_title.'". Im at your command!');						
 				$output = $this->CI->telegram->sendMessage($content);	
 			}
 		}
@@ -407,7 +411,7 @@ class Commander {
 		
 		if ($user_id == $ship->captain ) {
 			$option = $this->CI->calculations->trollKeyboardV1();
-			$text = "El capitán quiere escanear el sector en busca de objetivos ¿Ayudas a escanear?";
+			$text = "The captain commanded a scan for enemies. Do you agree?";
 
 			// Create custom keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
@@ -428,7 +432,7 @@ class Commander {
 				));
 			}
 		} else {
-			$text = "Solo el capitán puede escanear, tripulante.";
+			$text = "Only the captain can perform a scan";
 			$content = array(
 				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
@@ -443,7 +447,7 @@ class Commander {
 
 		/* Code to prevent cheating on command series */
 		if ($this->_isCheat($last_action, 'escanear')) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "Listar requiere haber hecho 'escanear'.");
+			$content = array('chat_id' => $msg->chatId(), 'text' => "You need the command 'escanear' before this.");
 			return $this->CI->telegram->sendMessage($content);
 		}
 
@@ -463,7 +467,7 @@ class Commander {
 			foreach ($sectorShips as $shipIndex => $sectorShip){
 
 				$captain_name = $this->CI->Users->get_name_by_id($sectorShip->captain);
-				if (empty($captain_name)) $captain_name = "Sin piloto";
+				if (empty($captain_name)) $captain_name = "No captain";
 
 				$nearShips[] = $sectorShip->id."@".$captain_name;
 
@@ -481,12 +485,12 @@ class Commander {
 		$this->CI->telegram->updateImage($imagePath, $output);
 
 		if (count($nearShips) > 0) {
-			$nearShips[] = "Ninguno";
+			$nearShips[] = "None";
 
 			$nearShipsDetailString = "";
 			foreach ($nearShipsDetail as $n) $nearShipsDetailString .= "\n".$n;
 
-			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "Listado de naves en tu sector:\n".$nearShipsDetailString));
+			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "List of enemies:\n".$nearShipsDetailString));
 
 			$option = array();
 			$perRow = 2;
@@ -503,7 +507,7 @@ class Commander {
 			$chat_id = $msg->chatId();
 			$captain_id = $ship->captain;
 			$username = $this->CI->Users->get_name_by_id($captain_id);
-			$text = "Selecciona un objetivo @". $username ." :";
+			$text = "Select a target @". $username ." :";
 
 			// Create custom keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=TRUE);
@@ -524,7 +528,7 @@ class Commander {
 				));
 			}
 		} else {
-			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "No hay blancos posibles en rango capitán!"));
+			$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "There is no one near!"));
 		}
 		
 	}
@@ -534,7 +538,7 @@ class Commander {
 
 		/* Code to prevent cheating on command series */
 		if ( $this->_isCheat($last_action, 'do_escanear') ) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "seleccionar requiere haber hecho 'escanear' y haber pasado la votación.");
+			$content = array('chat_id' => $msg->chatId(), 'text' => "'seleccionar' requires the command 'escanear' and a vote passed.");
 			return $this->CI->telegram->sendMessage($content);
 		}
 
@@ -545,7 +549,7 @@ class Commander {
 		
 		$target = explode("@",$msg->text());
 		if (!isset($target[1])){
-			$text = $username ." esperemos tener otra oportunidad capitán...";
+			$text = $username ." the target is unreachable...";
 		} else {
 			
 			$targetShip = $this->CI->Ships->get_ship($target[0]);
@@ -555,12 +559,12 @@ class Commander {
 				$this->CI->Ships->update_ship(array('target'=>$targetShip->id),$ship->id); 
 
 				// Avisar al objetivo targeteado
-				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 ATENCIÓN!, la nave de $username te tiene en su objetivo! Usa /esquivar para librarte de sus ataques."));
+				$this->CI->telegram->sendMessage(array('chat_id' => $targetShip->chat_id, 'text' => "\xE2\x9A\xA0 WARNING!, $username spaceship has lock on you! Use /esquivar to flee their target."));
 				
-				$text = $username ." hemos fijado en el blanco a ".$target[1]. " con éxito, estámos listos para /atacar";
+				$text = $username ." we lock on ".$target[1]. " successfully, ready to /atacar";
 			} else {
 				// La nave no está en rango
-				$text = $username ." la nave de ".$target[1]. " está demasiado lejos para seleccionarla.";
+				$text = $username ." , ".$target[1]. " spaceship is too far for a lock on.";
 			}
 	
 		}
@@ -593,7 +597,7 @@ class Commander {
 		if ($user_id == $ship->captain ) {
 
 			if (!is_numeric($param) || $param == 0) {
-				$text = "Capitán debéis indicar la potencia del ataque! ( /atacar_1 , /atacar_5 ... ) o con ( /a1 , /a2 , /a5 ... )";
+				$text = "Captain! you need to type the power of the attack ( /atacar_1 , /atacar_5 ... ) o con ( /a1 , /a2 , /a5 ... )";
 				$content = array(
 					'reply_to_message_id' => $messageId, 
 					'chat_id' => $chat_id, 
@@ -604,7 +608,7 @@ class Commander {
 				if ($this->CI->Ships->can_i_attack($ship)) {
 
 					$option = $this->CI->calculations->trollKeyboardV1();
-					$text = "El capitán quiere atacar con potencia ".$param." ¿Apoyas el ataque?";
+					$text = "Captain commanded fire rockets lv. ".$param." ¿Do you agree?";
 
 					// Create custom keyboard
 					$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
@@ -625,7 +629,7 @@ class Commander {
 						));
 					}
 				} else {
-					$text = $ship->target == null ? "Capitán no tenemos objetivo, utilice /escanear" : "Capitán la nave no se encuentra dentro de nuestro arco de fuego!";
+					$text = $ship->target == null ? "Captain we lost our target, use /escanear" : "Captain your target is not on range of fire!";
 					$content = array(
 						'reply_to_message_id' => $messageId, 
 						'chat_id' => $chat_id, 
@@ -635,7 +639,7 @@ class Commander {
 				}
 			}
 		} else {
-			$text = "Solo el capitán puede atacar, tripulante.";
+			$text = "Only the captain can attack";
 			$content = array(
 				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
@@ -649,17 +653,17 @@ class Commander {
 
 		/* Code to prevent cheating on command series */
 		if ( $this->_isCheat($last_action, 'atacar') ) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar un ataque requiere haber hecho 'atacar' y haber pasado la votación.");
+			$content = array('chat_id' => $msg->chatId(), 'text' => "Attack recuires command 'atacar' y and successfully vote.");
 			return $this->CI->telegram->sendMessage($content);
 		}
 
 		$chat_id = $msg->chatId();
 
-		$quantity = $last_action->required == 1 ? 'una bolea' : $last_action->required.' boleas';
+		$quantity = $last_action->required == 1 ? 'one laser' : $last_action->required.' lasers';
 		$imagePath = APPPATH.'../imgs/attack.png';
 		$img = $this->CI->telegram->prepareImage($imagePath);
 
-		$caption = "Atacando con ".$quantity." de torpedos de protones!";
+		$caption = "Attacking with ".$quantity." of proton!";
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 		$output = $this->CI->telegram->sendPhoto($content);
 
@@ -669,13 +673,13 @@ class Commander {
 		if ($ship->target != null && $this->CI->calculations->attack_success($ship, $target_ship)) {
 			$target_ship = $this->CI->Ships->deal_damage($target_ship, $last_action->required);
 
-			$text = "IMPACTO!!!";
-			$text .= "\nEstado de la nave objetivo:".
+			$text = "HIT!!!";
+			$text .= "\nTarget status:".
 				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
 			
-			$target_text = "\xF0\x9F\x94\xA5 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de alcanzar con su ataque!!';
-			$target_text .= "\nEstado de la nave:".
+			$target_text = "\xF0\x9F\x94\xA5 WARNING! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' has reached us with its attack!!';
+			$target_text .= "\nShip status:".
 				"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 				"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield;
 
@@ -696,21 +700,21 @@ class Commander {
 				$pilot = $this->CI->Users->get_user($target_ship->captain);
 				$this->CI->Users->update_user(array('score' => $pilot->score + $playerScore), $target_ship->captain);
 
-			 	$text = "IMPACTO!!!";
-				$text .= "\nEl enemigo ha sido destruido!:".
+			 	$text = "FINAL HIT!!!";
+				$text .= "\nEnemy was destroyed!:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
-					"\n\nHemos obtenido +".$score." puntos!".
-					(($cargo>0)?("\nHemos recuperado +".$cargo." minerales!"):'').
-					(($moneyz>0)?("\nHemos recuperado +".$moneyz." dineros!"):'');
+					"\n\nWe gain +".$score." points!".
+					(($cargo>0)?("\nYou obtain +".$cargo." minerals!"):'').
+					(($moneyz>0)?("\nYou obtain +".$moneyz." money!"):'');
 
 
-			 	$target_text = "\xF0\x9F\x92\x80 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos acaba de destruir con su ataque!!';
-				$target_text .= "\nEstado de la nave:".
+			 	$target_text = "\xF0\x9F\x92\x80 WARNING! ".$ship->name.' of @'.$this->CI->Users->get_name_by_id($ship->captain).' has destroyed you!!';
+				$target_text .= "\nYour ship is:".
 					"\n\xE2\x9D\xA4: ".$target_ship->health."/".$target_ship->max_health.
 					"\n\xF0\x9F\x94\xB5: ".$target_ship->shield."/".$target_ship->max_shield.
-					"\nLos pedazos de tu lamentable nave se esparcen por el espacio, hasta aquí ha llegado tu aventura capitán!
-					\n(BETATESTERS: puedes resucitar la nave usando \n/pilotar , la tripulación necesita volver a \n/alistarse para que el ordenador de abordo los tome en cuenta.)" ;
+					"\nWas a pity that your adventure ends here! 
+					\n(BETATESTERS: If you want revenge, you can play again typing /pilotar , your crew have to type /alistarse also to be part of the crew)" ;
 
 				//morirse <-- seriously? morirsen!
 				$this->CI->Ships->update_ship(array( 'active' => 0, 'chat_id' => null ), $target_ship->id);
@@ -731,8 +735,8 @@ class Commander {
 
 			}
 		} else {
-			$text = "El ataque ha fallado!";
-			$target_text = "\xE2\x9A\xA0 ATENCIÓN! La ".$ship->name.' de @'.$this->CI->Users->get_name_by_id($ship->captain).' nos esta atacando! Por suerte ha fallado!';
+			$text = "Attack missed!";
+			$target_text = "\xE2\x9A\xA0 WARNING! ".$ship->name.' of @'.$this->CI->Users->get_name_by_id($ship->captain).' has failed the attack agains us!';
 		}
 
 		$content = array(
@@ -775,7 +779,7 @@ class Commander {
 				}
 
 				// http://apps.timwhitlock.info/emoji/tables/unicode
-				$caption = "Información de la nave:".
+				$caption = "Starship info:".
 							"\n\xF0\x9F\x9A\x80: ".$Ship->name.
 							$target.
 							"\n\xE2\x9D\xA4: ".$Ship->health."/".$Ship->max_health.
@@ -794,7 +798,7 @@ class Commander {
 			else {			
 				$content = array(
 					'chat_id' => $chat_id, 
-					'text' => "Sólo el capitán puede pedir el informe."
+					'text' => "Only captain can get the report."
 				);
 				$output = $this->CI->telegram->sendMessage($content);
 			}
@@ -818,7 +822,7 @@ class Commander {
 		
 		if ($user_id == $ship->captain ) {
 			if (!$needDodge){
-				$text = "Nadie te tiene seleccionado, no es necesario esquivar...";
+				$text = "Any has targeted you , what are you trying to avoid?...";
 				$content = array(
 					'reply_to_message_id' => $messageId, 
 					'chat_id' => $chat_id, 
@@ -828,7 +832,7 @@ class Commander {
 			}
 
 			$option = $this->CI->calculations->trollKeyboardV1();
-			$text = "El capitán quiere hacer maniobra de evasión para esquivar $needDodge enemigo".(($needDodge==1)?"":"s")." ¿Ayudas en la maniobra?";
+			$text = "Captains is trying to avoid $needDodge starship".(($needDodge==1)?"":"s")." ¿Do you agree?";
 
 			// Create custom keyboard
 			$keyboard = $this->CI->telegram->buildKeyBoard($option, $onetime=TRUE, $resize=TRUE, $selective=FALSE);
@@ -849,7 +853,7 @@ class Commander {
 				));
 			}
 		} else {
-			$text = "Solo el capitán puede esquivar, tripulante.";
+			$text = "Only the captain can do that";
 			$content = array(
 				'reply_to_message_id' => $messageId, 
 				'chat_id' => $chat_id, 
@@ -863,7 +867,7 @@ class Commander {
 
 		/* Code to prevent cheating on command series */
 		if ( $this->_isCheat($last_action, 'esquivar') ) {
-			$content = array('chat_id' => $msg->chatId(), 'text' => "realizar esquivar requiere haber hecho 'esquivar'.");
+			$content = array('chat_id' => $msg->chatId(), 'text' => "You need to do esquivar to do that.");
 			return $this->CI->telegram->sendMessage($content);
 		}
 

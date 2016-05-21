@@ -71,7 +71,7 @@ class Processor {
 
 		return $this->CI->telegram->sendMessage(array(
 			'chat_id' => $msg->fromId(),
-			'text' => 'Para usar '.$this->botUsername.' es necesario tener configurado un username'
+			'text' => 'To play '.$this->botUsername.' you need to set up your username at telegram'
 		));
 
 	}
@@ -80,8 +80,8 @@ class Processor {
 	private function _welcome(& $msg) {
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
-			Bienvenido a Interestelegram @".$msg->fromUsername().", tu aventura espacial!\n
-			Crea un grupo de telegram con uno o más amigos.\n 
+			Welcome to Interestelegram @".$msg->fromUsername().", your space adventure!\n
+			Talk directly to bot or create a group if you want to play with friends at same ship.\n 
 			"));
 			
 		//foto de invitar amigos
@@ -89,7 +89,7 @@ class Processor {
 		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $img));		
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
-			Una vez creado, en el perfil del bot encontrarás como añadirlo a tu grupo.\n
+			With your group created, add the bot to your group, and some friends if you want.\n
 			"));
 		
 		//foto de invitar bot
@@ -97,9 +97,9 @@ class Processor {
 		$this->CI->telegram->sendPhoto(array('chat_id' => $msg->chatId(), 'photo' => $img));
 
 		$this->CI->telegram->sendMessage(array('chat_id' => $msg->chatId(), 'text' => "
-			Él os guiará en vuestro grupo y lo transformará en una nave espacial lista para jugar.\n
-			Ten cuidado con tu tripulación, tus amigos podrán ser la ayuda que necesitas para conquistar la galaxia o la razón de la autodestrucción de la nave.\n
-			Recuerda que necesitas su participación para que tu nave funcione!"));
+			The bot will transform your group into a spaceship ready to combat.\n
+			You dont need to invite friends, be a lonely pirate or a captain with no crew.\n
+			The teamplay is not allways funny xD, but you can try!"));
 
 		return true;
 	}
@@ -112,7 +112,7 @@ class Processor {
 
 		$output = array(
 			'chat_id' => $chat_id,
-			'text' => 'Te acabamos de perder, como lágrimas en la lluvia...'
+			'text' => 'We just lost you, like tears in the rain...'
 		);
 		return $this->CI->telegram->sendMessage($output);
 	}
@@ -152,7 +152,7 @@ class Processor {
 			$content = array(
 				'chat_id' => $chatId, 
 				'reply_to_message_id' => $messageId, 
-				'text' => '@'.$username.' has respondido demasiado tarde!'
+				'text' => '@'.$username.' your response is too late!'
 			);
 
 			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
@@ -170,7 +170,7 @@ class Processor {
 			$content = array(
 				'chat_id' => $chatId, 
 				'reply_to_message_id' => $messageId, 
-				'text' => '@'.$username.' tu voto no se ha tenido en cuenta. Ya has votado o ha fallado.'
+				'text' => '@'.$username.' your vote has failed.'
 			);
 
 			if ($ship->captain != $user_id) { // No ocultes teclados del capitán
@@ -197,9 +197,9 @@ class Processor {
 			$keyboard = $this->CI->telegram->buildKeyBoardHide($selective=TRUE);
 			
 			if (($response_value + $last_action->positives) == $last_action->required) {
-				$text = "Votación superada";
+				$text = "Vote succeeded";
 			} else {
-				$text = "Votación ".($response_value + $last_action->positives)." de ".$last_action->required." hecha por @{$username} ({$response})";
+				$text = "Vote ".($response_value + $last_action->positives)." of ".$last_action->required." done by @{$username} ({$response})";
 			}
 
 

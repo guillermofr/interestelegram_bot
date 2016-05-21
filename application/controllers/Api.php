@@ -77,7 +77,7 @@ class Api extends CI_Controller {
 
 		foreach ($data->result as $key => $msg){
 
-			echo "Analizando mensaje $key<br>";
+			echo "Analyzing message $key<br>";
 
 			//datos grupo
 			$in_group = !isset($msg->message->chat->username);
@@ -93,7 +93,7 @@ class Api extends CI_Controller {
 			$from_username	= $msg->message->from->username;
 			$text 		= $msg->message->text;
 
-			//lista de comandos disponibles
+			//lista de commands disponibles
 			$commands = array(
 				'crearpartida' => '/(\/crearpartida)$/',
 				'cancelarpartida' => '/(\/cancelarpartida)$/',
@@ -112,18 +112,18 @@ class Api extends CI_Controller {
 					switch($commandkey){
 
 						case "crearpartida":
-							echo "comando $commandkey<br>";
-							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando crearpartida leído");
+							echo "command $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: command crearpartida leído");
 						break;
 
 						case "cancelarpartida":
-							echo "comando $commandkey<br>";
-							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando cerrarpartida leído.");
+							echo "command $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: command cerrarpartida leído.");
 						break;
 
 						case "infopartida":
-							echo "comando $commandkey<br>";
-							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: comando infopartida leído.");
+							echo "command $commandkey<br>";
+							file_get_contents($website."/sendMessage?chat_id=$group_id&text=@$from_username: command infopartida leído.");
 						break;
 
 					}
@@ -202,7 +202,7 @@ class Api extends CI_Controller {
 		$img = $this->telegram->prepareImage($pathimg);
 
 		// $img = 'AgADBAADqacxG3864gf8EKgg3EpKRVXNijAABMy2MMSlqhpUJGAAAgI'; // file_id
-		$caption = 'Pruebas de caché';
+		$caption = 'Cache Tests';
 		$content = array('chat_id' => $chat_id, 'photo' => $img, 'caption' => $caption );
 
 		$output = $this->telegram->sendPhoto($content);

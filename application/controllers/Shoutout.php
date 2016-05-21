@@ -43,7 +43,7 @@ class Shoutout extends CI_Controller {
 		foreach ($users as $user) {
 			$output = array(
 				'chat_id' => $user->id,
-				'text' => $text."\n\nSi no quieres recibir más de estos mensajes, escribe /olvidar"
+				'text' => $text."\n\nIf you dont want to receive more messages, type /olvidar"
 			);
 			$this->telegram->sendMessage($output);
 		}

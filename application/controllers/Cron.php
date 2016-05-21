@@ -117,7 +117,7 @@ class Cron extends CI_Controller {
 		foreach ($MineralShips['full'] as $user) {
 			$output = array(
 				'chat_id' => $user->chat_id,
-				'text' => "\xF0\x9F\x94\x9A\xF0\x9F\x92\x8E Tu nave está a reventar de mineral interestelegraminium, acércate a la estación para cambiar los minerales por dinero."
+				'text' => "\xF0\x9F\x94\x9A\xF0\x9F\x92\x8E You reach the limit of interestelegraminium, Go to the shop to change minerals for money."
 			);
 			$this->telegram->sendMessage($output);
 
@@ -129,7 +129,7 @@ class Cron extends CI_Controller {
 		foreach ($MineralShips['empty'] as $user) {
 			$output = array(
 				'chat_id' => $user->chat_id,
-				'text' => "\xF0\x9F\x92\x8E\xE2\x9D\x95 Acabas de recolectar 1 unidad de interestelegraminium, podrás cambiarlo por dinero en la estación."
+				'text' => "\xF0\x9F\x92\x8E\xE2\x9D\x95 You have obtained 1 interestelegraminium, change it for money at shop."
 			);
 			$this->telegram->sendMessage($output);
 		}

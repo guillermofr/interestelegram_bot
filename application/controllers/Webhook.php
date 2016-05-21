@@ -53,7 +53,7 @@ class Webhook extends CI_Controller
 				);
 				$this->load->library('Telegram', $params);
 	        	$chat_id = $message['message']['chat']['id'];
-				$content = array('chat_id' => $chat_id, 'text' => 'La Beta ha finalizado. Para seguir jugando, echa a este bot e invita a @interestelegram_bot !');						
+				$content = array('chat_id' => $chat_id, 'text' => 'The beta is finished, continue playing at @interestelegram_bot !');						
 				$output = $this->telegram->sendMessage($content);
         	} catch (Exception $e) {
         		log_message('error', $e->getMessage());
