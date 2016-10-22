@@ -9,6 +9,7 @@
         <button class="control" value="recto" data-action="/action/move/forward" >Recto</button>
         <button class="control" value="derecha" data-action="/action/move/right" >Derecha</button>
         <button class="control" value="giro" data-action="/action/move/turn" >Giro</button>
+        <button class="control" value="attack" data-action="/action/attack" >Atacar</button>
     </div>
     <div id="target" style="width:500px; margin: 20px auto; text-align: center;">
         

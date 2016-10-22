@@ -210,6 +210,13 @@ class Ships extends MY_Model
         $this->update(array('target' => null), $ship->id);
         return $ship;
     }
+
+    public function clear_targeted($ship=null){
+        if ($ship == null) return null;
+        $this->update(array('target' => null), array('target' => $ship->id));
+        return $ship;
+    }
+
     /**
     * devuelve true si alguien te tiene seleccionado
     */
@@ -232,5 +239,9 @@ class Ships extends MY_Model
         return $addMoney;  
     }
 
-
+    public function kill($ship = null){
+        if ($ship == null) return null;
+        $this->update_ship(array( 'active' => 0, 'chat_id' => 0 ), $ship->id);
+        $this->clear_targeted($ship);
+    }
 }

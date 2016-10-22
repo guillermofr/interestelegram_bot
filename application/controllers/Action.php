@@ -74,4 +74,17 @@ class Action extends CI_Controller
 
             $this->_response($data);
         }
+
+        public function attack()
+        {
+            $this->load->library('Attack');
+
+            $response = $this->attack->attackShip($this->ship, $this->ship->target);
+
+            $data = array(
+                    'messages' => $response
+                );
+
+            $this->_response($data);
+        }
 }

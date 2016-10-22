@@ -29,6 +29,10 @@ class Calculations {
 		return ($rand <= $chance);
 	}
 
+	//Keep the old one for retrocompatibility
+	public function chance($chance, $min=0, $max=100) {
+		return $this->_chance($chance, $min, $max);
+	}
 
 	public function attack_success($attackerShip, $defenderShip) {
 		if (empty($attackerShip)) return false;
@@ -74,6 +78,14 @@ class Calculations {
 
 	}
 
+	public function distance($elementA, $elementB) {
+		$xA = isset($elementA->x) ? $elementA->x : 0;
+		$yA = isset($elementA->y) ? $elementA->y : 0;
+		$xB = isset($elementB->x) ? $elementB->x : 0;
+		$yB = isset($elementB->y) ? $elementB->y : 0;
+		return round (sqrt( pow($xA - $xB, 2) + pow($yA - $yB, 2) ),1);
+	}
+
 
 	/**
 	 * ship_damage
@@ -114,7 +126,7 @@ class Calculations {
 		if (empty($mainShip)) return false;
 		if (empty($attackerShip)) return false;
 
-		$distance = round (sqrt( pow($mainShip->x - $attackerShip->x, 2) + pow($mainShip->y - $attackerShip->y, 2) ),1);
+		$distance = $this->distance($mainShip, $attackerShip);
 
 		return ($this->_chance($distance*10, 5, 100));
 	}

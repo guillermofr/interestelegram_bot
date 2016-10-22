@@ -28,7 +28,7 @@ class Target {
 
 		if (in_array($targetShip, $sectorShips)){
 			$this->CI->Ships->update_ship(array('target'=>$targetShip->id),$ship->id);
-			$output[] = sprintf(_('Hemos fijado en el blanco a %s.'), $targetShip->name);
+			$output[] = sprintf(_('Hemos fijado en el blanco a %s (%s escudo, %s casco restantes).'), $targetShip->name, $targetShip->shield, $targetShip->health);
 		} else {
 			$output[] = sprintf(_('No es posible fijar en el blanco a %s.'), $targetShip->name);
 		}
