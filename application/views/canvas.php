@@ -10,6 +10,9 @@
         <button class="control" value="derecha" data-action="/action/move/right" >Derecha</button>
         <button class="control" value="giro" data-action="/action/move/turn" >Giro</button>
     </div>
+    <div id="target" style="width:500px; margin: 20px auto; text-align: center;">
+        
+    </div>
     <div id="log" style="width:500px; margin: 20px auto; text-align: left; font-family: monospace; font-size: 12px; color: #FFF;">
 
     </div>
@@ -21,6 +24,19 @@
             content : {
                 data: [],
                 loaded: 0
+            },
+            bind_controls: function() {
+                $('.control').unbind('click').click(function(){
+                    $.post($(this).attr('data-action'),
+                        {},
+                        function(response){
+                            INTER.canvas.update(response.map.content);
+                            INTER.canvas.log(typeof response.data.messages != 'undefined' ? response.data.messages : []);
+                            INTER.canvas.targets(typeof response.map.os != 'undefined' ? response.map.os : []);
+                            INTER.canvas.bind_controls();
+                        }
+                    );
+                });
             },
             loader : function(imgs, callback) {
                 INTER.canvas.content.loaded = 0;
@@ -60,24 +76,23 @@
                 for (var i = 0; i < messages.length; i++) {
                     $('#log').append('<p>' + messages[i] + '</p>');
                 }
+            },
+            targets: function(ships) {
+                $('#target').html('');
+                for (var i = 0; i < ships.length; i++) {
+                    $('#target').append('<button class="control" data-action="/action/target/' + ships[i].id + '" >Fijar a ' + ships[i].name + '</button>');
+                }
             }
         };
 
         var data = <?php echo json_encode($data); ?>;
         INTER.canvas.update(data.content);
+        INTER.canvas.targets(typeof data.os != 'undefined' ? data.os : []);
 
     </script>
     <script>
     $.fn.ready(function(){
-        $('.control').click(function(){
-            $.post($(this).attr('data-action'),
-                {},
-                function(response){
-                    INTER.canvas.update(response.map.content);
-                    INTER.canvas.log(typeof response.data.messages != 'undefined' ? response.data.messages : []);
-                }
-            );
-        })
+        INTER.canvas.bind_controls();
     });
     </script>
 </body>

@@ -33,6 +33,7 @@ class Mapdrawercanvas {
 	 */
 	public function generateShipMap($mainShip, $isScan = false, $isDead = false) {
 		$debug = false;
+		$mainShip = $this->refreshMainShip($mainShip);
 		$data = $this->prepareData($mainShip);
 		$data['scan'] = $isScan ? 1 : 0;
 		$data['dead'] = $isDead ? 1 : 0;
@@ -411,6 +412,7 @@ class Mapdrawercanvas {
 	 */
 	private function prepareData($mainShip) {
 		// Keep array keys small for better compression of the array
+
 		$data = array(
 				'ms' => array( // mainShip
 						'id' => $mainShip->id,
@@ -437,6 +439,7 @@ class Mapdrawercanvas {
 				if ($ship->id != $mainShip->id) {
 					$data['os'][] = array(
 						'id' => $ship->id,
+						'name' => $ship->name,
 						'angle' => $ship->angle,
 						'model' => $ship->model,
 						'shield' => $ship->shield,
@@ -501,4 +504,14 @@ class Mapdrawercanvas {
 		return $data;
 	}
 
+	private function refreshMainShip($mainShip)
+	{
+		if (is_numeric($mainShip)) {
+			$mainShip = $this->CI->Ships->get_ship($mainShip);
+		} else if (is_object($mainShip) && isset($mainShip->id)) {
+			$mainShip = $this->CI->Ships->get_ship($mainShip->id);
+		} else return null;
+
+		return $mainShip;
+	}
 }

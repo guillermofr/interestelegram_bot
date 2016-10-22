@@ -61,4 +61,17 @@ class Action extends CI_Controller
 
             $this->_response($data);
         }
+
+        public function target($ship=null)
+        {
+            $this->load->library('Target');
+
+            $response = $this->target->targetIfValid($this->ship, $ship);
+
+            $data = array(
+                    'messages' => $response
+                );
+
+            $this->_response($data);
+        }
 }

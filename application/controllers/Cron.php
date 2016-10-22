@@ -66,7 +66,7 @@ class Cron extends CI_Controller {
 
 		$timestamp = date('i');
 
-		if ($timestamp % 10 != 0) return;
+		//if ($timestamp % 10 != 0) return;
 
 		$types = array(0,1,2);
 		$amount = 2;  //esto debería ir en un config
