@@ -10,6 +10,9 @@
         <button class="control" value="derecha" data-action="/action/move/right" >Derecha</button>
         <button class="control" value="giro" data-action="/action/move/turn" >Giro</button>
     </div>
+    <div id="log" style="width:500px; margin: 20px auto; text-align: left; font-family: monospace; font-size: 12px; color: #FFF;">
+
+    </div>
     <script type="text/javascript">
         var INTER = {};
         INTER.canvas = {
@@ -51,6 +54,12 @@
                 INTER.canvas.context.drawImage( image, -image.width/2, -image.height/2 );
                 INTER.canvas.context.rotate( -angleInRad );
                 INTER.canvas.context.translate( - (positionX + image.width/2), - (positionY + image.height/2) );
+            },
+            log: function(messages) {
+                $('#log').html('');
+                for (var i = 0; i < messages.length; i++) {
+                    $('#log').append('<p>' + messages[i] + '</p>');
+                }
             }
         };
 
@@ -65,6 +74,7 @@
                 {},
                 function(response){
                     INTER.canvas.update(response.map.content);
+                    INTER.canvas.log(typeof response.data.messages != 'undefined' ? response.data.messages : []);
                 }
             );
         })

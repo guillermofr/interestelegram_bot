@@ -111,6 +111,7 @@ class Movement {
 
 	public function __construct() {
 		$this->CI =& get_instance();
+		$this->CI->load->library('Pickup');
 	}
 
 	/**
@@ -162,11 +163,12 @@ class Movement {
 			if ($ship->y <= 0) $ship->y = 1;
 			if ($ship->y > $this->mapSize) $ship->y = $this->mapSize;
 
+			$output = $this->CI->pickup->pickUp($ship);
 			// Return success
-			return 1;
+			return $output;
 		} else {
 			// Return error
-			return -1;
+			return array();
 		}
 	}
 

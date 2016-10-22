@@ -34,16 +34,16 @@ class Action extends CI_Controller
 
             switch ($direction) {
                 case 'turn':
-                    $this->movement->moveShip($this->ship, 0);
+                    $response = $this->movement->moveShip($this->ship, 0);
                     break;
                 case 'left':
-                    $this->movement->moveShip($this->ship, 1);
+                    $response = $this->movement->moveShip($this->ship, 1);
                     break;
                 case 'right':
-                    $this->movement->moveShip($this->ship, 3);
+                    $response = $this->movement->moveShip($this->ship, 3);
                     break;
                 default:
-                    $this->movement->moveShip($this->ship, 2);
+                    $response = $this->movement->moveShip($this->ship, 2);
                     break;
             }
             $this->Ships->update_ship(
@@ -55,6 +55,10 @@ class Action extends CI_Controller
                     $this->ship->id
                 );
 
-            $this->_response();
+            $data = array(
+                    'messages' => $response
+                );
+
+            $this->_response($data);
         }
 }
