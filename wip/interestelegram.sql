@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50711
 File Encoding         : 65001
 
-Date: 2016-10-22 18:19:19
+Date: 2016-10-22 18:43:21
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -84,29 +84,11 @@ CREATE TABLE `images_cache` (
   `path` varchar(255) NOT NULL DEFAULT '',
   `telegram_id` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of images_cache
 -- ----------------------------
-INSERT INTO `images_cache` VALUES ('1', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/3fe52b2b132323a82b60532f365118a4.png', '123');
-INSERT INTO `images_cache` VALUES ('2', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/18d4c8da26807a5cb5ad7ba92491e8ec.png', '123');
-INSERT INTO `images_cache` VALUES ('3', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/2c50d145f367ee8ec7ac84ca99cf139b.png', '123');
-INSERT INTO `images_cache` VALUES ('4', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/dcf6f81323b2ad9e016f9d3c9873fb6d.png', '123');
-INSERT INTO `images_cache` VALUES ('5', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/6cf9febd18a83ffc91e7033a3cbdd86d.png', '123');
-INSERT INTO `images_cache` VALUES ('6', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/cff2559d3e2b455db5c94f9ef4e8e1b8.png', '123');
-INSERT INTO `images_cache` VALUES ('7', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/118b1361eb0e3e0f4726d431c4c1e90c.png', '123');
-INSERT INTO `images_cache` VALUES ('8', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/1feb5b5fb33acb5b17fac8fdba718def.png', '123');
-INSERT INTO `images_cache` VALUES ('9', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/dc1d123ec40b0ee79328001034253116.png', '123');
-INSERT INTO `images_cache` VALUES ('10', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/9210531fba905c32ee168270d07cafa2.png', '123');
-INSERT INTO `images_cache` VALUES ('11', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/b5278b04c4c351a6dd7c6aeb2225e1be.png', '123');
-INSERT INTO `images_cache` VALUES ('12', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/c89c499167738c0de84acab616e968fc.png', '123');
-INSERT INTO `images_cache` VALUES ('13', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/6b89221d6aa275623be659b30dbc7915.png', '123');
-INSERT INTO `images_cache` VALUES ('14', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/c649445e2c517dd989c75538ccfe13f6.png', '123');
-INSERT INTO `images_cache` VALUES ('15', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/0e09f2e7d41998edd72336e112a3d585.png', '123');
-INSERT INTO `images_cache` VALUES ('16', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/71632c5f8cdf8a4b1f64123ff414b4d2.png', '123');
-INSERT INTO `images_cache` VALUES ('17', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/fb0ddf43ec6796645cf4cc6d7813fb78.png', '123');
-INSERT INTO `images_cache` VALUES ('18', 'C:\\UwAmp\\www\\inter\\application\\../imgs/map/scans/21568dddfcb7b061f0b8b537aea62567.png', '123');
 
 -- ----------------------------
 -- Table structure for `migrations`
@@ -201,7 +183,7 @@ CREATE TABLE `ships` (
 -- ----------------------------
 -- Records of ships
 -- ----------------------------
-INSERT INTO `ships` VALUES ('1', '123', 'Test1', '6', '3', '1', '123', '1', '0', '0', '5', '1', '5', '5', '0', '2', '1000', '3', '270', '22');
+INSERT INTO `ships` VALUES ('1', '123', 'Test1', '5', '4', '1', '123', '1', '0', '0', '5', '1', '5', '5', '0', '2', '1000', '3', '315', '22');
 INSERT INTO `ships` VALUES ('2', '321', 'Test2', '5', '3', '1', '124', '1', '0', '0', '5', '0', '5', '5', '0', '5', '1000', null, '180', '12');
 INSERT INTO `ships` VALUES ('3', '333', 'Test3', '4', '5', '1', '125', '1', '0', '0', '5', '0', '5', '5', '0', '0', '1000', null, '90', '31');
 

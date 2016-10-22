@@ -21,6 +21,8 @@ Navega a
 * http://www.inter.es/canvas
 * http://www.inter.es/api/test
 
+El segundo enlace es el antiguo generador de imagenes, para debug.
+
 #WIP
 
 He mantenido el código viejo, cuando reemplazaba algún controlador o librería lo he renombrado a _old para tenerlo de referencia de consulta.

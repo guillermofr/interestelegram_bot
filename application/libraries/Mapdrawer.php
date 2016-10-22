@@ -126,6 +126,7 @@ class Mapdrawer {
 
 		$scanPath = APPPATH.'../imgs/map/scans/'.$dataHash.'.png';
 
+		/*
 		$cache = $this->CI->Images_cache->get_by_path($scanPath);
 		if ($cache != null && is_object($cache) && !empty($cache->telegram_id)) {
 			if (!$debug) {
@@ -138,7 +139,7 @@ class Mapdrawer {
 				return;
 			}
 		}
-
+		*/
 
 		// Fast transformation to objects
 		$data = json_decode($data);
@@ -225,10 +226,10 @@ class Mapdrawer {
 	public function addShip(&$base, $mainShip, $currentShip) {
 		$this->shipscount[$currentShip->x.'-'.$currentShip->y] = isset($this->shipscount[$currentShip->x.'-'.$currentShip->y]) ? $this->shipscount[$currentShip->x.'-'.$currentShip->y]+1 : 1;
 
-		$type = ($currentShip->id % 9)+1;
+		$type = ($currentShip->id % 4)+1;
 		$specialAngle = $currentShip->angle % 90 == 0;
 
-		$path = $specialAngle ? APPPATH."../imgs/map/newset/random{$type}_100.png" : APPPATH."../imgs/map/newset/random{$type}_100_rotated.png";
+		$path = $specialAngle ? APPPATH."../imgs/map/ship_type{$type}.png" : APPPATH."../imgs/map/ship_type{$type}_rotated.png";
 
 		$this->addSquare($base, $mainShip, $path, $currentShip);
 
