@@ -104,7 +104,7 @@ class Mapdrawercanvas {
 		
 		if ($isDead) $this->addDead($data, $mainShip);
 
-		return $data;
+		return $this->clearPrivateData($data);
 	}
 
 	public function addImage($path, $x=0, $y=0, $angle=0, $offset=0, $size=null) {
@@ -431,6 +431,17 @@ class Mapdrawercanvas {
 				'm' => array(), // minerals
 			);
 
+		$this->CI->load->model('Asteroids');
+		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 1);
+		if (is_array($asteroids)) {
+			foreach ($asteroids as $asteroid) {
+				$data['as'][] = array(
+					'x' => $asteroid->x,
+					'y' => $asteroid->y
+				);
+			}
+		}
+
 		$this->CI->load->model('Ships');
 		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip);
 
@@ -445,7 +456,8 @@ class Mapdrawercanvas {
 						'shield' => $ship->shield,
 						'max_shield' => $ship->max_shield,
 						'x' => $ship->x,
-						'y' => $ship->y
+						'y' => $ship->y,
+						'hidden' => $this->_coordinatesInSet($ship->x, $ship->y, $asteroids)
 					);
 				}
 			}
@@ -490,17 +502,6 @@ class Mapdrawercanvas {
 			}
 		}
 
-		$this->CI->load->model('Asteroids');
-		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 1);
-		if (is_array($asteroids)) {
-			foreach ($asteroids as $asteroid) {
-				$data['as'][] = array(
-					'x' => $asteroid->x,
-					'y' => $asteroid->y
-				);
-			}
-		}
-
 		return $data;
 	}
 
@@ -513,5 +514,22 @@ class Mapdrawercanvas {
 		} else return null;
 
 		return $mainShip;
+	}
+
+	private function clearPrivateData($data)
+	{
+		foreach ($data->os as $key => $value) {
+			if ($value->hidden) {
+				unset($data->os[$key]);
+			} else {
+				unset($data->os[$key]->angle);
+				unset($data->os[$key]->model);
+				unset($data->os[$key]->max_shield);
+				unset($data->os[$key]->x);
+				unset($data->os[$key]->y);
+			}
+		}
+
+		return $data;
 	}
 }

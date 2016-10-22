@@ -13,7 +13,7 @@ class Attack {
 
 	public function __construct() {
 		$this->CI =& get_instance();
-		$this->CI->load->model('Ships');
+		$this->CI->load->model(array('Ships', 'Asteroids'));
 		$this->CI->load->library('Calculations');
 	}
 
@@ -23,17 +23,20 @@ class Attack {
 		if ($target == null) return;
 
 		$targetShip = $this->CI->Ships->get_ship($target);
-
+		$isHidden = $this->CI->Asteroids->ship_is_in_asteroid($targetShip);
 		$distance = $this->CI->calculations->distance($ship, $targetShip);
 
 		$impact = false;
 		if ($distance < 3) {
-			$impact = true;
+			$chance = 100;
 		} else if ($distance < 5) {
-			$impact = $this->CI->calculations->chance(65);
+			$chance = 65;
 		} else {
-			$impact = $this->CI->calculations->chance(35);
+			$chance = 35;
 		}
+
+		if ($isHidden) $chance = $chance/3;
+		$impact = $this->CI->calculations->chance($chance);
 
 		$output = array();
 

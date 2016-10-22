@@ -74,6 +74,7 @@
             },
             log: function(messages) {
                 $('#log').html('');
+                if (messages == null) return;
                 for (var i = 0; i < messages.length; i++) {
                     $('#log').append('<p>' + messages[i] + '</p>');
                 }
