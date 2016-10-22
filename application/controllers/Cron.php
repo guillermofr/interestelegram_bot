@@ -110,16 +110,16 @@ class Cron extends CI_Controller {
 
 		$MineralShips = $this->calculations->obtainMinerals($minerals);
 
-		$this->config->load('bot');
-		$params = array( $this->config->item('botToken') );
-		$this->load->library('Telegram', $params);
+		//$this->config->load('bot');
+		//$params = array( $this->config->item('botToken') );
+		//$this->load->library('Telegram', $params);
 
 		foreach ($MineralShips['full'] as $user) {
 			$output = array(
 				'chat_id' => $user->chat_id,
 				'text' => "\xF0\x9F\x94\x9A\xF0\x9F\x92\x8E You reach the limit of interestelegraminium, Go to the shop to change minerals for money."
 			);
-			$this->telegram->sendMessage($output);
+			//$this->telegram->sendMessage($output);
 
 			$this->Ships->update(array('dont_remind_full_minerals' => 1),$user->id);
 
@@ -131,7 +131,7 @@ class Cron extends CI_Controller {
 				'chat_id' => $user->chat_id,
 				'text' => "\xF0\x9F\x92\x8E\xE2\x9D\x95 You have obtained 1 interestelegraminium, change it for money at shop."
 			);
-			$this->telegram->sendMessage($output);
+			//$this->telegram->sendMessage($output);
 		}
 
 	}

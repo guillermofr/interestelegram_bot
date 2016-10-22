@@ -35,5 +35,16 @@ class Welcome extends CI_Controller {
 		$this->load->view('contacto');
 	}
 
+	public function canvas(){
+		$this->load->library('Mapdrawercanvas');
+		$this->load->model('Ships');
+		$ship = $this->Ships->get(1);
+		$data = $this->mapdrawercanvas->generateShipMap($ship);
+
+		$this->load->view('canvas', array(
+				'data' => $data
+			));
+	}
+
 
 }

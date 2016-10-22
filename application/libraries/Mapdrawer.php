@@ -113,7 +113,7 @@ class Mapdrawer {
 	 * TODO: $range does nothing at the moment
 	 */
 	public function generateShipMap($mainShip, $isScan = false, $isDead = false) {
-		$debug = false;
+		$debug = true;
 		$this->CI->load->model('Images_cache');
 		$data = $this->prepareData($mainShip);
 		$data['scan'] = $isScan ? 1 : 0;

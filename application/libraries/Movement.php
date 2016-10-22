@@ -26,75 +26,7 @@ class Movement {
 		);
 
 	/**
-	 * Defines the Telegram array for keyboard building
-	 *
-	 *  \xE2\x86\x96 (NO) \xE2\xAC\x86 (N) \xE2\x86\x97 (NE)
-	 *  \xE2\xAC\x85 (O)                   \xE2\x9E\xA1 (E)
-	 *  \xE2\x86\x99 (SO) \xE2\xAC\x87 (S) \xE2\x86\x98 (SE)
-	 *  \xE2\x86\xAA (turn)  \xF0\x9F\x9A\xAB  (cancel)
-	 *  \xF0\x9F\x94\xB9 (empty)
-	 *
-	 */
-	private $movementKeyboard = array(
-			  0 => array(
-			  		array("\xE2\x86\x96","\xE2\xAC\x86","\xE2\x86\x97"),
-			  		array("\xF0\x9F\x94\xB9","\xF0\x9F\x9A\xAB","\xF0\x9F\x94\xB9"),
-			  		array("\xF0\x9F\x94\xB9","\xE2\x86\xAA","\xF0\x9F\x94\xB9")
-			  	),
-			 45 => array(
-			 		array("\xF0\x9F\x94\xB9","\xE2\xAC\x86","\xE2\x86\x97"),
-			 		array("\xF0\x9F\x94\xB9","\xF0\x9F\x9A\xAB","\xE2\x9E\xA1"),
-			 		array("\xE2\x86\xAA","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9")
-			 	),
-			 90 => array(
-			 		array("\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9","\xE2\x86\x97"),
-			 		array("\xE2\x86\xAA","\xF0\x9F\x9A\xAB","\xE2\x9E\xA1"),
-			 		array("\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9","\xE2\x86\x98")
-			 	),
-			135 => array(
-					array("\xE2\x86\xAA","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9"),
-					array("\xF0\x9F\x94\xB9","\xF0\x9F\x9A\xAB","\xE2\x9E\xA1"),
-					array("\xF0\x9F\x94\xB9","\xE2\xAC\x87","\xE2\x86\x98")
-				),
-			180 => array(
-					array("\xF0\x9F\x94\xB9","\xE2\x86\xAA","\xF0\x9F\x94\xB9"),
-					array("\xF0\x9F\x94\xB9","\xF0\x9F\x9A\xAB","\xF0\x9F\x94\xB9"),
-					array("\xE2\x86\x99","\xE2\xAC\x87","\xE2\x86\x98")
-				),
-			225 => array(
-					array("\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9","\xE2\x86\xAA"),
-					array("\xE2\xAC\x85","\xF0\x9F\x9A\xAB","\xF0\x9F\x94\xB9"),
-					array("\xE2\x86\x99","\xE2\xAC\x87","\xF0\x9F\x94\xB9")
-				),
-			270 => array(
-					array("\xE2\x86\x96","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9"),
-					array("\xE2\xAC\x85","\xF0\x9F\x9A\xAB","\xE2\x86\xAA"),
-					array("\xE2\x86\x99","\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9")
-				),
-			315 => array(
-					array("\xE2\x86\x96","\xE2\xAC\x86","\xF0\x9F\x94\xB9"),
-					array("\xE2\xAC\x85","\xF0\x9F\x9A\xAB","\xF0\x9F\x94\xB9"),
-					array("\xF0\x9F\x94\xB9","\xF0\x9F\x94\xB9","\xE2\x86\xAA")
-				)
-		);
-	
-	/**
-	 * Translates icons to movements
-	 */
-	private $iconMovementEquivalence = array(
-		1 => "\xE2\x86\x96",
-		2 => "\xE2\xAC\x86",
-		3 => "\xE2\x86\x97",
-		4 => "\xE2\xAC\x85",
-		5 => "\xE2\x86\xAA", // turn
-		6 => "\xE2\x9E\xA1",
-		7 => "\xE2\x86\x99",
-		8 => "\xE2\xAC\x87",
-		9 => "\xE2\x86\x98"
-	);
-
-	/**
-	 * Defines the modification applied to coordinates when a moved is performed
+	 * Defines the modification applied to coordinates when a move is performed
 	 */
 	private $coordinatesModifiers = array(
 			1 => array(-1, 1),
@@ -123,6 +55,60 @@ class Movement {
 			3 => array(-2,-2)
 		);
 
+	private $angleCoordinatesModifiers = array(
+			  0 => array(
+			  	1 => array(-1, 1),
+			  	2 => array( 0, 1),
+			  	3 => array( 1, 1),
+			  ),
+			 45 => array(
+			  	1 => array( 0, 1),
+			  	2 => array( 1, 1),
+			  	3 => array( 1, 0),
+			  ),
+			 90 => array(
+			  	1 => array( 1, 1),
+			  	2 => array( 1, 0),
+			  	3 => array( 1,-1),
+			  ),
+			135 => array(
+			  	1 => array( 1, 0),
+			  	2 => array( 1,-1),
+			  	3 => array( 0,-1),
+			  ),
+			180 => array(
+			  	1 => array( 1,-1),
+			  	2 => array( 0,-1),
+			  	3 => array(-1,-1),
+			  ),
+			225 => array(
+			  	1 => array( 0,-1),
+			  	2 => array(-1,-1),
+			  	3 => array(-1, 0),
+			  ),
+			270 => array(
+			  	1 => array(-1,-1),
+			  	2 => array(-1, 0),
+			  	3 => array(-1, 1),
+			  ),
+			315 => array(
+			  	1 => array(-1, 0),
+			  	2 => array(-1, 1),
+			  	3 => array( 0, 1),
+			  ),
+		);
+
+	private $angleCoordinatesModifiersTurn = array(
+			  0 => array(array( 0, 2)),
+			 45 => array(array( 2, 2)),
+			 90 => array(array( 2, 0)),
+			135 => array(array( 2,-2)),
+			180 => array(array( 0,-2)),
+			225 => array(array(-2,-2)),
+			270 => array(array(-2, 0)),
+			315 => array(array(-2, 2))
+		);
+
 	public function __construct() {
 		$this->CI =& get_instance();
 	}
@@ -141,43 +127,34 @@ class Movement {
 	 * Applies a defined movement to a ship. Adds angle to its rotation and changes its coordinates.
 	 * Returns true on success, false otherwise
 	 */
-	public function moveShip(& $ship, $move) {
-		$move = array_search($move, $this->iconMovementEquivalence);
-		
+	public function moveShip(& $ship, $movement=false) {
+
 		// Cancelation icon
-		if ($move === false) return 0;
-		if ($move == 5) { // Turn icon, get turn from dial
-			$move = $this->movementDials[$ship->angle][3];
-			$movement = 3;
-		} else {
-			$movement = array_search($move, $this->movementDials[$ship->angle]);
-		}
-		// Movement is not in the available dial, return error
-		if ($movement === false) return -1;
+		if ($movement === false) return 0;
 
 		$coords = null;
 		if ($movement >= 0) {
 			switch ($movement) {
 				case 0:
-					$ship->angle = $this->modifyAngle($ship->angle, -45);
-					$coords = $this->coordinatesModifiers;
+					$coords = $this->angleCoordinatesModifiersTurn[$ship->angle];
+					$ship->angle = $this->modifyAngle($ship->angle, 180);
 					break;
 				case 1:
-					$ship->angle = $this->modifyAngle($ship->angle,   0);
-					$coords = $this->coordinatesModifiers;
+					$coords = $this->angleCoordinatesModifiers[$ship->angle];
+					$ship->angle = $this->modifyAngle($ship->angle, -45);
 					break;
 				case 2:
-					$ship->angle = $this->modifyAngle($ship->angle,  45);
-					$coords = $this->coordinatesModifiers;
+					$coords = $this->angleCoordinatesModifiers[$ship->angle];
+					$ship->angle = $this->modifyAngle($ship->angle,  0);
 					break;
 				case 3:
-					$ship->angle = $this->modifyAngle($ship->angle, 180);
-					$coords = $this->turnCoordinatesModifiers;
+					$coords = $this->angleCoordinatesModifiers[$ship->angle];
+					$ship->angle = $this->modifyAngle($ship->angle, 45);
 					break;
 			}
 
-			$ship->x = $ship->x + $coords[$move][0];
-			$ship->y = $ship->y + $coords[$move][1];
+			$ship->x = $ship->x + $coords[$movement][0];
+			$ship->y = $ship->y + $coords[$movement][1];
 
 			// Keep movement inside bounds
 			if ($ship->x <= 0) $ship->x = 1;
@@ -191,13 +168,6 @@ class Movement {
 			// Return error
 			return -1;
 		}
-	}
-
-	/**
-	 * Returns a Telegram keyboard with valid movements given a ship
-	 */
-	public function generateKeyboard($ship) {
-		return $this->movementKeyboard[$ship->angle];
 	}
 
 	/**
