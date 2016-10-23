@@ -615,7 +615,7 @@ class Bitauth
 
 		$data['roles'] = $roles;
 
-		$this->db->trans_start();
+		$this->db->trans_begin();
 
 		$this->db->insert($this->_table['groups'], $data);
 
@@ -718,7 +718,7 @@ class Bitauth
 			unset($data['password']);
 		}
 		
-		$this->db->trans_start();
+		$this->db->trans_begin();
 
 		if( ! empty($data))
 		{
@@ -803,7 +803,7 @@ class Bitauth
 	{
 		if($user = $this->get_user_by_id($user_id))
 		{
-			$this->db->trans_start();
+			$this->db->trans_begin();
 
 			$this->update_user($user_id, array('enabled' => 0, 'groups' => array()));
 
@@ -908,7 +908,7 @@ class Bitauth
 
 		$data['roles'] = $roles;
 
-		$this->db->trans_start();
+		$this->db->trans_begin();
 
 		$this->db->set($data)->where($this->_table_ids['groups'], $id)->update($this->_table['groups']);
 
@@ -952,7 +952,7 @@ class Bitauth
 	 */
 	public function delete_group($group_id)
 	{
-		$this->db->trans_start();
+		$this->db->trans_begin();
 
 		$this->db->where($this->_table_ids['groups'], $group_id)->delete($this->_table['groups']);
 		$this->db->where('group_id', $group_id)->delete($this->_table['assoc']);
