@@ -98,10 +98,13 @@ h2 {
 
 		#nick_input,#login_input{
 			padding: 8px;
-			width: 444px;
-			display: block;
+			width: 300px;
+			display: inline-block;
 			margin: auto;
 			margin-top: 15px;
+		}
+		#login_input{
+			display: block;
 		}
 		#cerrar_session {
 			position:absolute;

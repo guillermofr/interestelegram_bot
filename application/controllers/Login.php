@@ -10,6 +10,7 @@ class Login extends CI_Controller {
         $this->load->library('Twig');
         $this->load->add_package_path(APPPATH.'third_party/bitauth');
         $this->load->library('bitauth');
+        $this->load->library('Movement');
     }
 
     public function index(){
@@ -108,9 +109,25 @@ class Login extends CI_Controller {
 
     public function setNick(){
 
+    	$this->load->model(array('Ships', 'Asteroids'));
+
+
     	if ($this->input->post('nick')){
     		if($this->bitauth->logged_in()){
     			$this->bitauth->update_user($this->bitauth->user_id,array('fullname'=>$this->input->post('nick')));
+
+    			$ship = $this->Ships->create_ship(array('chat_id' => $this->bitauth->user_id, 
+														'captain' => $this->bitauth->user_id, 
+														'name' => "Nave de ".$this->bitauth->fullname, 
+														'total_crew' => 1, 
+														'active' => 1, 
+														'x'=>$this->movement->generateRandomX(),
+														'y'=>$this->movement->generateRandomY(),
+														'angle'=>$this->movement->generateRandomAngle(),
+														'health' => 5,
+														'max_health' => 5,
+														'max_shield' => 5));
+
     		}
     	} 
     	redirect('/jugar');

@@ -24,6 +24,7 @@ class Jugar extends CI_Controller {
         $this->load->add_package_path(APPPATH.'third_party/bitauth');
         $this->load->library('bitauth');
         $this->load->library('Twig');
+        $this->load->library('Movement');
 
         if (!$this->bitauth->logged_in()){
         	$data = array();
@@ -35,6 +36,8 @@ class Jugar extends CI_Controller {
 
     public function index(){
 
+    	$this->load->model(array('Ships', 'Asteroids'));
+
 		if ($this->bitauth->logged_in()){
 			$data['logueado'] = $this->bitauth->logged_in();
 			$data['user'] = ($data['logueado'])?$this->bitauth->get_user_by_id($this->bitauth->user_id):false;
@@ -42,11 +45,26 @@ class Jugar extends CI_Controller {
 
 			$this->load->library('Mapdrawercanvas');
 			$this->load->model('Ships');
-			$ship = $this->Ships->get(1);
-			$mapdata = $this->mapdrawercanvas->generateShipMap($ship);
-			$data['data'] = json_encode($mapdata);
+			//check if user is dead or is first time
+			$ship = $this->Ships->get_ship($this->bitauth->user_id);
 
-			$this->twig->display('canvas.twig',$data);
+			if ($ship){
+
+				if ($ship->health == 0) {
+				//if is dead 
+					//show dead message
+					$data['dead'] = true;
+
+				} 
+				$mapdata = $this->mapdrawercanvas->generateShipMap($ship);
+				$data['data'] = json_encode($mapdata);
+
+			} 
+
+			$this->twig->display('jugar.twig',$data);
+
+
+
 		} else {
 			$data = array('type' => '');
 			$data['logueado'] = $this->bitauth->logged_in();
