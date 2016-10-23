@@ -58,3 +58,4 @@ $route['help'] = 'welcome/help';
 $route['ranking'] = 'welcome/ranking';
 $route['contacto'] = 'welcome/contacto';
 $route['canvas'] = 'welcome/canvas';
+$route['jugar'] = 'jugar';

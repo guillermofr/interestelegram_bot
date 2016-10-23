@@ -1,0 +1,52 @@
+{% extends 'layout.twig' %}
+
+
+{% block content %}
+
+	{% if logueado %}
+
+		{% if user.fullname %}
+
+			<div class="container">
+			
+					<div>
+						<h1 style="font-weight:normal">Eres {{ user.fullname }} </h1>
+					</div>
+
+			</div>
+
+	    {% else %}
+
+		    <form method="POST" action="/login/setNick">
+				<h2>No hemos encontrado tu correo en la base de datos de participantes de la MurciaLanParty.</h2>
+				<p>Para poder jugar necesitas terner un nombre</p>
+				<p>Al no ser participante de la MLP no podrás optar a premios, pero podrás jugar como los demás y fastidiarles la racha!</p>
+
+				<input type="text" name="nick" placeholder="Nick/Apodo" id='nick_input'/>
+
+			    <span style="display:block;">
+			    	<button type="submit" class="btn btn-2 btn-2a">Guardar Nick</button>
+				</span>
+			</form>
+	   
+	    {% endif %}
+
+    {% else %}
+
+    <h2>Necesitas estar logueado para participar en la partida</h2>
+    <form style="width: 56%;margin: auto;" method="POST" action="/login">
+    	<label for="email">Introduce el correo electrónico con el que te diste de alta en la <b>MurciaLanParty</b>.</label>
+    	<input type="email" name="email" placeholder="Correo electrónico" id="login_input"/>
+    	<button type="submit" class="btn btn-2 btn-2a">Login</button>
+    	<p>Esta página no necesita preguntarte una clave o contraseña, al darnos tu 
+    	dirección de correo, la comprobaremos en la base de datos de la Murcia lan party y 
+    	te enviaremos un correo con un link para entrar a jugar.</p>
+    	<p>Al darnos tu correo de registro en la <b>MurciaLanParty</b>, podremos reconocerte como participante y podrás optar a los premios de la competición.</p>
+    	<p>Los usuarios registrados que no sean participantes podrán entrar a jugar sin opción a premio.</p>
+    	<p>No hay ningún problema por tener multicuenta para participar</p>
+    </form>
+
+
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	{% if enviado %}
+ 		<h2>Te hemos enviado un correo con un enlace para entrar a jugar.</h2>
+ 		<p>Ya sabes, comprueba tu bandeja de correo spam y todas esas cosas.</p>
+ 		<p>El link enviado te servirá para entrar hasta que pidas otro nuevo.</p>
+ 	{% else %}
+ 		<h2>No hemos podido enviarte el correo de acceso. Puedes ponerte en contacto a killer415@gmail.com para solucionar el problema.</h2>
+ 	{% endif %}
+{% endblock %}

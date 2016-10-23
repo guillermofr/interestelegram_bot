@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>No Man´s Vitamins</title>
+		<meta name="author" content="kiLLeR415" />
+		<link rel="shortcut icon" href="/assets/img/favicon.ico">
+		<link rel="stylesheet" type="text/css" href="/assets/css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/css/component.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/css/layout.css" />
+		<script src="/assets/js/jquery.min.js"></script>
+		<script src="/assets/js/modernizr.custom.js"></script>
+		<script src="/assets/js/jquery.timeago.js" type="text/javascript"></script>
+		
+		<script src="/assets/js/gauge.min.js"></script>
+
+	{% block head %}{% endblock %}
+	</head>
+
+	<body>
+		<div class="container">
+			<!-- Top Navigation -->
+			<div class="codrops-top clearfix">
+				
+			</div>
+			<header>
+				{% if logueado %}
+					<nav class="cl-effect-6" id="cl-effect-6">
+						<a id="cerrar_session" href="/login/out">Cerrar Sessión</a>
+					</nav>
+				{% endif %}
+				<h1><a href="/" style="color:#89867e">No Man´s Vitamins</a> <span>BATALLAS DE NAVES</span></h1>
+				
+			</header>
+			<section id="otravez" class="color-5">
+				<nav class="cl-effect-4">
+					<a style="font-size:16px" href="/info">¿Cómo se juega!?</a>
+					<a style="font-size:16px" href="/info/ranking">¿Quién va ganando?</a>
+					<a style="font-size:37px" href="/jugar">{% block jugar %}¡Jugar!{% endblock %}</a>
+					<a style="font-size:16px" href="/info/developer">¿Quién ha hecho esta mierda?</a>
+					<a style="font-size:16px" href="/info/premios">Premios</a>
+				</nav>
+			</section>
+
+			{% block content %}{% endblock %}
+		</div>
+
+		<div class="md-overlay"></div><!-- the overlay element -->
+
+		<!-- classie.js by @desandro: https://github.com/desandro/classie -->
+		<script src="/assets/js/classie.js"></script>
+		<script src="/assets/js/modalEffects.js"></script>
+
+		<!-- for the blur effect -->
+		<!-- by @derSchepp https://github.com/Schepp/CSS-Filters-Polyfill -->
+		<script>
+			// this is important for IEs
+			var polyfilter_scriptpath = '/assets/js/';
+		</script>
+		<script src="/assets/js/cssParser.js"></script>
+		<script src="/assets/js/css-filters-polyfill.js"></script>
+
+	</body>
+
+</html>
