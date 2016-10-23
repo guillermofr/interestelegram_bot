@@ -835,6 +835,8 @@ class Bitauth
 	{
 		if($user = $this->get_user_by_id($user_id))
 		{
+			$forgot_code = $this->generate_code();
+
 			if($this->update_user($user_id, array('forgot_code' => $forgot_code, 'forgot_generated' => $this->timestamp())))
 			{
 				return $forgot_code;
@@ -1411,7 +1413,7 @@ class Bitauth
 	 */
 	public function generate_code()
 	{
-		return time();
+		return sha1(uniqid().time());
 	}
 
 	/**
