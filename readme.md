@@ -2,50 +2,71 @@
 
 ## ¿Qué es?
 
-Es un proyecto para crear un juego conversacional a través de web y Telegram. Utiliza la API de bots de Telegram y una web hecha con Code Igniter.
-Toda la documentación se puede encontrar aquí
-https://docs.google.com/document/d/1dfeGdC2gUoB5qJ0LUF58SEu_IwiqckzxTgXPO3yhnBs/edit?usp=sharing
+Es una rama a parte para transformar el juego de Telegram a otro basado solo en Web. Utiliza una web hecha con Code Igniter.
+Toda la documentación de la versión de telegram se puede encontrar aquí
+https://docs.google.com/document/d/1dfeGdC2gUoB5qJ0LUF58SEu_IwiqckzxTgXPO3yhnBs/edit?usp=sharing 
+La versión web será similar y los cambios los añadiremos en esta descripción.
 
 ## Instalación
+#Instalación
 
-Renombra `config/bot.example.php` a `config/bot.php`.
-Modifica el fichero `config/bot.php` para indicar el token de tu [bot de Telegram](https://core.telegram.org/bots/api).
+Carga el dump de base de datos.
+Monta un virtual host, por ejemplo:
 
-Modifica el fichero `config/database.php` para indicar usuario y base de datos disponible para el proyecto.
-
-Visita el controlador `/migrate` para ejecutar las migraciones existentes.
-
-## Estado del proyecto
-
-#### Controlador Webhook
-
-Simula el punto en el que se recibirán los POST de Telegram. Abre en el navegador una pestaña apuntando a Webhook (`/index.php/webhook`) y el recibirá y procesará los mensajes de Telegram de uno en uno. Hace un dump en pantalla del mensaje que está procesando. Si va demasiado rápido aumenta `refreshMillis` a 10000 para tener 10 segundos para ver el mensaje, etc.
-
-#### Librería Processor
-
-Se encarga de procesar los mensajes recibidos y reaccionar según corresponda. 
-
-#### Librería Commander
-
-Lugar donde se implementan las operaciones.
-
-#### Modelos
-
-Extiende de [MY_Model](https://github.com/avenirer/CodeIgniter-MY_Model). Falta añadirle soporte para caché.
-
-#### Comandos disponibles
 ```
-pilotar - Toma el mando de una nave como capitán 
-mover - Muevete por el espacio para buscar objetivos 
-escanear - Busca y selecciona tu objetivo 
-atacar - Ataca a tu objetivo 
-a1 - Atajo para atacar con daño 1 
-a3 - Atajo para atacar con daño 3 y 3 personas 
-a5 - Atajo para atacar con daño 5 y 5 personas 
-esquivar - Sal de los radares enemigos con una maniobra evasiva 
-informe - Informe de situación de tu nave 
-alistarse - Formar parte de la tripulación, por si estabas antes que el bot
-ranking - Muestra el ranking de naves y pilotos
-ayuda - Muestra un mensaje de ayuda
+<VirtualHost *:80>
+	DocumentRoot "/www/inter"
+	ServerName "inter.es"
+	ServerAlias "www.inter.es"
+       <Directory "/www/inter/">
+		AllowOverride All
+		Options FollowSymLinks Indexes 	
+	</Directory>
+</VirtualHost>
 ```
 
+#Pruebas
+
+Navega a 
+* http://www.inter.es/canvas
+* http://www.inter.es/api/test
+
+El segundo enlace es el antiguo generador de imagenes, para debug.
+
+#WIP
+
+He mantenido el código viejo, cuando reemplazaba algún controlador o librería lo he renombrado a _old para tenerlo de referencia de consulta.
+
+##Librerías
+
+*Mapdrawercanvas*
+
+Genera el array de imagenes y posiciones que tiene que representar el canvas respecto a la nave del jugador principal.
+
+* Tipos de naves
+
+El tipo de nave es un entero de 1 a 4. El 0 está reservado para las naves NPC.
+El tipo de nave ofensivo es el 10. Sus evoluciones son 11 y 12.
+Los otros tipos de naves siguen el mismo sistema: 20, 21 y 22, y 30, 31 y 32. El canvas ya sabe dibujar la nave si esta tiene un tamaño mayor de 100x100.
+
+*Movement*
+
+Actualizada para mover una nave en función de su posición y su ángulo. Ahora recibe un parámetro que indica si el movimiento es izquierda, derecha, recto o giro de 180º en lugar del antiguo teclado de Telegram.
+
+##Controladores
+
+*Welcome/canvas*
+
+Carga los datos de la nave 1 y dibuja el mapa relativo a lo que ve.
+
+*Action*
+
+Recibe los posts del canvas y realiza la acción. Está montado para que sea sencillo construír una respuesta para que el canvas dibuje el nuevo estado. Ahora mismo siempre recupera la nave 1.
+
+La idea es que Action recibe los post, y luego delega cada tipo de acción a una librería. Por ejemplo, las acciones de movimiento se delegan a Movement. Si se implementa ataque, Action recibe el post y delegaría a una librería Attack los cálculos, etc.
+
+##Vistas
+
+*canvas*
+
+La vista canvas lleva el javascript necesario para dibujar el mapa. Además lleva un evento click genérico para hacer post a un atributo data-action que llevan los botones y dibujar el nuevo mapa que llega como respuesta.
