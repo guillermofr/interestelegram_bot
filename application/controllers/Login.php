@@ -69,11 +69,11 @@ class Login extends CI_Controller {
 			$this->email->subject('Link de acceso');
 			$this->email->message("Pincha en el enlace para entrar en la web a jugar: <a href='".site_url()."login/in/$code'>".site_url()."login/in/$code</a>");	
 			//if (site_url() == 'http://vitaminados.local/'){
-				echo "Pincha en el siguiente enlace para entrar a jugar, en este servidor no funciona el env&iacute;o de correos<br><a href='/login/in/$code'>$code</a>"; exit;
+				//echo "Pincha en el siguiente enlace para entrar a jugar, en este servidor no funciona el env&iacute;o de correos<br><a href=>$code</a>"; exit;
 			//}
 
-			if ($this->email->send()){
-				$this->twig->display('info/enviado.twig',array('enviado'=>true));
+			if (/*$this->email->send()*/true){
+				$this->twig->display('info/enviado.twig',array('enviado'=>true,'url'=>'/login/in/'.$code));
 			} else {
 	    		$this->twig->display('info/enviado.twig',array('enviado'=>false));
 			}

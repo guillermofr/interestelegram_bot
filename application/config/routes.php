@@ -55,7 +55,7 @@ $route['translate_uri_dashes'] = FALSE;
 
 //$route['welcome/help'] = 'help';
 $route['help'] = 'welcome/help';
+$route['contact'] = 'welcome/contact';
 $route['ranking'] = 'welcome/ranking';
-$route['contacto'] = 'welcome/contacto';
 $route['canvas'] = 'welcome/canvas';
 $route['jugar'] = 'jugar';

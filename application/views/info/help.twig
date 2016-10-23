@@ -1,0 +1,168 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+	<div class="container">	
+			<div class="main row-fluid">
+				<div class="col-sm-offset-2 col-sm-8">
+
+
+
+					<h2>Start of the game: <img src="/imgs/map/ship_type1.png"/> </h2> 
+					<p>To start a game you have to create a group and invite the bot to the group.</p>
+						<center><p><a href="/jugar"><img src="/images/help/logo.png"/></a></p></center>
+					<p>The bot then will explain certain things about the dynamics of the game and wait for the captain to take control.</p>
+					<p>The first activates the bot with the "Piloting" command becomes Captain.</p>
+					<p>The captain can permanently cede control to another person with another command.</p>
+
+
+					<h2>Growth of the game: <img src="/imgs/map/ship_type3.png"/></h2>
+					<p>The groups are not limited in number of people. The more people, the more powerful their weapons. </p>
+					<p>The bot will inform the crew information about impacts, communications, fire, and state of the ship (Life, shield and money).</p>
+					<p>When a ship dies, the bot informs you that the ship is unusable and we'd better abandon ship. The ship that killed you will be subsidized with points. (You can respawn the same ship while game is in beta)</p>
+
+					<h2>Money <img src="/imgs/map/ship_type4.png"/></h2>
+					<p>The way you obtain money is mining on gray asteroids and selling at shop. The shop is located at left bottom of Map. You can buy ship models with that money.</p>
+
+					<h2>Playability  <img src="/imgs/map/ship_type0.png"/></h2>
+					<p>The captain will command via commands to perform actions. Each action will be voted by the crew with YES or NO. Each type of action will require a % of votes according to the size of the crew.</p>
+
+					<p>The higher a ship, the greater their statistics, more life and less agility to dodge.</p>
+
+					<h3>Ship Stats</h3>
+					<p>The ship will have life and shield. Life will be 5 + (crew * 5)</p>
+
+					<p>The shield will absorb a consumable damage.</p>
+
+					<p>An attack of 5 removes 5 points of life or 5 points of shield.</p>
+					<p>If a ship runs out of life the bot will disable the ship. It will display a message saying that the ship must evacuate because all the controls have been destroyed, photo and some photographic detail to indicate endgame.</p>
+
+					<p>Increase the size of the ship, will increase its life and to make stronger attacks, also mine more resources, etc, but complicates success in coordinating actions and reduce evasion.</p>
+
+
+					<h2>Combat and movement <img src="/imgs/map/target.png"/></h2>
+					<p>Ships can only move forward: front left, front and right front. They will also have available a maneuver to rotate 180 degrees and advance two squares. This latest move will have a % chance to miss, becoming a basic straight movement if fail.</p>
+					
+					</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/image04.png"/>
+						</div>
+						<div class="col-sm-6 text-left">
+							<img src="/images/help/image07.png"/>
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+					<p>These movements involve more planning. Rotated 90 degrees clockwise for example, involves stringing two consecutive movements.</p>
+
+					</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/image05.png"/>
+						</div>
+						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
+							<p>A ship may target any ship in its viewing area, but can only shoot ships within its arc of fire.</p>
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+
+
+					</div>
+					<center>
+						<div class="col-sm-6 text-right" >
+							<p style="max-width: 340px;margin-top: 49px;float:right;">The arc of fire in diagonal is different</p>
+						</div>
+						<div class="col-sm-6 text-left">
+							<img src="/images/help/image02.png"/>
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+					
+
+					</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/image06.png"/>
+						</div>
+						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
+							
+
+							<p>In the image, the blue ship has the ability to target red and green ships, while the black ship is out of reach.</p>
+
+							<p>When a ship (A) target another ship (B) (A) ship can attack B.</p>
+
+							
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+
+
+					</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<p style="max-width: 340px;margin-top: 49px;float:right;">A ship will have a visual indicator of the position of the enemy B while this remains targeted, even if out of his range of vision.</p>
+						</div>
+						<div class="col-sm-6 text-left">
+							
+							<img src="/images/help/image08.jpg"/>
+
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+
+					</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/image09.jpg"/>
+						</div>
+						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
+							
+
+
+							<p>The ship B can perform an action with high miss chance to evade and remove the target.</p>
+
+						</div>
+					</center>
+					<div class="col-sm-offset-2 col-sm-8">
+
+
+					<p>The combination of these mechanical favors the attacking ship: </p>
+	
+					<p>The attacker must predict the position of your target to follow him successfully and continue shooting.</p>
+					<p>The defender must decide whether to flee the arc of fire or attempt evasive action to get rid of the target.</p>
+
+
+				</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/hidden.jpg"/>
+						</div>
+						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
+				
+							<p>The enemies can hide behind rocks and become invisible to other players. We'll have to scan the sector to detect those hiding ships. But carefull when you are hidding, because asteroids move!</p>
+						</div>
+					</center>
+				<div class="col-sm-offset-2 col-sm-8">
+
+				</div>
+					<center>
+						<div class="col-sm-6 text-right">
+							<img src="/images/help/hiddenlock.jpg"/>
+						</div>
+						<div class="col-sm-6 text-left" style="max-width: 340px;margin-top: 49px;">
+				
+							<p>Once selected our enemy can no longer hide in the rocks.</p>
+						</div>
+					</center>
+				<div class="col-sm-offset-2 col-sm-8">
+
+
+				</div>
+				
+			</div><!-- /main -->
+		</div><!-- /container -->
+{% endblock %}

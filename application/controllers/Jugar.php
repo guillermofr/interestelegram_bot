@@ -26,7 +26,6 @@ class Jugar extends CI_Controller {
         $this->load->library('Twig');
 
         if (!$this->bitauth->logged_in()){
-        	echo "usuario no logueado";
         	$data = array();
 			echo $this->twig->render('jugar.twig');
         	exit;
@@ -37,13 +36,18 @@ class Jugar extends CI_Controller {
     public function index(){
 
 		if ($this->bitauth->logged_in()){
-			echo "usuario logueado";
 			$data['logueado'] = $this->bitauth->logged_in();
 			$data['user'] = ($data['logueado'])?$this->bitauth->get_user_by_id($this->bitauth->user_id):false;
 			//echo "<pre>";print_r($data);
-			echo $this->twig->render('jugar.twig',$data);
+
+			$this->load->library('Mapdrawercanvas');
+			$this->load->model('Ships');
+			$ship = $this->Ships->get(1);
+			$mapdata = $this->mapdrawercanvas->generateShipMap($ship);
+			$data['data'] = json_encode($mapdata);
+
+			$this->twig->display('canvas.twig',$data);
 		} else {
-			echo "usuario no logueado";
 			$data = array('type' => '');
 			$data['logueado'] = $this->bitauth->logged_in();
 			$data['user'] = ($data['logueado'])?$this->bitauth->get_user_by_id($this->bitauth->user_id):false;

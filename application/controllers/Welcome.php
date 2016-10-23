@@ -3,6 +3,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Welcome extends CI_Controller {
 
+	function __construct()
+    {
+        parent::__construct();
+        $this->load->library('Twig');
+        $this->load->add_package_path(APPPATH.'third_party/bitauth');
+        $this->load->library('bitauth');
+    }
+
 	/**
 	 * Index Page for this controller.
 	 *
@@ -24,15 +32,15 @@ class Welcome extends CI_Controller {
 	}
 
 	public function help(){
-		$this->load->view('ayuda');
+		$this->twig->display('info/help.twig');
 	}
 
 	public function ranking(){
 		$this->load->view('ranking');
 	}
 
-	public function contacto(){
-		$this->load->view('contacto');
+	public function contact(){
+		$this->twig->display('info/contact.twig');
 	}
 
 	public function canvas(){

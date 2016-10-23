@@ -23,7 +23,7 @@ h2 {
 
 
 		.btn-2a:hover {
-			box-shadow: 0 3px #A53629;
+			box-shadow: 0 3px #56445d;
 			top: 2px;
 		}
 		.btn-2a {
@@ -31,9 +31,9 @@ h2 {
 		}
 		.btn-2 {
 			white-space:nowrap;
-			background: #CD4436;
+			background: #8d7098;
 			color: #fff;
-			box-shadow: 0 6px #A53629;
+			box-shadow: 0 6px #56445d;
 			-webkit-transition: none;
 			-moz-transition: none;
 			transition: none;
@@ -151,7 +151,7 @@ h2 {
 			border-radius: 81px;
 			border: 10px outset white;
 			padding: 0px;
-			box-shadow: 0px 5px 0px #cd4436;
+			box-shadow: 0px 5px 0px #8d7098;
 
 		}
 
@@ -169,7 +169,7 @@ h2 {
 			margin: 8px 20px;
 			font-size: 26px;
 			border: 5px solid #fff;
-			box-shadow: 0px 5px 0px #cd4436;
+			box-shadow: 0px 5px 0px #8d7098;
 		}
 
 		.vitamina {
@@ -472,4 +472,17 @@ font-size: 17px;
 line-height: 17px;
 max-width: 1000px;
 margin: auto;
+}
+
+body {
+	color: #C7ADD0;
+    background: #3A2E3F;
+    font-size: 0.9em;
+    overflow-x: hidden;
+    background: url(../../images/darkPurple.png);
+}
+
+.container {
+    background: transparent;
+    min-height: 100%;
 }
