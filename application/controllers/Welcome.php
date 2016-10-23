@@ -28,7 +28,7 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message2');
+		$this->twig->display('index.twig');
 	}
 
 	public function help(){
