@@ -126,7 +126,9 @@ class Login extends CI_Controller {
 														'angle'=>$this->movement->generateRandomAngle(),
 														'health' => 5,
 														'max_health' => 5,
-														'max_shield' => 5));
+														'max_shield' => 5,
+														'model' => rand(1,4)
+													));
 
     		}
     	} 

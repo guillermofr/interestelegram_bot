@@ -46,7 +46,7 @@ class Jugar extends CI_Controller {
 			$this->load->library('Mapdrawercanvas');
 			$this->load->model('Ships');
 			//check if user is dead or is first time
-			$ship = $this->Ships->get_ship($this->bitauth->user_id);
+			$ship = $this->Ships->get_ship_by_chat_id($this->bitauth->user_id);
 
 			if ($ship){
 
