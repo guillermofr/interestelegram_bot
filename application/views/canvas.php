@@ -1,6 +1,7 @@
 <html>
 <head>
     <script src="//code.jquery.com/jquery-2.x-git.min.js" type="text/javascript"></script>
+    <script src="/assets/js/ocanvas-2.8.6.min.js" type="text/javascript"></script>
 </head>
 <body style="background:#454545">
     <canvas id="canvas" width="300" height="300" style="margin-left:40%;" ></canvas>
@@ -20,10 +21,14 @@
     <script type="text/javascript">
         var INTER = {};
         INTER.canvas = {
-            canvas : document.getElementById('canvas'),
-            context : canvas.getContext('2d'),
+            canvas : oCanvas.create({
+                canvas: "#canvas",
+                background: "#222",
+                fps: 60
+            }),
             content : {
                 data: [],
+                cache: {},
                 loaded: 0
             },
             bind_controls: function() {
@@ -39,38 +44,68 @@
                     );
                 });
             },
-            loader : function(imgs, callback) {
-                INTER.canvas.content.loaded = 0;
-                for (var i = imgs.length - 1; i >= 0; i--) {
-                    imgs[i].o = new Image();
-                    imgs[i].o.src = imgs[i].i;
-                    imgs[i].o.onload = callback;
-                }
-            },
             update : function(data) {
                 INTER.canvas.content.data = data;
-                INTER.canvas.loader(INTER.canvas.content.data, INTER.canvas.draw);
-            },
-            draw : function(path, x, y) {
-                INTER.canvas.content.loaded++;
-
-                if (INTER.canvas.content.loaded == INTER.canvas.content.data.length) {
-                    var data = INTER.canvas.content.data;
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].a != 0) {
-                            INTER.canvas.drawRotated(INTER.canvas.context, data[i].o, data[i].a*Math.PI/180, data[i].x, data[i].y);
-                        } else {
-                            INTER.canvas.context.drawImage(data[i].o, data[i].x, data[i].y);
-                        }
+                for (var i in INTER.canvas.content.cache) {
+                    INTER.canvas.content.cache[i].updated = false;
+                }
+                for (var i = 0; i < INTER.canvas.content.data.length; i++) {
+                    INTER.canvas.load(i);
+                }
+                for (var i = 0; i < INTER.canvas.content.data.length; i++) {
+                    INTER.canvas.draw(i);
+                }
+                for (var i in INTER.canvas.content.cache) {
+                    if (!INTER.canvas.content.cache[i].updated) {
+                        delete INTER.canvas.content.cache[i];
                     }
                 }
             },
-            drawRotated: function(context, image, angleInRad , positionX, positionY) {
-                INTER.canvas.context.translate( positionX + image.width/2, positionY + image.height/2 );
-                INTER.canvas.context.rotate( angleInRad );
-                INTER.canvas.context.drawImage( image, -image.width/2, -image.height/2 );
-                INTER.canvas.context.rotate( -angleInRad );
-                INTER.canvas.context.translate( - (positionX + image.width/2), - (positionY + image.height/2) );
+            load : function(i) {
+                if (typeof INTER.canvas.content.cache[INTER.canvas.content.data[i].id] != 'undefined') {
+                    INTER.canvas.content.data[i].o = INTER.canvas.content.cache[INTER.canvas.content.data[i].id];
+                }
+
+                if (typeof INTER.canvas.content.data[i].o != 'undefined') {
+                    INTER.canvas.content.data[i].current_x = INTER.canvas.content.data[i].o.x;
+                    INTER.canvas.content.data[i].current_y = INTER.canvas.content.data[i].o.y;
+                    INTER.canvas.content.data[i].new_x = INTER.canvas.content.data[i].x;
+                    INTER.canvas.content.data[i].new_y = INTER.canvas.content.data[i].y;
+                } else {
+                    INTER.canvas.content.data[i].current_x = INTER.canvas.content.data[i].x;
+                    INTER.canvas.content.data[i].current_y = INTER.canvas.content.data[i].y;
+                    INTER.canvas.content.data[i].new_x = INTER.canvas.content.data[i].x;
+                    INTER.canvas.content.data[i].new_y = INTER.canvas.content.data[i].y;
+                }
+                
+                INTER.canvas.content.data[i].o = INTER.canvas.canvas.display.image({
+                    x: INTER.canvas.content.data[i].current_x,
+                    y: INTER.canvas.content.data[i].current_y,
+                    origin: { x: "center", y: "center" },
+                    image: INTER.canvas.content.data[i].i
+                });
+
+                INTER.canvas.content.cache[INTER.canvas.content.data[i].id] = INTER.canvas.content.data[i];
+
+                INTER.canvas.content.cache[INTER.canvas.content.data[i].id].updated = true;
+            },
+            draw : function(i) {
+                if (INTER.canvas.content.data[i].a > 0) {
+                    INTER.canvas.content.data[i].o.rotate(INTER.canvas.content.data[i].a);
+                }
+                if (INTER.canvas.content.data[i].current_x != INTER.canvas.content.data[i].new_x || INTER.canvas.content.data[i].current_y != INTER.canvas.content.data[i].new_y) {
+                    INTER.canvas.findEntrance(INTER.canvas.content.data[i], data.ms.angle);
+                    INTER.canvas.canvas.addChild(INTER.canvas.content.data[i].o);
+                    INTER.canvas.content.data[i].o.animate({
+                        x: INTER.canvas.content.data[i].new_x,
+                        y: INTER.canvas.content.data[i].new_y
+                    }, {
+                        duration: "long",
+                        easing: "ease-in-out-cubic"
+                    });
+                } else {
+                    INTER.canvas.canvas.addChild(INTER.canvas.content.data[i].o);
+                }
             },
             log: function(messages) {
                 $('#log').html('');
@@ -84,6 +119,34 @@
                 for (var i = 0; i < ships.length; i++) {
                     $('#target').append('<button class="control" data-action="/action/target/' + ships[i].id + '" >Fijar a ' + ships[i].name + '</button>');
                 }
+            },
+            findEntrance: function(obj, angle) {
+                switch(angle) {
+                    case 0:
+                        obj.o.moveTo(obj.new_x, obj.new_y + 100);
+                        break;
+                    case 45:
+                        obj.o.moveTo(obj.new_x + 100, obj.new_y + 100);
+                        break;
+                    case 90:
+                        obj.o.moveTo(obj.new_x + 100, obj.new_y);
+                        break;
+                    case 135:
+                        obj.o.moveTo(obj.new_x + 100, obj.new_y - 100);
+                        break;
+                    case 180:
+                        obj.o.moveTo(obj.new_x, obj.new_y - 100);
+                        break;
+                    case 225:
+                        obj.o.moveTo(obj.new_x - 100, obj.new_y - 100);
+                        break;
+                    case 270:
+                        obj.o.moveTo(obj.new_x - 100, obj.new_y);
+                        break;
+                    case 315:
+                        obj.o.moveTo(obj.new_x - 100, obj.new_y + 100);
+                        break;
+                }
             }
         };
 
@@ -93,9 +156,10 @@
 
     </script>
     <script>
-    $.fn.ready(function(){
-        INTER.canvas.bind_controls();
-    });
+        $.fn.ready(function(){
+            INTER.canvas.bind_controls();
+        });
+    
     </script>
 </body>
 </html>

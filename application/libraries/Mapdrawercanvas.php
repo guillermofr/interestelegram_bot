@@ -54,13 +54,12 @@ class Mapdrawercanvas {
 		$drawnShips = array();
 		$data->content = array();
 
-		$data->content[] = $this->addImage('/imgs/map/background.png');
+		$data->content[] = $this->addImage('bg', '/imgs/map/background.png', 0, 0, 0, 0, 300);
 
 		$this->markForbidden($data, $mainShip);
 
 		$this->showStarports($data, $mainShip);
 
-		
 		if ($isScan) $this->addRadar($data, $mainShip);
 
 		$ships = $data->os;
@@ -107,13 +106,14 @@ class Mapdrawercanvas {
 		return $this->clearPrivateData($data);
 	}
 
-	public function addImage($path, $x=0, $y=0, $angle=0, $offset=0, $size=null) {
+	public function addImage($id, $path, $x=0, $y=0, $angle=0, $offset=0, $size=null) {
 		if ($size == null) $size = $this->size;
 
 		$obj = new StdClass();
+		$obj->id = $id;
 		$obj->i = $path;
-		$obj->x = ($x * $size) - $offset;
-		$obj->y = ($y * $size) - $offset;
+		$obj->x = ($x * $size) + ($size/2) - $offset;
+		$obj->y = ($y * $size) + ($size/2) - $offset;
 
 		$obj->a = $angle;
 		if ($obj->a % 90 != 0) {
@@ -122,14 +122,15 @@ class Mapdrawercanvas {
 		return $obj;
 	}
 
-	public function addImageRelative($path, $x=0, $y=0, $angle=0, $offset=0, $size=null) {
+	public function addImageRelative($id, $path, $x=0, $y=0, $angle=0, $offset=0, $size=null) {
 		if ($size == null) $size = $this->size;
 
 		$obj = new StdClass();
+		$obj->id = $id;
 		$obj->i = $path;
 
-		$obj->x = ($this->translate($this->mainShip->x, $x) * $size) - $offset;
-		$obj->y = ($this->remapY($this->translate($this->mainShip->y, $y)) * $size) - $offset;
+		$obj->x = ($this->translate($this->mainShip->x, $x) * $size) + ($size/2) - $offset;
+		$obj->y = ($this->remapY($this->translate($this->mainShip->y, $y)) * $size) + ($size/2) - $offset;
 
 		$obj->a = $angle;
 		if ($obj->a % 90 != 0) {
@@ -143,33 +144,40 @@ class Mapdrawercanvas {
 	 */
 	private function markForbidden(&$data, $ship) {
 		$forbidden = "/imgs/map/forbidden.png";
-		if ($ship->y == 1) {
-			$data->content[] = $this->addImage($forbidden, 0, 2);
-			$data->content[] = $this->addImage($forbidden, 1, 2);
-			$data->content[] = $this->addImage($forbidden, 2, 2);
+		if ($ship->y == 1 || $ship->y == 2) {
+			$data->content[] = $this->addImageRelative('xtlf', $forbidden, $ship->x-2, 0);
+			$data->content[] = $this->addImageRelative('xtl', $forbidden, $ship->x-1, 0);
+			$data->content[] = $this->addImageRelative('xtc', $forbidden, $ship->x, 0);
+			$data->content[] = $this->addImageRelative('xtr', $forbidden, $ship->x+1, 0);
+			$data->content[] = $this->addImageRelative('xtrf', $forbidden, $ship->x+2, 0);
 		}
-		if ($ship->y == $this->mapSize) {
-			$data->content[] = $this->addImage($forbidden, 0, 0);
-			$data->content[] = $this->addImage($forbidden, 1, 0);
-			$data->content[] = $this->addImage($forbidden, 2, 0);
+		if ($ship->y == $this->mapSize || $ship->y == ($this->mapSize-1)) {
+			$data->content[] = $this->addImageRelative('xblf', $forbidden, $ship->x-2, $this->mapSize+1);
+			$data->content[] = $this->addImageRelative('xbl', $forbidden, $ship->x-1, $this->mapSize+1);
+			$data->content[] = $this->addImageRelative('xbc', $forbidden, $ship->x, $this->mapSize+1);
+			$data->content[] = $this->addImageRelative('xbr', $forbidden, $ship->x+1, $this->mapSize+1);
+			$data->content[] = $this->addImageRelative('xbrf', $forbidden, $ship->x+2, $this->mapSize+1);
 		}
-		if ($ship->x == 1) {
-			$data->content[] = $this->addImage($forbidden, 0, 0);
-			$data->content[] = $this->addImage($forbidden, 0, 1);
-			$data->content[] = $this->addImage($forbidden, 0, 2);
+		if ($ship->x == 1 || $ship->x == 2) {
+			$data->content[] = $this->addImageRelative('xltf', $forbidden, 0, $ship->y-2);
+			$data->content[] = $this->addImageRelative('xlt', $forbidden, 0, $ship->y-1);
+			$data->content[] = $this->addImageRelative('xlc', $forbidden, 0, $ship->y);
+			$data->content[] = $this->addImageRelative('xlb', $forbidden, 0, $ship->y+1);
+			$data->content[] = $this->addImageRelative('xlbf', $forbidden, 0, $ship->y+2);
 		}
-		if ($ship->x == $this->mapSize) {
-			$data->content[] = $this->addImage($forbidden, 2, 0);
-			$data->content[] = $this->addImage($forbidden, 2, 1);
-			$data->content[] = $this->addImage($forbidden, 2, 2);
+		if ($ship->x == $this->mapSize || $ship->x == ($this->mapSize-1)) {
+			$data->content[] = $this->addImageRelative('xrtf', $forbidden, $this->mapSize+1, $ship->y-2);
+			$data->content[] = $this->addImageRelative('xrt', $forbidden, $this->mapSize+1, $ship->y-1);
+			$data->content[] = $this->addImageRelative('xrc', $forbidden, $this->mapSize+1, $ship->y);
+			$data->content[] = $this->addImageRelative('xrb', $forbidden, $this->mapSize+1, $ship->y+1);
+			$data->content[] = $this->addImageRelative('xrbf', $forbidden, $this->mapSize+1, $ship->y+2);
 		}
 	}
 
 	function showStarports(&$data, $mainShip) {
 		if ($mainShip->x <= 2 && $mainShip->y <= 2) {
 			$mine = "/imgs/map/mine.png";
-			$data->content[] = $this->addImageRelative($mine, 1, 1, 0, 100);
-			//$this->addImageRelativeXYSize($base, $mainShip, $mine, 1, 1, 0, 100);
+			$data->content[] = $this->addImageRelative('st1', $mine, 1, 1, 0, 0, 0);
 		}
 	}
 
@@ -186,7 +194,7 @@ class Mapdrawercanvas {
 
 		$path = $specialAngle ? "/imgs/map/ship_type{$type}.png" : "/imgs/map/ship_type{$type}_rotated.png";
 
-		$data->content[] = $this->addImageRelative($path, $currentShip->x, $currentShip->y, $currentShip->angle, $offset);
+		$data->content[] = $this->addImageRelative('s'.$currentShip->id, $path, $currentShip->x, $currentShip->y, $currentShip->angle, $offset);
 		if ($currentShip->shield > 0) {
 			$shield = 'low';
 			if ($currentShip->shield == $currentShip->max_shield) {
@@ -195,7 +203,7 @@ class Mapdrawercanvas {
 				$shield = 'med';
 			}
 			$shield = $specialAngle ? "/imgs/map/shield_{$shield}.png" : "/imgs/map/shield_{$shield}_rotated.png";
-			$data->content[] = $this->addImageRelative($shield, $currentShip->x, $currentShip->y, $currentShip->angle);
+			$data->content[] = $this->addImageRelative('s'.$currentShip->id.'s', $shield, $currentShip->x, $currentShip->y, $currentShip->angle);
 		}
 	}
 
@@ -214,7 +222,7 @@ class Mapdrawercanvas {
 	 * In the game, the Y coordinate grows from bottom to top, but in the png sprite the 0,0 is at top, so we switch the Y coordinate
 	 */
 	private function remapY($value) {
-		$y = array(0=>2,1=>1,2=>0);
+		$y = array(-1=>3,0=>2,1=>1,2=>0,3=>-1);
 		return isset($y[$value])?$y[$value]:-1;
 	}
 
@@ -224,7 +232,7 @@ class Mapdrawercanvas {
 
 		$angle = ($specialAngle ? $mainShip->angle : ($mainShip->angle-45));
 
-		$data->content[] = $this->addImage($radar, 0, 0, $angle);
+		//$data->content[] = $this->addImage($radar, 0, 0, $angle);
 	}
 
 	/**
@@ -241,7 +249,7 @@ class Mapdrawercanvas {
 
 			$image = "/imgs/map/m_{$type}.png";
 
-			$data->content[] = $this->addImageRelative($image, $mineral->x, $mineral->y);
+			$data->content[] = $this->addImageRelative('m'.$mineral->id, $image, $mineral->x, $mineral->y);
 		}
 	}
 
@@ -257,7 +265,7 @@ class Mapdrawercanvas {
 		}
 
 		foreach ($asteroids as $astr) {
-			$data->content[] = $this->addImageRelative($asteroid, $astr->x, $astr->y);
+			$data->content[] = $this->addImageRelative($astr->id, $asteroid, $astr->x, $astr->y);
 			if ($target != null && $astr->x == $target->x && $astr->y == $target->y) {
 				$this->addTargetMarker($base, $this->mainShip, $target->x, $target->y);
 			}
@@ -290,13 +298,13 @@ class Mapdrawercanvas {
 
 			$power = "/imgs/map/pu_{$rarity}_{$type}.png";
 
-			$data->content[] = $this->addImageRelative($power, $pwr->x, $pwr->y);
+			$data->content[] = $this->addImageRelative('p'.$pwr->id, $power, $pwr->x, $pwr->y);
 		}
 	}
 
 	private function addTargetMarker(&$data, $mainShip, $x, $y) {
 		$target_symbol = "/imgs/map/target.png";
-		$data->content[] = $this->addImageRelative($target_symbol, $x, $y);
+		$data->content[] = $this->addImageRelative('tl', $target_symbol, $x, $y);
 	}
 
 	/**
@@ -353,7 +361,7 @@ class Mapdrawercanvas {
 		}
 
 		if ($target_symbol != null) {
-			$data->content[] = $this->addImage($target_symbol, $x, $y, $angle);
+			$data->content[] = $this->addImage('tl', $target_symbol, $x, $y, $angle);
 		}
 	}
 
@@ -380,7 +388,7 @@ class Mapdrawercanvas {
 			}
 
 			if ($target_symbol != null) {
-				$data->content[] = $this->addImage($target_symbol, $x, $y);
+				$data->content[] = $this->addImage('ml', $target_symbol, $x, $y);
 			}
 		}
 	}
@@ -395,7 +403,7 @@ class Mapdrawercanvas {
 				$parts = explode('-', $key);
 				if ($value > 4) $value = 5;
 				$count = "/imgs/map/count{$value}.png";
-				$data->content[] = $this->addImageRelative($count, $parts[0], $parts[1]);
+				$data->content[] = $this->addImageRelative('c', $count, $parts[0], $parts[1]);
 			}
 		}
 	}
@@ -404,7 +412,7 @@ class Mapdrawercanvas {
 		
 		$explosion = "/imgs/map/self_destruction.png";
 
-		$data->content[] = $this->addImage('/imgs/map/background.png');
+		//$data->content[] = $this->addImage('/imgs/map/background.png');
 	}
 
 	/**
@@ -432,10 +440,11 @@ class Mapdrawercanvas {
 			);
 
 		$this->CI->load->model('Asteroids');
-		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 1);
+		$asteroids = $this->CI->Asteroids->get_asteroids_nearby($mainShip, 2);
 		if (is_array($asteroids)) {
 			foreach ($asteroids as $asteroid) {
 				$data['as'][] = array(
+					'id' => $asteroid->id,
 					'x' => $asteroid->x,
 					'y' => $asteroid->y
 				);
@@ -443,7 +452,7 @@ class Mapdrawercanvas {
 		}
 
 		$this->CI->load->model('Ships');
-		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip);
+		$ships = $this->CI->Ships->get_target_lock_candidates($mainShip, 2);
 
 		if (is_array($ships)) {
 			foreach ($ships as $ship) {
@@ -477,10 +486,11 @@ class Mapdrawercanvas {
 		}
 
 		$this->CI->load->model('Powerups');
-		$powerups = $this->CI->Powerups->get_powerups_nearby($mainShip, 1);
+		$powerups = $this->CI->Powerups->get_powerups_nearby($mainShip, 2);
 		if (is_array($powerups)) {
 			foreach ($powerups as $powerup) {
 				$data['pu'][] = array(
+					'id' => $powerup->id,
 					'rarity' => $powerup->rarity,
 					'type' => $powerup->type,
 					'x' => $powerup->x,
@@ -491,10 +501,11 @@ class Mapdrawercanvas {
 
 
 		$this->CI->load->model('Minerals');
-		$minerals = $this->CI->Minerals->get_minerals_nearby($mainShip, 1);
+		$minerals = $this->CI->Minerals->get_minerals_nearby($mainShip, 2);
 		if (is_array($minerals)) {
 			foreach ($minerals as $mineral) {
 				$data['m'][] = array(
+					'id' => $mineral->id,
 					'type' => $mineral->type,
 					'x' => $mineral->x,
 					'y' => $mineral->y
@@ -522,11 +533,8 @@ class Mapdrawercanvas {
 			if ($value->hidden) {
 				unset($data->os[$key]);
 			} else {
-				unset($data->os[$key]->angle);
 				unset($data->os[$key]->model);
 				unset($data->os[$key]->max_shield);
-				unset($data->os[$key]->x);
-				unset($data->os[$key]->y);
 			}
 		}
 
