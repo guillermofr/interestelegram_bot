@@ -15,7 +15,7 @@ class Pickup {
 		$this->CI =& get_instance();
 	}
 
-	public function pickUp($ship=null)
+	public function pick($ship=null)
 	{
 		if ($ship == null) return;
 		$powerups = $this->_pickUpPowerups($ship);
