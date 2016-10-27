@@ -20,6 +20,7 @@ class Cron extends CI_Controller {
 	 */
 	public function index()
 	{
+		echo "done";
 		$this->moveAsteroids();
 		$this->addPowerups();
 		$this->addMinerals();
