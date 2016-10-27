@@ -241,7 +241,7 @@ class Ships extends MY_Model
 
     public function kill($ship = null){
         if ($ship == null) return null;
-        $this->update_ship(array( 'active' => 0, 'chat_id' => 0 ), $ship->id);
+        $this->update_ship(array( 'active' => 0 ), $ship->id);
         $this->clear_targeted($ship);
     }
 }
