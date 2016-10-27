@@ -78,7 +78,7 @@ class Mapdrawercanvas {
 						$this->addShip($data, $ship);
 					}
 				}
-				if ($ship->id == $mainShip->target) $target = $ship;
+				if ($ship->id == $mainShip->target && $this->distance($ship, $mainShip) < 2) $target = $ship;
 			}
 		}
 		
@@ -532,6 +532,8 @@ class Mapdrawercanvas {
 		foreach ($data->os as $key => $value) {
 			if ($value->hidden) {
 				unset($data->os[$key]);
+			} else if ($this->distance($value, $this->mainShip) >= 2) {
+				unset($data->os[$key]);
 			} else {
 				unset($data->os[$key]->model);
 				unset($data->os[$key]->max_shield);
@@ -539,5 +541,13 @@ class Mapdrawercanvas {
 		}
 
 		return $data;
+	}
+
+	public function distance($elementA, $elementB) {
+		$xA = isset($elementA->x) ? $elementA->x : 0;
+		$yA = isset($elementA->y) ? $elementA->y : 0;
+		$xB = isset($elementB->x) ? $elementB->x : 0;
+		$yB = isset($elementB->y) ? $elementB->y : 0;
+		return round (sqrt( pow($xA - $xB, 2) + pow($yA - $yB, 2) ),1);
 	}
 }
