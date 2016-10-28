@@ -46,7 +46,7 @@ class Welcome extends CI_Controller {
 	public function canvas(){
 		$this->load->library('Mapdrawercanvas');
 		$this->load->model('Ships');
-		$ship = $this->Ships->get(1);
+		$ship = $this->Ships->get(4);
 		$data = $this->mapdrawercanvas->generateShipMap($ship);
 
 		$this->load->view('canvas', array(
