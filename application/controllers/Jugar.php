@@ -41,7 +41,7 @@ class Jugar extends CI_Controller {
 		if ($this->bitauth->logged_in()){
 			$data['logueado'] = $this->bitauth->logged_in();
 			$data['user'] = ($data['logueado'])?$this->bitauth->get_user_by_id($this->bitauth->user_id):false;
-			//echo "<pre>";print_r($data);
+            $data['user_id'] = $this->bitauth->user_id;
 
 			$this->load->library('Mapdrawercanvas');
 			$this->load->model('Ships');
@@ -50,26 +50,21 @@ class Jugar extends CI_Controller {
 
 			if ($ship){
 
-				if ($ship->health == 0) {
-				//if is dead 
-					//show dead message
-					$data['dead'] = true;
-
-				} 
+				if ($ship->health == 0) $data['dead'] = true;
 				$mapdata = $this->mapdrawercanvas->generateShipMap($ship);
 				$data['data'] = json_encode($mapdata);
 
 			} 
 
-			$this->twig->display('jugar.twig',$data);
-
-
+			echo $this->twig->render('jugar.twig',$data);
 
 		} else {
+
 			$data = array('type' => '');
 			$data['logueado'] = $this->bitauth->logged_in();
 			$data['user'] = ($data['logueado'])?$this->bitauth->get_user_by_id($this->bitauth->user_id):false;
 			echo $this->twig->render('jugar.twig',$data);
+
 		}
 
     }

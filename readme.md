@@ -25,6 +25,10 @@ Monta un virtual host, por ejemplo:
 </VirtualHost>
 ```
 
+Instalar rabbitmq-server (si tienes ubuntu 12.04 sigue estos pasos: https://coderwall.com/p/rbahzg/installing-rabbitmq-in-ubuntu-12-04-lts)
+Instalar nodejs 5.0+
+Instala librerías vendor de composer ( "composer install" en el root del proyecto )
+
 #Pruebas
 
 Navega a 
@@ -42,6 +46,15 @@ He mantenido el código viejo, cuando reemplazaba algún controlador o librería
 *Mapdrawercanvas*
 
 Genera el array de imagenes y posiciones que tiene que representar el canvas respecto a la nave del jugador principal.
+
+*RabbitConnector*
+
+Capa de comunicación con rabbitmq, funciones básicas para poder establecer la comunicación como queramos.
+La configuración de la librería se puede encontrar en /config/rabbitmq.php
+
+*Communications*
+
+Capa de comunicación entre core de interestelegram con clientes socket.io, hace uso de RabbitConnector.
 
 * Tipos de naves
 
@@ -70,3 +83,14 @@ La idea es que Action recibe los post, y luego delega cada tipo de acción a una
 *canvas*
 
 La vista canvas lleva el javascript necesario para dibujar el mapa. Además lleva un evento click genérico para hacer post a un atributo data-action que llevan los botones y dibujar el nuevo mapa que llega como respuesta.
+
+##Servicios
+
+*socket server*
+
+Se ha añadido un servidor nodejs con express y socket.io para establecer conexión con los clientes web y node.
+El servidor de node tiene un consumidor de Rabbitmq, que coge los mensajes enviados a la cola por el core de PHP.
+La configuración de la librería ampq se encuentra en /socket_server/config.
+Es necesario instalar los paquetes necesarios ("npm install" desde /socket_server )
+Ejecutar el servidor de node con "node index.js" desde /socket_server.
+- falta añadir un forever para el servidor de node

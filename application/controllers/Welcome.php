@@ -1,6 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
 class Welcome extends CI_Controller {
 
 	function __construct()
@@ -53,6 +56,5 @@ class Welcome extends CI_Controller {
 				'data' => $data
 			));
 	}
-
 
 }

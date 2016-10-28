@@ -59,3 +59,5 @@ $route['contact'] = 'welcome/contact';
 $route['ranking'] = 'welcome/ranking';
 $route['canvas'] = 'welcome/canvas';
 $route['jugar'] = 'jugar';
+$route['sockettest'] = 'welcome/sockettest';
+$route['sockettest_client'] = 'welcome/sockettest_client';

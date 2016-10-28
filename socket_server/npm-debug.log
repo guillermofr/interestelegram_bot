@@ -1,0 +1,77 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node',
+1 verbose cli   '/usr/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   '--save',
+1 verbose cli   'socket-io-client' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.38
+4 verbose node symlink /usr/bin/node
+5 warn package.json socket_server@1.0.0 No description
+6 warn package.json socket_server@1.0.0 No repository field.
+7 warn package.json socket_server@1.0.0 No README data
+8 verbose readDependencies using package.json deps
+9 verbose cache add [ 'socket-io-client', null ]
+10 verbose cache add name=undefined spec="socket-io-client" args=["socket-io-client",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: null,
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'socket-io-client',
+11 verbose parsed url   path: 'socket-io-client',
+11 verbose parsed url   href: 'socket-io-client' }
+12 silly lockFile f36adbae-socket-io-client socket-io-client
+13 verbose lock socket-io-client /home/vagrant/.npm/f36adbae-socket-io-client.lock
+14 silly lockFile f36adbae-socket-io-client socket-io-client
+15 silly lockFile f36adbae-socket-io-client socket-io-client
+16 verbose addNamed [ 'socket-io-client', '' ]
+17 verbose addNamed [ null, '*' ]
+18 silly lockFile b70baeaf-socket-io-client socket-io-client@
+19 verbose lock socket-io-client@ /home/vagrant/.npm/b70baeaf-socket-io-client.lock
+20 silly addNameRange { name: 'socket-io-client', range: '*', hasData: false }
+21 verbose request where is /socket-io-client
+22 verbose request registry https://registry.npmjs.org/
+23 verbose request id 62085fd6e575bfe1
+24 verbose url raw /socket-io-client
+25 verbose url resolving [ 'https://registry.npmjs.org/', './socket-io-client' ]
+26 verbose url resolved https://registry.npmjs.org/socket-io-client
+27 verbose request where is https://registry.npmjs.org/socket-io-client
+28 info trying registry request attempt 1 at 12:41:22
+29 http GET https://registry.npmjs.org/socket-io-client
+30 http 404 https://registry.npmjs.org/socket-io-client
+31 silly registry.get cb [ 404,
+31 silly registry.get   { 'content-type': 'application/json',
+31 silly registry.get     'cache-control': 'max-age=0',
+31 silly registry.get     'content-length': '2',
+31 silly registry.get     'accept-ranges': 'bytes',
+31 silly registry.get     date: 'Tue, 25 Oct 2016 12:41:23 GMT',
+31 silly registry.get     via: '1.1 varnish',
+31 silly registry.get     age: '0',
+31 silly registry.get     connection: 'keep-alive',
+31 silly registry.get     'x-served-by': 'cache-lhr6321-LHR',
+31 silly registry.get     'x-cache': 'MISS',
+31 silly registry.get     'x-cache-hits': '0',
+31 silly registry.get     'x-timer': 'S1477399283.190787,VS0,VE170',
+31 silly registry.get     vary: 'Accept-Encoding' } ]
+32 silly lockFile b70baeaf-socket-io-client socket-io-client@
+33 silly lockFile b70baeaf-socket-io-client socket-io-client@
+34 error 404 Not Found
+34 error 404
+34 error 404 'socket-io-client' is not in the npm registry.
+34 error 404 You should bug the author to publish it
+34 error 404 It was specified as a dependency of 'socket_server'
+34 error 404
+34 error 404 Note that you can also install from a
+34 error 404 tarball, folder, or http url, or git url.
+35 error System Linux 3.2.0-79-generic-pae
+36 error command "/usr/bin/node" "/usr/bin/npm" "install" "--save" "socket-io-client"
+37 error cwd /personal/interestelegram_bot/socket_server
+38 error node -v v0.10.38
+39 error npm -v 1.4.28
+40 error code E404
+41 verbose exit [ 1, true ]

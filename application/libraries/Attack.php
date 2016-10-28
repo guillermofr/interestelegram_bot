@@ -15,6 +15,7 @@ class Attack {
 		$this->CI =& get_instance();
 		$this->CI->load->model(array('Ships', 'Asteroids'));
 		$this->CI->load->library('Calculations');
+		$this->CI->load->library('notifications');
 	}
 
 	public function attackShip($ship=null, $target=null, $strength=1)
@@ -45,11 +46,14 @@ class Attack {
 			if ($targetShip->health == 0) {
 				$output[] = sprintf(_('Hemos destruído a la %s !!!'), $targetShip->name);
 				$this->CI->Ships->kill($targetShip);
+				$this->CI->notifications->destroyedBy( $targetShip->captain, $ship->name );
 			} else {
 				$output[] = sprintf(_('Hemos impactado a %s (%s escudo, %s casco restantes).'), $targetShip->name, $targetShip->shield, $targetShip->health);
+				$this->CI->notifications->underAttack( $targetShip->captain, $ship->name );
 			}
 		} else {
 			$output[] = sprintf(_('El ataque a %s ha fallado (%s escudo, %s casco restantes).'), $targetShip->name, $targetShip->shield, $targetShip->health);
+			$this->CI->notifications->dodgedAttach( $targetShip->captain, $ship->name );
 		}
 
 		return $output;

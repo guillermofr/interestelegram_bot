@@ -1,5 +1,27 @@
 {% extends 'layout.twig' %}
 
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="/assets/css/csshake.min.css">
+	<style type="text/css">
+		canvas {
+			transition: all 1s;
+		}
+		canvas.under_attack {
+
+		}
+		canvas.impact {
+			border : 2px solid red;
+			box-shadow: 0 0 10px red;
+		}
+		canvas.targeted {
+			border : 2px solid gold;
+			box-shadow: 0 0 10px gold;
+		}
+		canvas.destroyed {
+			display : none;
+		}
+	</style>
+{% endblock %}
 
 {% block content %}
 
@@ -22,23 +44,29 @@
 
 				<div class="container">
 				
-						<canvas id="canvas" width="300" height="300" style="margin-top:40px;border: 2px solid #5e3f6b;background: #5e3f6b;" ></canvas>
-				    <div style="width:500px; margin: 20px auto; text-align: center;">
-				        <button class="control" value="izquierda" data-action="/action/move/left" >Izquierda</button>
-				        <button class="control" value="recto" data-action="/action/move/forward" >Recto</button>
-				        <button class="control" value="derecha" data-action="/action/move/right" >Derecha</button>
-				        <button class="control" value="giro" data-action="/action/move/turn" >Giro</button>
-				        <button class="control" value="attack" data-action="/action/attack" >Atacar</button>
-				    </div>
+					<div id="hud">
+						<canvas id="canvas" class="shake-constant" width="300" height="300" style="margin-top:40px;border: 2px solid #5e3f6b;background: #5e3f6b;" ></canvas>
+					    <div id="hud_controls" style="width:500px; margin: 20px auto; text-align: center;">
+					        <button class="control" value="izquierda" data-action="/action/move/left" >Izquierda</button>
+					        <button class="control" value="recto" data-action="/action/move/forward" >Recto</button>
+					        <button class="control" value="derecha" data-action="/action/move/right" >Derecha</button>
+					        <button class="control" value="giro" data-action="/action/move/turn" >Giro</button>
+					        <button class="control" value="attack" data-action="/action/attack" >Atacar</button>
+					    </div>
+					</div>
 				    <div id="target" style="width:500px; margin: 20px auto; text-align: center;">
 				        
 				    </div>
 				    <div id="log" style="width:500px; margin: 20px auto; text-align: left; font-family: monospace; font-size: 12px; color: #FFF;">
 
 				    </div>
+
+    				<script src="http://www.inter.es:30000/socket.io/socket.io.js"></script>
 				    <script type="text/javascript">
 				        var INTER = {};
 				        INTER.canvas = {
+				        	hud : document.getElementById('hud'),
+				        	hud_controls : document.getElementById('hud_controls'),
 				            canvas : document.getElementById('canvas'),
 				            context : canvas.getContext('2d'),
 				            content : {
@@ -52,7 +80,7 @@
 				                        function(response){
 				                        	console.log(response);
 				                        	if (response.data.hasOwnProperty('dead')){
-				                        		window.location = '/jugar';
+				                        		window.location.href = '/jugar';
 				                        	}
 				                            INTER.canvas.update(response.map.content);
 				                            INTER.canvas.log(typeof response.data.messages != 'undefined' ? response.data.messages : []);
@@ -96,10 +124,10 @@
 				                INTER.canvas.context.translate( - (positionX + image.width/2), - (positionY + image.height/2) );
 				            },
 				            log: function(messages) {
-				                $('#log').html('');
+				                //$('#log').html('');
 				                if (messages == null) return;
 				                for (var i = 0; i < messages.length; i++) {
-				                    $('#log').append('<p>' + messages[i] + '</p>');
+				                    $('#log').prepend('<p>' + messages[i] + '</p>');
 				                }
 				            },
 				            targets: function(ships) {
@@ -113,10 +141,165 @@
 				        INTER.canvas.update(data.content);
 				        INTER.canvas.targets(typeof data.os != 'undefined' ? data.os : []);
 
+				        /* Communications layer */
+				        var user_id = {{user_id}};
+				        INTER.communications = {
+				            socket : null,
+				            init : function(){
+				                INTER.communications.socket = io('http://www.inter.es:30000');
+				                INTER.communications.socket.on('connect', INTER.communications.connect);
+				                INTER.communications.socket.on('client_message', INTER.communications.message_recieved);
+				            },
+				            connect : function(){
+				                console.log('Connected', INTER.communications.socket.id, user_id);
+				                INTER.communications.socket.emit('identify', { id : user_id });
+				            },
+				            message_recieved : function(data){
+				                console.log('message recived', data);
+
+				                if ( 'undefined' !== typeof data.action ) {
+				                	if ( 'undefined' !== typeof INTER.responseActions[data.action] ) {
+				                		INTER.responseActions[data.action](data);
+				                	} else {
+				                		console.log('undefined action');
+				                		alert('message recieved, '+ data.action +' action is undefined');
+				                	}
+				                } else {
+				                	alert('message recieved that is not an action');
+				                }
+				            }
+				        };
+				        /* Communication responses actions layer */
+				        INTER.responseActions = {
+				        	under_attack : function(data){
+				        		INTER.canvas.log(['Estamos siendo atacados por ' + data.from]);
+				        		INTER.canvas.canvas.classList.add('under_attack');
+				        		INTER.canvas.canvas.classList.add('shake-chunk');
+				        		INTER.canvas.canvas.classList.add('impact');
+								setTimeout(function(){
+				        			INTER.canvas.canvas.classList.remove('shake-chunk');
+				        			INTER.canvas.canvas.classList.remove('under_attack');
+				        			INTER.canvas.canvas.classList.remove('impact');
+				        		}, 2000);
+				        		INTER.mediaPlayer.playAudio('/assets/sounds/under_attack.mp3', function(){
+				        			INTER.mediaPlayer.playAudio('/assets/sounds/impact.mp3');
+				        		});
+				        	},
+				        	destroyed : function(data){
+				        		INTER.canvas.log(['Hemos sido destruidos por ' + data.from]);
+				        		INTER.canvas.canvas.classList.add('shake-hard');
+				        		INTER.canvas.canvas.classList.add('destroyed');
+				        		INTER.mediaPlayer.playAudio('/assets/sounds/destroyed.mp3');
+				        		setTimeout(function(){
+				        			INTER.canvas.canvas.classList.remove('shake-little');
+				        			alert('Hemos sido destruidos por ' + data.from);
+				        			document.location.href = 'http://www.inter.es/jugar';
+				        		}, 3000);
+				        	},
+				        	locked_as_target : function(data){
+				        		INTER.canvas.log(['Somos el objetivo de ' + data.from]);
+				        		INTER.canvas.canvas.classList.add('shake-little');
+				        		INTER.canvas.canvas.classList.add('targeted');
+				        		INTER.mediaPlayer.playAudio('/assets/sounds/targetted.mp3');
+				        		setTimeout(function(){
+				        			INTER.canvas.canvas.classList.remove('shake-little');
+				        			INTER.canvas.canvas.classList.remove('targeted');
+				        		}, 2000);
+				        	},
+				        	dodged_attack : function(data){
+				        		INTER.canvas.log(['PUFF! por los pelos, hemos esquivado un ataque de ' + data.from]);
+				        		INTER.canvas.canvas.classList.add('shake-opacity');
+				        		INTER.canvas.canvas.classList.add('under_attack');
+				        		INTER.mediaPlayer.playAudio('/assets/sounds/dodge.mp3');
+								setTimeout(function(){
+				        			INTER.canvas.canvas.classList.remove('shake-opacity');
+				        			INTER.canvas.canvas.classList.remove('under_attack');
+				        		}, 2000);
+				        	},
+				        	announcement : function(data){
+				        		INTER.canvas.log(['GLOBAL ANNOUNCEMENT: ' + data.message]);
+				        	},
+				        	gandalf : function(){
+				        		var gandalf = document.createElement('div');
+				        		gandalf.innerHTML = '<iframe width="560" height="315" src="https://www.youtube.com/embed/FRBh2ftywLM?rel=0&autoplay=1&controls=0&loop=1&playlist=FRBh2ftywLM&showinfo=0" frameborder="0" allowfullscreen></iframe>';
+				        		INTER.canvas.hud.parentNode.replaceChild(gandalf, INTER.canvas.hud);
+			        		},
+			        		gandalflocal : function(){
+			        			INTER.mediaPlayer.playVideo('/assets/videos/gandalfsax.mov', {
+			        				loop : true,
+			        				onStart : function(video){
+			        					INTER.canvas.hud.parentNode.replaceChild(video, INTER.canvas.hud);
+			        				}
+			        			});
+			        		},
+			        		gandalffull : function(){
+				        		INTER.mediaPlayer.playVideo('/assets/videos/gandalfsax.mov', {
+			        				loop : true,
+			        				onStart : function(video){
+			        					var body = document.getElementsByTagName("BODY")[0];
+			        					//body.innerHTML = '';
+			        					body.appendChild(video);
+			        					video.style.width = "auto";
+			        					video.style.height = "auto";
+			        					video.style.position = "fixed";
+			        					video.style.right = 0;
+			        					video.style.bottom = 0;
+			        					video.style['min-width'] = "100%";
+			        					video.style['min-height'] = "100%";
+			        					if ( video.clientWidth > window.innerWidth ) video.style.left = ( ( window.innerWidth - video.clientWidth ) / 2 ) + 'px';
+			        					window.addEventListener('resize', function(){
+			        						if ( video.clientWidth > window.innerWidth ) video.style.left = ( ( window.innerWidth - video.clientWidth ) / 2 ) + 'px';
+			        					});
+			        				}
+			        			});
+			        		}
+				        };
+
+				        /* Inter media */
+				        INTER.mediaPlayer = {
+				        	play : function(type, src, opt, cb){
+				        		if ('undefined' === typeof cb && 'function' === typeof opt) { cb = opt; opt = {}; }
+				        		else if ('undefined' === typeof opt) 
+				        			opt = { numTimes : 1,
+					        				loop : false,
+					        				onStart : null,
+					        				onProgress : null };
+				        		/* Test loop playing, play N times and other kind of stuff */
+				        		var times = 0;
+				        		var media = document.createElement(type);
+				        		media.loop = opt.loop;
+				        		media.addEventListener('progress', function(e){
+				        			e.preventDefault();
+				        			if ('function' === typeof opt.onProgress) opt.onProgress(e. media);
+				        		});
+				        		media.addEventListener('canplay', function(e){ 
+				        			e.preventDefault(); 
+				        			media.play(); 
+				        			if ('function' === typeof opt.onStart) opt.onStart(media);
+				        		});
+				        		media.addEventListener('ended', function(e){ 
+				        			e.preventDefault(); 
+				        			times++;
+				        			if ( opt.loop && times < numTimes ) {
+
+				        			} else {
+					        			media.src=''; 
+					        			media = null; 
+					        			if( 'function' === typeof cb ) cb();
+				        			}
+				        		});
+				        		media.src = src;
+				        		media.load();
+				        	},
+				        	playAudio : function(src, opt, cb){ INTER.mediaPlayer.play('audio', src, opt, cb); },
+				        	playVideo : function(src, opt, cb){ INTER.mediaPlayer.play('video', src, opt, cb); }
+				        }
+
 				    </script>
 				    <script>
 				    $.fn.ready(function(){
 				        INTER.canvas.bind_controls();
+        				INTER.communications.init();
 				    });
 				    </script>
 
