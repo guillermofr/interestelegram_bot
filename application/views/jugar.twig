@@ -46,7 +46,7 @@
 
 					<script src="/assets/js/ocanvas-2.8.6.min.js" type="text/javascript"></script>
                     <div id="hud">
-						<canvas id="canvas" width="300" height="300" style="margin-top:40px;border: 2px solid #5e3f6b;background: #5e3f6b;" ></canvas>
+						<canvas id="canvas" class="shake-constant" width="300" height="300" style="margin-top:40px;border: 2px solid #5e3f6b;background: #5e3f6b;" ></canvas>
     				    <div id="hud_controls" style="width:500px; margin: 20px auto; text-align: center;">
     				        <button class="control" value="izquierda" data-action="/action/move/left" >Izquierda</button>
     				        <button class="control" value="recto" data-action="/action/move/forward" >Recto</button>
@@ -69,6 +69,7 @@
                         INTER.canvas = {
                             hud : document.getElementById('hud'),
                             hud_controls : document.getElementById('hud_controls'),
+                            canvasDom : document.getElementById('canvas'),
                             canvas : oCanvas.create({
                                 canvas: "#canvas",
                                 background: "#222",
@@ -305,13 +306,13 @@
 				        INTER.responseActions = {
 				        	under_attack : function(data){
 				        		INTER.canvas.log(['Estamos siendo atacados por ' + data.from]);
-				        		INTER.canvas.canvas.classList.add('under_attack');
-				        		INTER.canvas.canvas.classList.add('shake-chunk');
-				        		INTER.canvas.canvas.classList.add('impact');
+				        		INTER.canvas.canvasDom.classList.add('under_attack');
+				        		INTER.canvas.canvasDom.classList.add('shake-chunk');
+				        		INTER.canvas.canvasDom.classList.add('impact');
 								setTimeout(function(){
-				        			INTER.canvas.canvas.classList.remove('shake-chunk');
-				        			INTER.canvas.canvas.classList.remove('under_attack');
-				        			INTER.canvas.canvas.classList.remove('impact');
+				        			INTER.canvas.canvasDom.classList.remove('shake-chunk');
+				        			INTER.canvas.canvasDom.classList.remove('under_attack');
+				        			INTER.canvas.canvasDom.classList.remove('impact');
 				        		}, 2000);
 				        		INTER.mediaPlayer.playAudio('/assets/sounds/under_attack.mp3', function(){
 				        			INTER.mediaPlayer.playAudio('/assets/sounds/impact.mp3');
@@ -319,33 +320,33 @@
 				        	},
 				        	destroyed : function(data){
 				        		INTER.canvas.log(['Hemos sido destruidos por ' + data.from]);
-				        		INTER.canvas.canvas.classList.add('shake-hard');
-				        		INTER.canvas.canvas.classList.add('destroyed');
+				        		INTER.canvas.canvasDom.classList.add('shake-hard');
+				        		INTER.canvas.canvasDom.classList.add('destroyed');
 				        		INTER.mediaPlayer.playAudio('/assets/sounds/destroyed.mp3');
 				        		setTimeout(function(){
-				        			INTER.canvas.canvas.classList.remove('shake-little');
+				        			INTER.canvas.canvasDom.classList.remove('shake-little');
 				        			alert('Hemos sido destruidos por ' + data.from);
 				        			document.location.href = 'http://www.inter.es/jugar';
 				        		}, 3000);
 				        	},
 				        	locked_as_target : function(data){
 				        		INTER.canvas.log(['Somos el objetivo de ' + data.from]);
-				        		INTER.canvas.canvas.classList.add('shake-little');
-				        		INTER.canvas.canvas.classList.add('targeted');
+				        		INTER.canvas.canvasDom.classList.add('shake-little');
+				        		INTER.canvas.canvasDom.classList.add('targeted');
 				        		INTER.mediaPlayer.playAudio('/assets/sounds/targetted.mp3');
 				        		setTimeout(function(){
-				        			INTER.canvas.canvas.classList.remove('shake-little');
-				        			INTER.canvas.canvas.classList.remove('targeted');
+				        			INTER.canvas.canvasDom.classList.remove('shake-little');
+				        			INTER.canvas.canvasDom.classList.remove('targeted');
 				        		}, 2000);
 				        	},
 				        	dodged_attack : function(data){
 				        		INTER.canvas.log(['PUFF! por los pelos, hemos esquivado un ataque de ' + data.from]);
-				        		INTER.canvas.canvas.classList.add('shake-opacity');
-				        		INTER.canvas.canvas.classList.add('under_attack');
+				        		INTER.canvas.canvasDom.classList.add('shake-opacity');
+				        		INTER.canvas.canvasDom.classList.add('under_attack');
 				        		INTER.mediaPlayer.playAudio('/assets/sounds/dodge.mp3');
 								setTimeout(function(){
-				        			INTER.canvas.canvas.classList.remove('shake-opacity');
-				        			INTER.canvas.canvas.classList.remove('under_attack');
+				        			INTER.canvas.canvasDom.classList.remove('shake-opacity');
+				        			INTER.canvas.canvasDom.classList.remove('under_attack');
 				        		}, 2000);
 				        	},
 				        	announcement : function(data){
