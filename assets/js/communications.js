@@ -1,4 +1,5 @@
 if ( 'undefined' === typeof INTER ) INTER = {};
+
 INTER.communications = (function($, io, IMP){
     
     "use strict";
@@ -42,6 +43,8 @@ INTER.communications = (function($, io, IMP){
         }
     };
     /* Communication responses actions layer */
+    // Change this definition with the response of a service
+    // The service should give the full list of response actions programmed by the people.
     var responseActions = {
         under_attack : function(data){
             dom.canvas.classList.add('under_attack');

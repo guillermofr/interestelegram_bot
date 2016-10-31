@@ -1,0 +1,17 @@
+canvas {
+    transition: all 1s;
+}
+canvas.under_attack {
+
+}
+canvas.impact {
+    border : 2px solid red;
+    box-shadow: 0 0 10px red;
+}
+canvas.targeted {
+    border : 2px solid gold;
+    box-shadow: 0 0 10px gold;
+}
+canvas.destroyed {
+    display : none;
+}

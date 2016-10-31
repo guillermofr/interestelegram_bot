@@ -1,5 +1,5 @@
-
 if ( 'undefined' === typeof INTER ) INTER = {};
+
 INTER.mediaPlayer = (function($){
     
     "use strict";
