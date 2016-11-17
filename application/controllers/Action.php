@@ -13,7 +13,12 @@ class Action extends CI_Controller
             $this->load->library('Mapdrawercanvas');
             $this->load->library('Movement');
             $this->load->model('Ships');
-            $this->ship = $this->Ships->get_ship_by_chat_id($this->bitauth->user_id);
+	    if (isset($this->bitauth->user_id)) {
+               $this->ship = $this->Ships->get_ship_by_chat_id($this->bitauth->user_id);
+            } else {
+               return;
+            }
+
         }
 
         public function index()
